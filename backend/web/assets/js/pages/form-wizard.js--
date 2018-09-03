@@ -1,0 +1,344 @@
+var baseUrl = $('#base_url').val();
+var create_project_response = '';
+
+$( document ).ready(function() {
+	
+    var form = $("#create-project-form");
+    var validator = $("#create-project-form").validate({
+        errorPlacement: function errorPlacement(error, element) { element.after(error); },
+        rules: {
+            confirm: {
+                equalTo: "#password"
+            }
+        }
+    });
+	
+    form.children("div").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "fade",
+        onStepChanging: function (event, currentIndex, newIndex)
+        {
+			if(form.valid()){
+				if(newIndex == 0){
+					$('[role=menu] li').first().css( "display", "none" );
+				}else{
+					$('[role=menu] li').first().removeAttr("style");
+				}
+			}
+            form.validate().settings.ignore = ":disabled,:hidden";
+            return form.valid();
+        },
+        onFinishing: function (event, currentIndex)
+        {
+            form.validate().settings.ignore = ":disabled";
+            return form.valid();
+        },
+        onFinished: function (event, currentIndex)
+        {	
+			var project_form_data = $(form).serialize();
+			
+			$.ajax({
+				type: "POST",
+				url: baseUrl + 'site/create-new-project',
+				data: project_form_data,
+				success: function (result) {
+					
+					if(result == "success")
+					{
+						$(form).trigger("reset");
+						//$(form).replaceWith("<p>Congratulations! You have successfully created new project</p>");
+						$(".project-success-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/current-projects';
+						 }, 2000 );
+						
+					}
+				}
+			});
+        }
+    });
+	
+	var update_form = $("#update-project-form");
+    var update_validator = $("#update-project-form").validate({
+        errorPlacement: function errorPlacement(error, element) { element.after(error); },
+        rules: {
+            confirm: {
+                equalTo: "#password"
+            }
+        }
+    });
+	
+    update_form.children("div").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "fade",
+        onStepChanging: function (event, currentIndex, newIndex)
+        {
+			if(update_form.valid()){
+				if(newIndex == 0){
+					$('[role=menu] li').first().css( "display", "none" );
+				}else{
+					$('[role=menu] li').first().removeAttr("style");
+				}
+			}
+            update_form.validate().settings.ignore = ":disabled,:hidden";
+            return update_form.valid();
+        },
+        onFinishing: function (event, currentIndex)
+        {
+            update_form.validate().settings.ignore = ":disabled";
+            return update_form.valid();
+        },
+        onFinished: function (event, currentIndex)
+        {	
+			var project_form_data = $(update_form).serialize();
+			
+			$.ajax({
+				type: "POST",
+				url: baseUrl + 'site/update-project',
+				data: project_form_data,
+				success: function (result) {
+					
+					if(result == "success")
+					{	
+						// $(update_form).trigger("reset");
+						$(".project-update-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/current-projects';
+						 }, 2000 );
+						
+					}
+				}
+			});
+        }
+    });
+	
+	var template_form = $("#create-template-form");
+    var template_validator = $("#create-template-form").validate({
+        errorPlacement: function errorPlacement(error, element) { element.after(error); },
+        rules: {
+            confirm: {
+                equalTo: "#password"
+            }
+        }
+    });
+	
+    template_form.children("div").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "fade",
+        onStepChanging: function (event, currentIndex, newIndex)
+        {
+			if(template_form.valid()){
+				if(newIndex == 0){
+					$('[role=menu] li').first().css( "display", "none" );
+				}else{
+					$('[role=menu] li').first().removeAttr("style");
+				}
+			}
+            template_form.validate().settings.ignore = ":disabled,:hidden";
+            return template_form.valid();
+        },
+        onFinishing: function (event, currentIndex)
+        {
+            template_form.validate().settings.ignore = ":disabled";
+            return template_form.valid();
+        },
+        onFinished: function (event, currentIndex)
+        {	
+			var template_form_data = $(template_form).serialize();
+			
+			$.ajax({
+				type: "POST",
+				url: baseUrl + 'site/create-template',
+				data: template_form_data,
+				success: function (result) {
+					
+					if(result == "success")
+					{	
+						// $(update_form).trigger("reset");
+						$(".template-success-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/manage-templates';
+						 }, 2000 );
+						
+					}
+				}
+			});
+        }
+    });
+	
+	
+	var update_template_form = $("#update-template-form");
+    var update_template_validator = $("#update-template-form").validate({
+        errorPlacement: function errorPlacement(error, element) { element.after(error); },
+        rules: {
+            confirm: {
+                equalTo: "#password"
+            }
+        }
+    });
+	
+    update_template_form.children("div").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "fade",
+        onStepChanging: function (event, currentIndex, newIndex)
+        {
+			if(update_template_form.valid()){
+				if(newIndex == 0){
+					$('[role=menu] li').first().css( "display", "none" );
+				}else{
+					$('[role=menu] li').first().removeAttr("style");
+				}
+			}
+            update_template_form.validate().settings.ignore = ":disabled,:hidden";
+            return update_template_form.valid();
+        },
+        onFinishing: function (event, currentIndex)
+        {
+            update_template_form.validate().settings.ignore = ":disabled";
+            return update_template_form.valid();
+        },
+        onFinished: function (event, currentIndex)
+        {	
+			var project_form_data = $(update_template_form).serialize();
+			
+			$.ajax({
+				type: "POST",
+				url: baseUrl + 'site/update-template',
+				data: project_form_data,
+				success: function (result) {
+					
+					if(result == "success")
+					{	
+						// $(update_form).trigger("reset");
+						$(".template-update-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/manage-templates';
+						 }, 2000 );
+						
+					}
+				}
+			});
+        }
+    });
+	
+	
+	var report = $("#generate-report-form");
+    var report_validator = $("#generate-report-form").validate({
+        errorPlacement: function errorPlacement(error, element) { element.after(error); },
+        rules: {
+            confirm: {
+                equalTo: "#password"
+            }
+        }
+    });
+	
+    report.children("div").steps({
+        headerTag: "h3",
+        bodyTag: "section",
+        transitionEffect: "fade",
+        onStepChanging: function (event, currentIndex, newIndex)
+        {
+			if(report.valid()){
+				/* console.log('currentIndex: '+ currentIndex);
+				console.log('newIndex: '+ newIndex);
+				console.log('style: '+$('#report-div-3').css( "display")); */
+				
+				
+				if(newIndex == 0){
+					$('[role=menu] li').first().css( "display", "none" );
+				}else{
+					$('[role=menu] li').first().removeAttr("style");
+				}
+				
+				if(newIndex == 6 || newIndex == 4){
+					if(newIndex == 6){
+						if($('input[name="GenerateReport[IsTimeline]"]:checked').val() == "1"){
+						
+							if($('#report-div-3').css( "display") == 'block' || $('#show-email-me').css( "display") == 'block'){
+								$('.actions').show();
+							}else{
+								$('.actions').hide();
+							}
+						}
+					}
+					if(newIndex == 4){
+						console.log($('input[name="GenerateReport[IsTimeline]"]:checked').val());
+						if($('input[name="GenerateReport[IsTimeline]"]:checked').val() == "0" || $('input[name="GenerateReport[IsTimeline]"]:checked').val() == undefined){
+						
+							if($('#report-div-3').css( "display") == 'block' || $('#show-email-me').css( "display") == 'block'){
+								$('.actions').show();
+							}else{
+								$('.actions').hide();
+							}
+						}
+					}
+				}else{
+					$('.actions').show();
+				}
+			}
+            report.validate().settings.ignore = ":disabled,:hidden";
+            return report.valid();
+        },
+        onFinishing: function (event, currentIndex)
+        {
+            report.validate().settings.ignore = ":disabled";
+            return report.valid();
+        },
+        onFinished: function (event, currentIndex)
+        {	
+			//var report_data = $(report).serialize();
+			var report_data = new FormData(report.get(0));
+			
+			$.ajax({
+				type: "POST",
+				url: baseUrl + 'report/generate-report',
+				data: report_data,
+				cache: false,
+				contentType: false,
+				processData: false,
+				success: function (result) {
+					
+					var resp = JSON.parse(result);
+					
+					if(resp.status == "success"){
+					
+						window.location.href = baseUrl+'report/download?f=pdf/report_file_'+resp.report_id+'.pdf';
+						$(report).trigger("reset");
+						$(".report-success-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/current-projects';
+						}, 2000 );
+					}
+					if(resp.stat == "success")
+					{
+						$(report).trigger("reset");
+						$(".report-success-sweetalert").trigger("click");
+						window.setTimeout( function(){
+							 window.location = baseUrl + 'site/current-projects';
+						 }, 2000 );
+					}
+				}
+			});
+        }
+    });
+	
+    $(".wizard .actions ul li a").addClass("waves-effect waves-blue btn-flat");
+    $(".wizard .steps ul").addClass("tabs z-depth-1");
+    $(".wizard .steps ul li").addClass("tab");
+    $('ul.tabs').tabs();
+    $('select').material_select();
+    $('.select-wrapper.initialized').prev( "ul" ).remove();
+    $('.select-wrapper.initialized').prev( "input" ).remove();
+    $('.select-wrapper.initialized').prev( "span" ).remove();
+    $('.datepicker').pickadate({
+        format: 'yyyy-mm-dd',
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15 // Creates a dropdown of 15 years to control year
+    });
+});
+
+

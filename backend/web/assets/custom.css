@@ -1,0 +1,495 @@
+/* Write your custom CSS here */
+img#place-icon {
+    display: none;
+}
+.select-wrapper span.caret {
+    color: #ffffff;
+    font-size: 10px;
+    position: absolute;
+    right: 0;
+    top: 16px;
+}
+.select-wrapper {
+    line-height: normal !important;
+    margin-top: 10px;
+    position: relative;
+}
+.select-wrapper .dropdown-content.select-dropdown {
+    width: 100% !important;
+}
+/*.left.col.m3.hide-on-small-and-down.header-select{
+	margin-left:70px;
+}*/
+.sidebar-profile-image	{
+    width: 60px;
+    display: inline-block;
+    position: relative;
+}
+.profile-notificatin {
+    position: absolute;
+    top: 10px;
+    left: 6px;
+    min-width: 1px!important;
+    line-height: 1.5;
+    background: #ff8f00;
+    border-radius: 100%;
+    font-size: 12px;
+    color: #fff;
+    width: 18px;
+    height: 18px;
+    text-align: center;
+    padding: 0;
+}
+.select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
+    border-color: transparent;
+}
+.with-border .select-wrapper input.select-dropdown{
+    border-color: #000;
+}
+.with-border .select-wrapper .caret{
+    color: #000;
+}
+
+.with-border .select-wrapper{
+    margin-top: -20px;
+}
+.navbar-fixed .header-title {
+    margin-left: 0;
+}
+.profile-notificatin:hover {
+    background-color: #ff8f00;
+}
+tr.activity {
+    font-weight: bold;
+	color: black;
+}
+tr.dismiss {
+    text-decoration: line-through;
+}
+.row.action-class {
+    margin: 0px;
+    width: 200px;
+}
+.wizard .actions{
+    text-align: center;
+}
+#add-role-html .btn-floating{
+    width: 23px;
+    height: 23px;
+}
+
+#add-role-html .btn-floating i{
+    line-height: 23px;
+}
+span.project-label {
+    font-weight: bold;
+    font-size: 14px;
+    margin-right: 15px;
+}
+span.project-value {
+    font-size: 15px;
+}
+input#empty {
+    border-bottom: none;
+    box-shadow: none;
+    height: 0px;
+}
+td.go-to-project, td.go-to-contact {
+    cursor: pointer;
+}
+
+/** pages css **/
+.add-contact {
+    float: right;
+    margin-right: 11px;
+    padding-left: 15px;
+    padding-right: 29px;
+}   
+.circles{float:left; width:100%;margin-top:20px;}
+.checkboxes{    float: left;
+                width: 100%;
+                margin-top: 20px;}
+.checkboxes label {
+    margin-right: 10px;
+    padding-left: 20px;
+}
+label.container {
+    position: relative;
+    margin-right:50px;
+    cursor: pointer;
+    font-size: 22px;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+/* Hide the browser's default radio button */
+label.container input {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+}
+
+/* Create a custom radio button */
+.checkmark {
+    position: absolute;
+    top: 0;
+    left: 0;
+    height: 30px;
+    width: 30px;
+    background-color: #eee;
+    border-radius: 50%;
+    padding-left: 7px;
+}
+
+/* When the radio button is checked, add a blue background */
+label.container input ~ .checkmarkblue {
+    background-color: blue;
+}
+label.container input ~ .checkmarkgreen {
+    background-color: green;
+}
+label.container input ~ .checkmarkyellow {
+    background-color: yellow;
+}
+label.container input ~ .checkmarkorange {
+    background-color: orange;
+}
+label.container input ~ .checkmarkred {
+    background-color: red;
+}
+label.container input ~ .checkmarkpurple {
+    background-color: purple;
+}
+
+/* Create the indicator (the dot/circle - hidden when not checked) */
+.checkmark:after {
+    content: "\2713";
+    position: absolute;
+    display: none;
+}
+
+/* Show the indicator (dot/circle) when checked */
+label.container input:checked ~ .checkmark:after {
+    display: block;
+}
+
+/* Style the indicator (dot/circle) */
+label.container .checkmark:after {
+    top: 0px;
+    left: 7px;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+}
+
+#peoplebox label {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    text-align: center;
+    border: 1px solid #ddd;
+    line-height: 30px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    cursor: pointer;
+    padding-right: 10px;
+}
+
+#pagesbox label {
+    display: inline-block;
+    width: auto;
+    height: auto;
+    text-align: center;
+    border: 1px solid #ddd;
+    line-height: 30px;
+    margin-bottom: 5px;
+    padding-left: 10px;
+    cursor: pointer;
+    padding-right: 10px;
+}
+
+#peoplebox label:before {
+    content: "\2713";
+    position: absolute;
+    display: none;
+}
+
+#pagesbox label:before {
+    content: "\2713";
+    position: absolute;
+    display: none;
+}
+#all:checked ~ label[for="all"],#none:checked ~ label[for="none"] {
+    background: lightskyblue;
+    color: #ffffff;
+}
+
+#pageall:checked ~ label[for="pageall"],#pagenone:checked ~ label[for="pagenone"] {
+    background: lightskyblue;
+    color: #ffffff;
+}
+#peoplebox{    margin-top: 20px;
+               float: left;
+               width: 100%;}
+#pagesbox{    margin-top: 20px;
+              float: left;
+              width: 100%;}
+.box{
+    display:none;
+    margin-top: 20px;
+    float: left;
+    width: 100%;
+}
+.ftext{float:right; width:90%;}
+.showSingle{cursor: pointer;}
+
+#post_list tr{cursor: move;}
+#post_list tr td{cursor: move;}
+#post_list tr.ui-state-highlight {
+    background-color: #eaecec;
+    border: 1px dotted #ccc;
+    cursor: move;
+}
+
+
+.savedcolor{border-radius: 50%;
+            position: absolute;
+            height:30px;
+            width:30px;
+            margin-left:10px;
+            margin-top:-5px;}    
+
+
+/** end pages **/
+
+/** chat **/
+
+.login_form {
+    border: 1px solid #AAA;
+    padding:10px;
+}
+h3 {margin-top:3px;}
+.chat_main {
+    border:1px solid #AAA;
+    -moz-box-shadow:0 0 10px #ccc;
+    -webkit-box-shadow: 0 0 10px #ccc;
+    width:auto;
+    padding:10px;
+    background:#f3f3f3;
+    overflow: auto;
+    height: 300px;
+}
+.message {
+    border:1px solid #AAA;
+    margin:4px;
+    padding:15px;
+   
+    -moz-border-radius:7px;
+    -webkit-border-radius:7px;
+    background:#ffffff;
+}
+.textf {
+    -moz-box-shadow:0 0 10px #CCCCCC;
+    -webkit-box-shadow:0 0 10px #CCCCCC;
+    border:1px solid #CCCCCC;
+    height:40px;
+}
+.submit {
+    -moz-border-radius:7px;
+    -webkit-border-radius:7px;
+    background:#F3F3F3;
+    border:1px solid #CCCCCC;
+    font-size:16px;
+    font-weight:bold;
+    height:35px;
+    margin-left:10px;
+    padding:5px;
+}
+.message span {
+    font-size:10px;
+    color:#888;
+    margin-left:10px;
+}
+.submit_form {
+    margin:10px 0px;
+}
+
+.boxz {
+    /* padding-right: 30px; */
+    float: left;
+    width: 100%;
+    padding: 10px;
+}
+
+.alert {
+    padding: 15px;
+    margin-bottom: 10px;
+    margin-top: 5px;
+    border: 1px solid transparent;
+    border-radius: 4px;
+    float: left;
+    width: 100%;
+}
+
+.alert-danger {
+  color: #a94442;
+  background-color: #f2dede;
+  border-color: #ebccd1;
+}
+.alert-danger hr {
+  border-top-color: #e4b9c0;
+}
+.alert-danger .alert-link {
+  color: #843534;
+}
+
+.content-row{
+    padding: 15px 4px;
+    border-bottom: 1px solid #c1c1c1;
+}
+.main-content {
+    height: 400px;
+    overflow: auto;
+}
+
+table#data-table {
+    overflow: auto;
+}
+
+table#current-project{
+        margin: 0 auto;
+        width: 100%;
+        clear: both;
+        border-collapse: collapse;
+        table-layout: fixed; // ***********add this
+        word-wrap:break-word; // ***********and this
+		 vertical-align: top;
+    }
+#timeline_list td {
+    word-wrap: break-word;
+	 vertical-align: top;
+}
+#contacts_list td {
+    word-wrap: break-word;
+    vertical-align: top;
+}
+
+form.del-page {
+    float: right;
+    margin-right: 11px;
+}
+#timeline_list tr{cursor: move;}
+#timeline_list tr td{cursor: move;}
+#timeline_list tr.ui-state-highlight {
+    background-color: #eaecec;
+    border: 1px dotted #ccc;
+    cursor: move;
+}
+
+#documents_list tr{cursor: move;}
+#documents_list tr td{cursor: move;}
+#documents_list tr.ui-state-highlight {
+    background-color: #eaecec;
+    border: 1px dotted #ccc;
+    cursor: move;
+}
+
+.wPaint-theme-classic .wPaint-menu-holder{width:40px;}
+
+img.redflag {
+    width: 30px;
+    height: 30px;
+    margin-left: 35px;
+}
+
+.rolesall a {
+    border: 1px solid black;
+    padding: 15px;
+    float: left;
+    width: 100%;
+    margin-bottom: 10px;
+}
+
+span.cross {
+    float: right;
+}
+
+#post_list td {
+    word-wrap: break-word;
+	 vertical-align: top;
+}
+
+#documents_list td {
+    word-wrap: break-word;
+	 vertical-align: top;
+}
+
+.multistep-heading{
+ text-align: center;
+}
+
+#post_list a {
+    margin: 2px;
+}
+
+#contacts_list a {
+    margin: 2px;
+}
+
+.col.s12.m12.l6.leftlist {
+    float: left;
+    width: 25%;
+}
+.targetthreaddiv {
+    float: left;
+    width: 100%;
+}
+h5.heading {
+    float: left;
+    width: 100%;
+    margin-left: 10px;
+}
+
+ul.right.col.s9.m3.nav-right-menu.setting {
+    /* float: left; */
+    /* margin-left: 94px; */
+    width: 100%;
+    margin-top: -70px;
+}
+
+.search-result-container .row {
+     margin-bottom: 0px!important;
+}
+
+/** end chat **/
+
+@media only screen and (max-width:400px){
+	.nav-right-menu {
+		margin-right: -25.25px;
+	}	
+}
+@media (min-width: 768px) and (max-width: 1312px) {
+	.btn-resp {
+		padding: 0em 0.7em;
+	}
+}
+@media (min-width: 992px) and (max-width: 1440px) {
+	table#data-table {
+		display: block;
+	}
+}
+@media only screen and (max-width: 320px){
+	.btn-resp {
+		padding: 0em 0.8em;
+	}	
+}
+
+@media (min-width: 993px) and (max-width: 1438px) {
+	.card-resp {
+		margin-left: 16.6666666667% !important;
+		width: 30em !important;
+	}
+}
+
