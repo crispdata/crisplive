@@ -12590,3 +12590,517 @@ $_SERVER = [
     'REQUEST_TIME_FLOAT' => 1549282159.236
     'REQUEST_TIME' => 1549282159
 ]
+2019-02-04 12:19:03 [172.69.134.127][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.69.134.127
+    in /var/www/html/backend/views/layouts/main.php:41
+    in /var/www/html/backend/controllers/SiteController.php:1212
+2019-02-04 12:19:03 [172.69.134.127][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.69.134.127
+2019-02-04 12:19:03 [172.69.134.127][3][-][info][application] $_GET = [
+    'id' => '335'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd4139a2e1282fa4db5e928dea8ee5bf1a1547184610'
+    '_ga' => 'GA1.3.1190037080.1548927807'
+    'advanced-backend' => 'm5h1604tku69lnmtqmmou2nvj0'
+    '_identity-backend' => 'c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[3,\"AgiEaNVNa4bxK2KipphR-KtFznI3CVXS\",2592000]\";}'
+    '_csrf-backend' => '190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    '__id' => 3
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1556daf3a9de-SIN'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_REFERER' => 'https://crispdata.co.in/admin/index.php/site/tenders'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d4139a2e1282fa4db5e928dea8ee5bf1a1547184610; _ga=GA1.3.1190037080.1548927807; advanced-backend=m5h1604tku69lnmtqmmou2nvj0; _identity-backend=c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B3%2C%22AgiEaNVNa4bxK2KipphR-KtFznI3CVXS%22%2C2592000%5D%22%3B%7D; _csrf-backend=190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '172.69.134.127'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '47972'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=335'
+    'REQUEST_URI' => '/admin/index.php/site/create-tender?id=335'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/create-tender'
+    'PATH_TRANSLATED' => '/var/www/html/site/create-tender'
+    'PHP_SELF' => '/admin/index.php/site/create-tender'
+    'REQUEST_TIME_FLOAT' => 1549282743.206
+    'REQUEST_TIME' => 1549282743
+]
+2019-02-04 12:19:48 [172.69.134.67][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.69.134.67
+    in /var/www/html/backend/views/layouts/main.php:41
+    in /var/www/html/backend/controllers/SiteController.php:1394
+2019-02-04 12:19:48 [172.69.134.67][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.69.134.67
+2019-02-04 12:19:48 [172.69.134.67][3][-][info][application] $_GET = [
+    'id' => '335'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd4139a2e1282fa4db5e928dea8ee5bf1a1547184610'
+    '_ga' => 'GA1.3.1190037080.1548927807'
+    'advanced-backend' => 'm5h1604tku69lnmtqmmou2nvj0'
+    '_identity-backend' => 'c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[3,\"AgiEaNVNa4bxK2KipphR-KtFznI3CVXS\",2592000]\";}'
+    '_csrf-backend' => '190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    '__id' => 3
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1670c955c34c-SIN'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_REFERER' => 'https://crispdata.co.in/admin/index.php/site/tenders'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d4139a2e1282fa4db5e928dea8ee5bf1a1547184610; _ga=GA1.3.1190037080.1548927807; advanced-backend=m5h1604tku69lnmtqmmou2nvj0; _identity-backend=c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B3%2C%22AgiEaNVNa4bxK2KipphR-KtFznI3CVXS%22%2C2592000%5D%22%3B%7D; _csrf-backend=190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '172.69.134.67'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '51672'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=335'
+    'REQUEST_URI' => '/admin/index.php/site/create-item?id=335'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/create-item'
+    'PATH_TRANSLATED' => '/var/www/html/site/create-item'
+    'PHP_SELF' => '/admin/index.php/site/create-item'
+    'REQUEST_TIME_FLOAT' => 1549282788.333
+    'REQUEST_TIME' => 1549282788
+]
+2019-02-04 12:23:16 [162.158.166.51][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 162.158.166.51
+2019-02-04 12:23:16 [162.158.166.51][3][-][info][application] $_GET = []
+
+$_POST = [
+    '_csrf-backend' => '9DUU-7FnxoTuqxXbwWVDwtUH6QQFF0JQJFCDAwWmkBi6eW284V-v1ILCT5KxNHabjWOHW0ZPFBRLNsh3VsXBTw=='
+    'tender_id' => '335'
+    'tenderone' => '1'
+    'tendertwo' => '1'
+    'tenderthree' => '1'
+    'tenderfour' => '1'
+    'tenderfive' => '2'
+    'tendersix' => '1'
+    'makes' => [
+        0 => '10'
+        1 => '11'
+        2 => '13'
+        3 => '18'
+        4 => '24'
+        5 => '26'
+        6 => '265'
+    ]
+    'itemtender' => [
+        0 => '23.00'
+        1 => '24.00'
+        2 => '25.00'
+        3 => '26.00'
+    ]
+    'desc' => [
+        0 => '14'
+        1 => '16'
+        2 => '20'
+        3 => '13'
+    ]
+    'core' => [
+        0 => '4'
+        1 => '2'
+        2 => '4'
+        3 => '4'
+    ]
+    'type' => [
+        0 => '1'
+    ]
+    'text' => [
+        0 => '12'
+    ]
+    'units' => [
+        0 => 'RM'
+        1 => 'RM'
+        2 => 'RM'
+        3 => 'RM'
+    ]
+    'quantity' => [
+        0 => '100'
+        1 => '150'
+        2 => '60'
+        3 => '50'
+    ]
+    'makeid' => [
+        0 => ''
+        1 => ''
+        2 => ''
+        3 => ''
+    ]
+    'makeids' => [
+        0 => stdClass#1
+        (
+            [key] => 0
+            [value] => '10'
+        )
+        1 => stdClass#2
+        (
+            [key] => 0
+            [value] => '11'
+        )
+        2 => stdClass#3
+        (
+            [key] => 0
+            [value] => '13'
+        )
+        3 => stdClass#4
+        (
+            [key] => 0
+            [value] => '18'
+        )
+        4 => stdClass#5
+        (
+            [key] => 0
+            [value] => '24'
+        )
+        5 => stdClass#6
+        (
+            [key] => 0
+            [value] => '26'
+        )
+        6 => stdClass#7
+        (
+            [key] => 0
+            [value] => '265'
+        )
+    ]
+    'submit' => 'Submit'
+]
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd4139a2e1282fa4db5e928dea8ee5bf1a1547184610'
+    '_ga' => 'GA1.3.1190037080.1548927807'
+    'advanced-backend' => 'm5h1604tku69lnmtqmmou2nvj0'
+    '_identity-backend' => 'c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[3,\"AgiEaNVNa4bxK2KipphR-KtFznI3CVXS\",2592000]\";}'
+    '_csrf-backend' => '190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW\";}'
+]
+
+$_SESSION = [
+    '__flash' => [
+        'success' => -1
+    ]
+    '__id' => 3
+    'success' => 'Item successfully added'
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1b85df6ec31f-SIN'
+    'CONTENT_LENGTH' => '1075'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_ORIGIN' => 'https://crispdata.co.in'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'CONTENT_TYPE' => 'application/x-www-form-urlencoded'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_REFERER' => 'https://crispdata.co.in/admin/index.php/site/create-item?id=335'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d4139a2e1282fa4db5e928dea8ee5bf1a1547184610; _ga=GA1.3.1190037080.1548927807; advanced-backend=m5h1604tku69lnmtqmmou2nvj0; _identity-backend=c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B3%2C%22AgiEaNVNa4bxK2KipphR-KtFznI3CVXS%22%2C2592000%5D%22%3B%7D; _csrf-backend=190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '162.158.166.51'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '54948'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'POST'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/admin/index.php/site/create-item'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/create-item'
+    'PATH_TRANSLATED' => '/var/www/html/site/create-item'
+    'PHP_SELF' => '/admin/index.php/site/create-item'
+    'REQUEST_TIME_FLOAT' => 1549282996.486
+    'REQUEST_TIME' => 1549282996
+]
+2019-02-04 12:23:17 [162.158.166.51][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 162.158.166.51
+    in /var/www/html/backend/views/layouts/main.php:41
+    in /var/www/html/backend/controllers/SiteController.php:1394
+2019-02-04 12:23:17 [162.158.166.51][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 162.158.166.51
+2019-02-04 12:23:17 [162.158.166.51][3][-][info][application] $_GET = [
+    'id' => '335'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd4139a2e1282fa4db5e928dea8ee5bf1a1547184610'
+    '_ga' => 'GA1.3.1190037080.1548927807'
+    'advanced-backend' => 'm5h1604tku69lnmtqmmou2nvj0'
+    '_identity-backend' => 'c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[3,\"AgiEaNVNa4bxK2KipphR-KtFznI3CVXS\",2592000]\";}'
+    '_csrf-backend' => '190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW\";}'
+]
+
+$_SESSION = [
+    '__flash' => [
+        'success' => 1
+    ]
+    '__id' => 3
+    'success' => 'Item successfully added'
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1b8acf71c31f-SIN'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d4139a2e1282fa4db5e928dea8ee5bf1a1547184610; _ga=GA1.3.1190037080.1548927807; advanced-backend=m5h1604tku69lnmtqmmou2nvj0; _identity-backend=c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B3%2C%22AgiEaNVNa4bxK2KipphR-KtFznI3CVXS%22%2C2592000%5D%22%3B%7D; _csrf-backend=190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '162.158.166.51'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '56196'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=335'
+    'REQUEST_URI' => '/admin/index.php/site/create-item?id=335'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/create-item'
+    'PATH_TRANSLATED' => '/var/www/html/site/create-item'
+    'PHP_SELF' => '/admin/index.php/site/create-item'
+    'REQUEST_TIME_FLOAT' => 1549282997.278
+    'REQUEST_TIME' => 1549282997
+]
+2019-02-04 12:23:44 [172.68.146.54][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.68.146.54
+    in /var/www/html/backend/views/layouts/main.php:41
+    in /var/www/html/backend/controllers/SiteController.php:2419
+2019-02-04 12:23:44 [172.68.146.54][3][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.68.146.54
+2019-02-04 12:23:44 [172.68.146.54][3][-][info][application] $_GET = [
+    'id' => '335'
+]
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd4139a2e1282fa4db5e928dea8ee5bf1a1547184610'
+    '_ga' => 'GA1.3.1190037080.1548927807'
+    'advanced-backend' => 'm5h1604tku69lnmtqmmou2nvj0'
+    '_identity-backend' => 'c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[3,\"AgiEaNVNa4bxK2KipphR-KtFznI3CVXS\",2592000]\";}'
+    '_csrf-backend' => '190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    '__id' => 3
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1c37ae7daa20-SIN'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_REFERER' => 'https://crispdata.co.in/admin/index.php/site/create-item?id=335'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d4139a2e1282fa4db5e928dea8ee5bf1a1547184610; _ga=GA1.3.1190037080.1548927807; advanced-backend=m5h1604tku69lnmtqmmou2nvj0; _identity-backend=c33fdd176a49c66da9c29409c69005e65d57729834a28ce29b8eda1aaef830c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B3%2C%22AgiEaNVNa4bxK2KipphR-KtFznI3CVXS%22%2C2592000%5D%22%3B%7D; _csrf-backend=190e3353c86333704b69bf10f0f7575c38d88351da3adad6b104112d943e1801a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22NLyGP8iPliZIpQ5YXdn_CXVDofKtScQW%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '172.68.146.54'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '50948'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => 'id=335'
+    'REQUEST_URI' => '/admin/index.php/site/view-items?id=335'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/view-items'
+    'PATH_TRANSLATED' => '/var/www/html/site/view-items'
+    'PHP_SELF' => '/admin/index.php/site/view-items'
+    'REQUEST_TIME_FLOAT' => 1549283024.936
+    'REQUEST_TIME' => 1549283024
+]
+2019-02-04 12:24:28 [172.68.146.192][2][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.68.146.192
+    in /var/www/html/backend/views/layouts/main.php:41
+    in /var/www/html/backend/controllers/SiteController.php:152
+2019-02-04 12:24:28 [172.68.146.192][2][-][warning][yii\debug\Module::checkAccess] Access to debugger is denied due to IP address restriction. The requesting IP address is 172.68.146.192
+2019-02-04 12:24:28 [172.68.146.192][2][-][info][application] $_GET = []
+
+$_POST = []
+
+$_FILES = []
+
+$_COOKIE = [
+    '__cfduid' => 'd51ec4e3a15b77e10855b8cd639eda0291536004295'
+    '_csrf-frontend' => 'e1195d8050dde863a50db3f2133111e949b4dc8d8c27a4154523850b39c93a88a:2:{i:0;s:14:\"_csrf-frontend\";i:1;s:32:\"NgVT8gmD_SkBZZaoyA5JrVUBvOZr-tru\";}'
+    'advanced-frontend' => '6mfbjkr13cq6tn5bgbho8qo3f7'
+    'PHPSESSID' => '5ct5mp73oeea5d6q2ud13eq2m4'
+    '_ga' => 'GA1.3.1586892476.1548926047'
+    '_gid' => 'GA1.3.2035856422.1549258451'
+    'advanced-backend' => '8juvpr8i87r0upre28qpo4f627'
+    '_identity-backend' => '52013fb89264748d622688ac84436d08dc28870970507c1fb12b8e72956444c7a:2:{i:0;s:17:\"_identity-backend\";i:1;s:46:\"[2,\"xQ24y9FKKFqZDZS5QL71UU7KJWN-aKnM\",2592000]\";}'
+    '_csrf-backend' => 'ff94dd726f66f881f8f583fde4a6ac1c0b63b662b3782d278f8bd4e23f5aa0c1a:2:{i:0;s:13:\"_csrf-backend\";i:1;s:32:\"SR2-Osrtj23hfYYu-oSDHgdAa24AI5z4\";}'
+]
+
+$_SESSION = [
+    '__flash' => []
+    '__id' => 2
+]
+
+$_SERVER = [
+    'HTTP_HOST' => 'crispdata.co.in'
+    'HTTP_CONNECTION' => 'Keep-Alive'
+    'HTTP_ACCEPT_ENCODING' => 'gzip'
+    'HTTP_CF_IPCOUNTRY' => 'IN'
+    'HTTP_X_FORWARDED_FOR' => '171.61.217.175'
+    'HTTP_CF_RAY' => '4a3d1d485e27a9de-SIN'
+    'HTTP_X_FORWARDED_PROTO' => 'https'
+    'HTTP_CF_VISITOR' => '{\"scheme\":\"https\"}'
+    'HTTP_CACHE_CONTROL' => 'max-age=0'
+    'HTTP_UPGRADE_INSECURE_REQUESTS' => '1'
+    'HTTP_USER_AGENT' => 'Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36'
+    'HTTP_ACCEPT' => 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8'
+    'HTTP_REFERER' => 'https://crispdata.co.in/admin/index.php/site/tenders'
+    'HTTP_ACCEPT_LANGUAGE' => 'en-US,en;q=0.9'
+    'HTTP_COOKIE' => '__cfduid=d51ec4e3a15b77e10855b8cd639eda0291536004295; _csrf-frontend=e1195d8050dde863a50db3f2133111e949b4dc8d8c27a4154523850b39c93a88a%3A2%3A%7Bi%3A0%3Bs%3A14%3A%22_csrf-frontend%22%3Bi%3A1%3Bs%3A32%3A%22NgVT8gmD_SkBZZaoyA5JrVUBvOZr-tru%22%3B%7D; advanced-frontend=6mfbjkr13cq6tn5bgbho8qo3f7; PHPSESSID=5ct5mp73oeea5d6q2ud13eq2m4; _ga=GA1.3.1586892476.1548926047; _gid=GA1.3.2035856422.1549258451; advanced-backend=8juvpr8i87r0upre28qpo4f627; _identity-backend=52013fb89264748d622688ac84436d08dc28870970507c1fb12b8e72956444c7a%3A2%3A%7Bi%3A0%3Bs%3A17%3A%22_identity-backend%22%3Bi%3A1%3Bs%3A46%3A%22%5B2%2C%22xQ24y9FKKFqZDZS5QL71UU7KJWN-aKnM%22%2C2592000%5D%22%3B%7D; _csrf-backend=ff94dd726f66f881f8f583fde4a6ac1c0b63b662b3782d278f8bd4e23f5aa0c1a%3A2%3A%7Bi%3A0%3Bs%3A13%3A%22_csrf-backend%22%3Bi%3A1%3Bs%3A32%3A%22SR2-Osrtj23hfYYu-oSDHgdAa24AI5z4%22%3B%7D'
+    'HTTP_CF_CONNECTING_IP' => '171.61.217.175'
+    'HTTP_CDN_LOOP' => 'cloudflare'
+    'PATH' => '/sbin:/usr/sbin:/bin:/usr/bin'
+    'SERVER_SIGNATURE' => ''
+    'SERVER_SOFTWARE' => 'Apache/2.4.34 (Amazon) PHP/7.0.33'
+    'SERVER_NAME' => 'crispdata.co.in'
+    'SERVER_ADDR' => '172.31.18.120'
+    'SERVER_PORT' => '80'
+    'REMOTE_ADDR' => '172.68.146.192'
+    'DOCUMENT_ROOT' => '/var/www/html'
+    'REQUEST_SCHEME' => 'http'
+    'CONTEXT_PREFIX' => ''
+    'CONTEXT_DOCUMENT_ROOT' => '/var/www/html'
+    'SERVER_ADMIN' => 'root@localhost'
+    'SCRIPT_FILENAME' => '/var/www/html/admin/index.php'
+    'REMOTE_PORT' => '46536'
+    'GATEWAY_INTERFACE' => 'CGI/1.1'
+    'SERVER_PROTOCOL' => 'HTTP/1.1'
+    'REQUEST_METHOD' => 'GET'
+    'QUERY_STRING' => ''
+    'REQUEST_URI' => '/admin/index.php/site/dealers'
+    'SCRIPT_NAME' => '/admin/index.php'
+    'PATH_INFO' => '/site/dealers'
+    'PATH_TRANSLATED' => '/var/www/html/site/dealers'
+    'PHP_SELF' => '/admin/index.php/site/dealers'
+    'REQUEST_TIME_FLOAT' => 1549283068.569
+    'REQUEST_TIME' => 1549283068
+]
