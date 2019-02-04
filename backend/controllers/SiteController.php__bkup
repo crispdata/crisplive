@@ -1,0 +1,1045 @@
+<?php
+
+namespace backend\controllers;
+
+use Yii;
+use yii\web\Session;
+use yii\web\Controller;
+use yii\filters\VerbFilter;
+use yii\filters\AccessControl;
+use common\models\LoginForm;
+use yii\helpers\ArrayHelper;
+use common\models\ItemTodo;
+use common\models\PageItem;
+use common\models\User;
+use common\models\Page;
+use common\models\Role;
+use common\models\Project;
+use common\models\Report;
+use common\models\ProjectPage;
+use common\models\Template;
+use common\models\DismissTime;
+use common\models\TemplatePage;
+use common\models\TemplateRole;
+use common\models\ItemPage;
+use common\models\Setting;
+use common\models\Contact;
+use common\models\Recentchanges;
+use backend\models\CreateProject;
+use backend\models\CreateTemplate;
+use backend\models\UpdateProject;
+use backend\models\UpdateTemplate;
+use frontend\models\PasswordResetRequestForm;
+use frontend\models\ResetPasswordForm;
+use frontend\models\SignupForm;
+use yii\db\Query;
+use yii\db\ActiveQuery;
+
+/**
+ * Site controller
+ */
+class SiteController extends Controller {
+
+    /**
+     * {@inheritdoc}
+     */
+    public function behaviors() {
+        return [
+            'access' => [
+                'class' => AccessControl::className(),
+                'rules' => [
+                    [
+                        'actions' => ['login', 'signup', 'request-password-reset', 'reset-password', 'error'],
+                        'allow' => true,
+                    ],
+                    [
+                        'actions' => ['logout', 'index', 'tenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'makes', 'create-make', 'delete-make', 'getmakes', 'delete-item', 'edit-item', 'json', 'approvetender'],
+                        'allow' => true,
+                        'roles' => ['@'],
+                    ],
+                ],
+            ],
+            'verbs' => [
+                'class' => VerbFilter::className(),
+                'actions' => [
+                // 'logout' => ['post'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function actions() {
+        return [
+            'error' => [
+                'class' => 'yii\web\ErrorAction',
+            ],
+        ];
+    }
+
+    /**
+     * Displays homepage.
+     *
+     * @return string
+     */
+    public function actionIndex() {
+        $user = Yii::$app->user->identity;
+        $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->orderBy(['itemdetails.id' => SORT_DESC])->all();
+        $tenders = \common\models\Tender::find()->where(['>=', 'bid_end_date', date('d-m-Y')])->orderBy('bid_end_date', SORT_ASC)->all();
+        return $this->render('index', [
+                    'tenders' => $tenders,
+                    'items' => $idetails
+        ]);
+    }
+
+    public function actionEditprofile() {
+        $userid = @$_POST['uid'];
+        $contactid = @$_POST['cid'];
+        $allowed_image_extension = array(
+            "png",
+            "jpg",
+            "jpeg"
+        );
+        if ($userid) {
+            if (isset($_POST['password']) && $_POST['password'] != '') {
+                $hashpass = \Yii::$app->security->generatePasswordHash($_POST['password']);
+                $data = ['username' => $_POST['username'], 'email' => $_POST['email'], 'password_hash' => $hashpass, 'password' => $_POST['password']];
+            } else {
+                $data = ['username' => $_POST['username'], 'email' => $_POST['email']];
+            }
+
+            if (isset($_FILES['LogoImage']['name']) && $_FILES['LogoImage']['name'] != '') {
+                $file_extension = pathinfo($_FILES["LogoImage"]["name"], PATHINFO_EXTENSION);
+                $logo_target = 'uploads/profile_logo_' . time() . $userid . '.' . pathinfo($_FILES['LogoImage']['name'], PATHINFO_EXTENSION);
+                if (in_array($file_extension, $allowed_image_extension)) {
+                    if (move_uploaded_file($_FILES["LogoImage"]["tmp_name"], $logo_target)) {
+                        $data['Logo'] = $logo_target;
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', "Upload valid images. Only PNG,JPG and JPEG are allowed.");
+                    return $this->redirect(array('site/editprofile'));
+                }
+            }
+            $querydata = \Yii::$app
+                    ->db
+                    ->createCommand()
+                    ->update('tbluser', $data, 'UserId = ' . $userid . '')
+                    ->execute();
+            if ($querydata) {
+                Yii::$app->session->setFlash('success', "Profile has been updated");
+            } else {
+                Yii::$app->session->setFlash('error', "Profile has not been updated");
+            }
+            return $this->redirect(array('site/editprofile'));
+        } elseif ($contactid) {
+            if (isset($_POST['password']) && $_POST['password'] != '') {
+                $hashpass = \Yii::$app->security->generatePasswordHash($_POST['password']);
+                $data = $_POST['CreateContact'];
+                $data['password_hash'] = $hashpass;
+                $data['password'] = $_POST['password'];
+            } else {
+                $data = $_POST['CreateContact'];
+            }
+
+            if (isset($_FILES['LogoImage']['name']) && $_FILES['LogoImage']['name'] != '') {
+                $file_extension = pathinfo($_FILES["LogoImage"]["name"], PATHINFO_EXTENSION);
+                $logo_target = 'uploads/profile_logo_' . time() . $contactid . '.' . pathinfo($_FILES['LogoImage']['name'], PATHINFO_EXTENSION);
+
+                if (in_array($file_extension, $allowed_image_extension)) {
+                    if (move_uploaded_file($_FILES["LogoImage"]["tmp_name"], $logo_target)) {
+                        $data['Logo'] = $logo_target;
+                    }
+                } else {
+                    Yii::$app->session->setFlash('error', "Upload valid images. Only PNG,JPG and JPEG are allowed.");
+                    return $this->redirect(array('site/editprofile'));
+                }
+            }
+
+            $querydata = \Yii::$app
+                    ->db
+                    ->createCommand()
+                    ->update('tbluser', $data, 'UserId = ' . $contactid . '')
+                    ->execute();
+            if ($querydata) {
+                Yii::$app->session->setFlash('success', "Profile has been updated");
+            } else {
+                Yii::$app->session->setFlash('error', "Profile has not been updated");
+            }
+            return $this->redirect(array('site/editprofile'));
+        } else {
+            return $this->render('editprofile', [
+            ]);
+        }
+    }
+
+    /**
+     * Login action.
+     *
+     * @return string
+     */
+    public function actionLogin() {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new LoginForm();
+        $model->is_admin = 1;
+        if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            return $this->goHome();
+        }
+
+        $model->password = '';
+
+        return $this->render('login', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
+     * Logout action.
+     *
+     * @return string
+     */
+    public function actionLogout() {
+
+        $session = Yii::$app->session;
+        $user = Yii::$app->user->identity;
+
+
+        Yii::$app->user->logout();
+
+        return $this->redirect(array('site/login'));
+    }
+
+    /**
+     * Signs user up.
+     *
+     * @return mixed
+     */
+    public function actionSignup() {
+        if (!Yii::$app->user->isGuest) {
+            return $this->goHome();
+        }
+
+        $model = new SignupForm();
+
+        if ($model->load(Yii::$app->request->post())) {
+            if ($model->admin()) {
+                if ($user = $model->signup()) {
+                    if (Yii::$app->getUser()->login($user)) {
+                        return $this->goHome();
+                    }
+                }
+            }
+        }
+
+        return $this->render('signup', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
+     * Requests password reset.
+     *
+     * @return mixed
+     */
+    public function actionRequestPasswordReset() {
+        $model = new PasswordResetRequestForm();
+        if ($model->load(Yii::$app->request->post()) && $model->validate()) {
+            if ($model->sendEmail()) {
+                Yii::$app->session->setFlash('success', 'Check your email for further instructions.');
+
+                return $this->goHome();
+            } else {
+                Yii::$app->session->setFlash('error', 'Sorry, we are unable to reset password for the provided email address.');
+            }
+        }
+
+        return $this->render('requestPasswordResetToken', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
+     * Resets password.
+     *
+     * @param string $token
+     * @return mixed
+     * @throws BadRequestHttpException
+     */
+    public function actionResetPassword($token) {
+        try {
+            $model = new ResetPasswordForm($token);
+        } catch (InvalidParamException $e) {
+            throw new BadRequestHttpException($e->getMessage());
+        }
+
+        if ($model->load(Yii::$app->request->post()) && $model->validate() && $model->resetPassword()) {
+            Yii::$app->session->setFlash('success', 'New password saved.');
+
+            return $this->goHome();
+        }
+
+        return $this->render('resetPassword', [
+                    'model' => $model,
+        ]);
+    }
+
+    /**
+     * create-new-contact action.
+     *
+     * @return mixed
+     */
+    public function actionCreateUser($id = null) {
+        $user = Yii::$app->user->identity;
+        $model = new User;
+
+
+        if (isset($_POST['CreateUser'])) {
+            $password = rand(1, 1000000);
+            $hashpass = \Yii::$app->security->generatePasswordHash($password);
+            $model->ParentId = '0';
+            $model->username = str_replace(' ', '', $_POST['CreateUser']['FirstName']) . rand(1, 100);
+            $model->FirstName = $_POST['CreateUser']['FirstName'];
+            $model->LastName = $_POST['CreateUser']['LastName'];
+            $model->Street = $_POST['CreateUser']['Street'];
+            $model->City = $_POST['CreateUser']['City'];
+            $model->State = $_POST['CreateUser']['State'];
+            $model->Zip = $_POST['CreateUser']['Zip'];
+            $model->password_hash = $hashpass;
+            $model->password = $password;
+            $model->email = $_POST['CreateUser']['Email'];
+            $model->Mobile = $_POST['CreateUser']['Phone'];
+            $model->ContactNumber = $_POST['CreateUser']['Office'];
+            $model->Fax = $_POST['CreateUser']['Fax'];
+            $model->auth_key = Yii::$app->security->generateRandomString();
+            $model->status = '10';
+            $model->is_admin = '1';
+            $model->is_superadmin = '0';
+            $model->view_as_admin = '0';
+            $model->created_at = time();
+            $model->updated_at = time();
+            $model->CreatedOn = date('Y-m-d h:i:s');
+            $model->IsActive = 1;
+
+            $useremail = User::find()
+                            ->where(['email' => $_POST['CreateUser']['Email']])->all();
+            if ($useremail) {
+                Yii::$app->session->setFlash('error', "Email is already registered!");
+            } else {
+                $project = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tbluser', $model)
+                        ->execute();
+            }
+
+            return $this->redirect(array('manage-users'));
+
+            die();
+        } else {
+
+            if ($id) {
+
+                $contact = User::find()
+                                ->where(['UserId' => $id])->all();
+            } else {
+                $contact = [];
+            }
+
+            return $this->render('createNewUser', [
+                        'model' => $model,
+                        'contact' => $contact,
+            ]);
+        }
+    }
+
+    /**
+     * Edit User action.
+     *
+     * @return mixed
+     */
+    public function actionEditUser($id = null) {
+        $user = Yii::$app->user->identity;
+        $model = new User;
+
+        $id = Yii::$app->request->get('id');
+
+        if (isset($_POST['CreateContact'])) {
+
+            $model->FirstName = $_POST['CreateContact']['FirstName'];
+            $model->LastName = $_POST['CreateContact']['LastName'];
+            $model->Street = $_POST['CreateContact']['Street'];
+            $model->City = $_POST['CreateContact']['City'];
+            $model->State = $_POST['CreateContact']['State'];
+            $model->Zip = $_POST['CreateContact']['Zip'];
+            //$model->email = $_POST['CreateContact']['Email'];
+            $model->Mobile = $_POST['CreateContact']['Phone'];
+            $model->ContactNumber = $_POST['CreateContact']['Office'];
+            $model->Fax = $_POST['CreateContact']['Fax'];
+
+            /* if ($_POST['CreateContact']['id']) {
+              $useremail = User::find()
+              ->where(['email' => $_POST['CreateContact']['Email']])->andWhere(['!=', 'UserId', $_POST['CreateContact']['id']])->all();
+              } else {
+              $useremail = User::find()
+              ->where(['email' => $_POST['CreateContact']['Email']])->all();
+              }
+              if ($useremail) {
+              Yii::$app->session->setFlash('error', "Email is already registered!");
+              } else {
+              if ($_POST['CreateContact']['id']) {
+              $model->UserId = $_POST['CreateContact']['id'];
+              $project = User::updateAll($model, 'UserId = ' . $_POST['CreateContact']['id'] . '');
+
+              if ($project) {
+              Yii::$app->session->setFlash('success', "User has been updated!");
+              }
+              }
+              } */
+
+            if ($_POST['CreateContact']['id']) {
+                $data = ['FirstName' => $_POST['CreateContact']['FirstName'], 'LastName' => $_POST['CreateContact']['LastName'], 'Street' => $_POST['CreateContact']['Street'], 'City' => $_POST['CreateContact']['City'], 'State' => $_POST['CreateContact']['State'], 'Zip' => $_POST['CreateContact']['Zip'], 'Mobile' => $_POST['CreateContact']['Phone'], 'ContactNumber' => $_POST['CreateContact']['Office'], 'Fax' => $_POST['CreateContact']['Fax']];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->update('tbluser', $data, 'UserId = ' . $_POST['CreateContact']['id'] . '')
+                        ->execute();
+                if ($querydata) {
+                    Yii::$app->session->setFlash('success', "User has been updated!");
+                }
+            }
+
+            return $this->redirect(array('manage-users'));
+
+            die();
+        } else {
+
+            if ($id) {
+
+                $contact = User::find()
+                                ->where(['UserId' => $id])->all();
+            } else {
+                $contact = [];
+            }
+
+            return $this->render('edituser', [
+                        'model' => $model,
+                        'contact' => $contact,
+            ]);
+        }
+    }
+
+    /**
+     * set session action.
+     *
+     * @return mixed
+     */
+    public function actionSetSession() {
+        $session = Yii::$app->session;
+
+        if ($_POST['value'] == 'all') {
+            $session->remove($_POST['key']);
+            echo json_encode('success');
+        } else if ($session[$_POST['key']] = $_POST['value']) {
+            echo json_encode('success');
+        }
+
+        die();
+    }
+
+    public function actionManageUsers() {
+        $users = User::find()->where(['ParentId' => 0, 'is_superadmin' => 0])->all();
+        return $this->render('manageusers', [
+                    'contacts' => $users
+        ]);
+    }
+
+    public function actionTenders() {
+        $tenders = \common\models\Tender::find()->orderBy('id', SORT_DESC)->all();
+        return $this->render('tenders', [
+                    'tenders' => $tenders
+        ]);
+    }
+
+    public function actionItems() {
+        $items = \common\models\Item::find()->all();
+
+        foreach ($items as $item) {
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $item->id])->all();
+            $data['items'] = $item;
+            $data['details'][] = $idetails;
+        }
+
+
+        return $this->render('items', [
+                    'items' => $items
+        ]);
+    }
+
+    public function actionCreateTender() {
+
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Tender::find()->where(['id' => $_POST['id']])->one();
+                $model->work = $_POST['work'];
+                $model->reference_no = $_POST['refno'];
+                $model->tender_id = $_POST['tid'];
+                $model->published_date = $_POST['pdate'];
+                $model->document_date = $_POST['ddate'];
+                $model->bid_sub_date = $_POST['subdate'];
+                $model->bid_end_date = $_POST['enddate'];
+                $model->bid_opening_date = $_POST['odate'];
+                $model->save();
+
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Tender successfully updated");
+                }
+            } else {
+                $model = new \common\models\Tender();
+                $model->work = $_POST['work'];
+                $model->reference_no = $_POST['refno'];
+                $model->tender_id = $_POST['tid'];
+                $model->published_date = $_POST['pdate'];
+                $model->document_date = $_POST['ddate'];
+                $model->bid_sub_date = $_POST['subdate'];
+                $model->bid_end_date = $_POST['enddate'];
+                $model->bid_opening_date = $_POST['odate'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                if ($user->group_id == 3) {
+                    $model->status = 0;
+                } else {
+                    $model->status = 1;
+                }
+                $tender = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenders', $model)
+                        ->execute();
+
+                if ($tender) {
+                    Yii::$app->session->setFlash('success', "Tender successfully added");
+                }
+            }
+
+            return $this->redirect(array('site/tenders'));
+
+            die();
+        } else {
+            if ($id) {
+                $tender = \common\models\Tender::find()->where(['id' => $id])->one();
+            } else {
+                $tender = [];
+            }
+
+            return $this->render('createtender', [
+                        'tender' => $tender
+            ]);
+        }
+    }
+
+    public function actionCreateItem() {
+
+        $user = Yii::$app->user->identity;
+        $model = new \common\models\Item();
+        $detail = new \common\models\ItemDetails();
+        $mdetail = new \common\models\MakeDetails();
+        $tid = @$_GET['id'];
+        $newarr = [];
+
+        if (isset($_POST['submit'])) {
+
+            $_POST['makeids'] = json_decode($_POST['makeids']);
+            if (@$_POST['makeids']) {
+                foreach ($_POST['makeids'] as $allmakes) {
+                    if (array_key_exists($allmakes->key, $newarr)) {
+                        $newarr[$allmakes->key] = $newarr[$allmakes->key] . ',' . $allmakes->value;
+                    } else {
+                        $newarr[$allmakes->key] = $allmakes->value;
+                    }
+                }
+            }
+
+            $model->tender_id = $_POST['tender_id'];
+            $model->tenderone = @$_POST['tenderone'];
+            $model->tendertwo = @$_POST['tendertwo'];
+            $model->tenderthree = @$_POST['tenderthree'];
+            $model->tenderfour = @$_POST['tenderfour'];
+            $model->tenderfive = @$_POST['tenderfive'];
+            $model->tendersix = @$_POST['tendersix'];
+            $model->user_id = $user->UserId;
+            $model->createdon = date('Y-m-d h:i:s');
+            if ($user->group_id == 3) {
+                $model->status = 0;
+            } else {
+                $model->status = 1;
+            }
+
+            $tender = \Yii::$app
+                    ->db
+                    ->createCommand()
+                    ->insert('items', $model)
+                    ->execute();
+            $id = Yii::$app->db->getLastInsertID();
+
+            if ($tender) {
+                foreach ($_POST['desc'] as $k => $v) {
+
+                    $detail->description = $v;
+                    $detail->itemtender = $_POST['itemtender'][$k];
+                    $detail->quantity = $_POST['quantity'][$k];
+                    $detail->units = $_POST['units'][$k];
+                    $detail->make = @$newarr[$k];
+                    $detail->makeid = @$_POST['makeid'][$k];
+                    $detail->user_id = $user->UserId;
+                    $detail->item_id = $id;
+                    $detail->createdon = date('Y-m-d h:i:s');
+                    if ($user->group_id == 3) {
+                        $detail->status = 0;
+                    } else {
+                        $detail->status = 1;
+                    }
+
+                    $details = \Yii::$app
+                            ->db
+                            ->createCommand()
+                            ->insert('itemdetails', $detail)
+                            ->execute();
+                    $lastid = Yii::$app->db->getLastInsertID();
+
+                    $makesids = explode(',', @$newarr[$k]);
+                    if (@$makesids) {
+                        foreach ($makesids as $makes_ids) {
+                            $mdetail->description = $v;
+                            $mdetail->itemtender = $_POST['itemtender'][$k];
+                            $mdetail->quantity = $_POST['quantity'][$k];
+                            $mdetail->units = $_POST['units'][$k];
+                            $mdetail->make = $makes_ids;
+                            $mdetail->makeid = @$_POST['makeid'][$k];
+                            $mdetail->user_id = $user->UserId;
+                            $mdetail->item_id = $id;
+                            $mdetail->item_detail_id = $lastid;
+                            $mdetail->createdon = date('Y-m-d h:i:s');
+                            if ($user->group_id == 3) {
+                                $mdetail->status = 0;
+                            } else {
+                                $mdetail->status = 1;
+                            }
+
+                            $mdetails = \Yii::$app
+                                    ->db
+                                    ->createCommand()
+                                    ->insert('makedetails', $mdetail)
+                                    ->execute();
+                        }
+                    }
+                }
+                Yii::$app->session->setFlash('success', "Item successfully added");
+            }
+            return $this->redirect(array('site/create-item?id=' . $_POST['tender_id'] . ''));
+
+            die();
+        } else {
+
+            $makes = \common\models\Make::find()->where(['status' => 1])->all();
+            $tenders = \common\models\Tender::find()->all();
+            $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_DESC])->all();
+            if (@$idetails) {
+                foreach ($idetails as $idetail) {
+                    $makeids = explode(',', $idetail->make);
+                    $makenameall = '';
+                    if (@$makeids) {
+                        foreach ($makeids as $mid) {
+                            $makename = \common\models\Make::find()->where(['id' => $mid])->one();
+                            if (@$makename) {
+                                $makenameall .= $makename->make . ',';
+                            }
+                        }
+                    }
+                    $idetail->make = rtrim($makenameall, ',');
+                }
+            }
+            $tenderdetail = \common\models\Tender::find()->where(['id' => $tid])->one();
+            return $this->render('createitem', [
+                        'tenders' => $tenders,
+                        'idetails' => $idetails,
+                        'makes' => $makes,
+                        'tender' => $tenderdetail
+            ]);
+        }
+    }
+
+    public function actionDeleteTender() {
+        $id = $_GET['id'];
+        $ids = [];
+        $delete = \common\models\Tender::deleteAll(['id' => $id]);
+        if ($delete) {
+            $idetails = \common\models\Item::find()->where(['tender_id' => $id])->all();
+            if (@$idetails) {
+                foreach ($idetails as $idet) {
+                    $ids[] = $idet->id;
+                }
+            }
+            $itemid = \common\models\Item::deleteAll(['tender_id' => $id]);
+            $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
+            $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
+            Yii::$app->session->setFlash('success', "Tender successfully deleted");
+            return $this->redirect(array('site/tenders'));
+        }
+    }
+
+    public function actionGetdata() {
+        $value = $_REQUEST['value'];
+        $data = '<option value="" selected>Select</option>';
+        if ($value == 1) {
+            $data .= '<option value="1">Electrical</option>';
+            $data .= '<option value="2">Air Conditioning</option>';
+            $data .= '<option value="3">Fire Fighting</option>';
+            $data .= '<option value="4">Water supply</option>';
+            $data .= '<option value="5">Lifts</option>';
+            $data .= '<option value="6">Cranes</option>';
+            $data .= '<option value="7">DG Set</option>';
+        } else {
+            $data .= '<option value="8">Building</option>';
+            $data .= '<option value="9">Road</option>';
+            $data .= '<option value="10">Periodical</option>';
+            $data .= '<option value="11">Joinery</option>';
+            $data .= '<option value="12">Plumbing</option>';
+        }
+        echo json_encode(['data' => $data]);
+        die;
+    }
+
+    public function actionGetseconddata() {
+        $value = $_REQUEST['value'];
+        $item = 0;
+        $data = '<option value="" selected>Select</option>';
+        if ($value == 1) {
+            $data .= '<option value="1">LT</option>';
+            $data .= '<option value="2">HT</option>';
+        } elseif ($value == 2) {
+            $data .= '<option value="3">VRV Units</option>';
+            $data .= '<option value="4">AC Plants</option>';
+        } elseif ($value == 3) {
+            $data .= '<option value="5">Pumps</option>';
+            $data .= '<option value="6">MS Pipes</option>';
+            $data .= '<option value="7">Motors</option>';
+        } elseif ($value == 4) {
+            $data .= '<option value="8">Pumps</option>';
+            $data .= '<option value="9">GI Pipes</option>';
+            $data .= '<option value="10">MS Pipes</option>';
+            $data .= '<option value="11">Motors</option>';
+            $data .= '<option value="12">NP 2</option>';
+        } else {
+            $item = 1;
+        }
+        echo json_encode(['data' => $data, 'item' => $item]);
+        die;
+    }
+
+    public function actionGetthirddata() {
+        $value = $_REQUEST['value'];
+        $item = 0;
+        $data = '<option value="" selected>Select</option>';
+        if ($value == 1) {
+            $data .= '<option value="1">Cables</option>';
+            $data .= '<option value="2">Lighting</option>';
+            $data .= '<option value="3">Fans</option>';
+            $data .= '<option value="4">Accessories</option>';
+            $data .= '<option value="5">Wire</option>';
+            $data .= '<option value="6">DB/MCB/MCCB/Timers</option>';
+            $data .= '<option value="7">Transformers</option>';
+            $data .= '<option value="8">Cable Jointing Kits</option>';
+            $data .= '<option value="9">Panels</option>';
+            $data .= '<option value="10">ACB</option>';
+            $data .= '<option value="13">Motors</option>';
+        } elseif ($value == 2) {
+            $data .= '<option value="1">Cables</option>';
+            $data .= '<option value="7">Transformers</option>';
+            $data .= '<option value="8">Cable Jointing Kits</option>';
+            $data .= '<option value="9">Panels</option>';
+            $data .= '<option value="11">VCB</option>';
+            $data .= '<option value="12">Substations</option>';
+            $data .= '<option value="13">Motors</option>';
+        } else {
+            $item = 1;
+        }
+        echo json_encode(['data' => $data, 'item' => $item]);
+        die;
+    }
+
+    public function actionGetfourdata() {
+        $value = $_REQUEST['value'];
+        $item = 0;
+        $data = '<option value="" selected>Select</option>';
+        if (($value == 1) || ($value == 12)) {
+            $data .= '<option value="1">Copper</option>';
+            $data .= '<option value="2">Aluminium</option>';
+        } elseif ($value == 2) {
+            $data .= '<option value="3">Domestic</option>';
+            $data .= '<option value="4">Industrial</option>';
+            $data .= '<option value="5">Street/Road</option>';
+        } elseif ($value == 3) {
+            $data .= '<option value="6">Ceiling fans</option>';
+            $data .= '<option value="7">Wall fans</option>';
+            $data .= '<option value="8">Exhaust fans</option>';
+        } else {
+            $item = 1;
+        }
+
+        $makes = [];
+        $allmakes = [];
+        if ($value) {
+            $makes = \common\models\Make::find()->where(['mtype' => $value, 'status' => 1])->all();
+        } else {
+            $makes = \common\models\Make::find()->where(['status' => 1])->all();
+        }
+
+        if ($makes) {
+            foreach ($makes as $_make) {
+                $allmakes[$_make->id] = $_make->make;
+            }
+        } else {
+            $allmakes['0'] = 'No Makes';
+        }
+
+        echo json_encode(['data' => $data, 'item' => $item, 'select' => $allmakes]);
+        die;
+    }
+
+    public function actionGetfivedata() {
+        $value = $_REQUEST['value'];
+        $item = 0;
+        $data = '<option value="" selected>Select</option>';
+        if (($value == 1) || ($value == 2)) {
+            $data .= '<option value="1">Armoured</option>';
+            $data .= '<option value="2">Unarmoured</option>';
+        } else {
+            $item = 1;
+        }
+        echo json_encode(['data' => $data, 'item' => $item]);
+        die;
+    }
+
+    public function actionViewItems() {
+        $user = Yii::$app->user->identity;
+        $tid = @$_GET['id'];
+        $tender = \common\models\Tender::find()->where(['id' => $tid])->one();
+        $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+        if (@$idetails) {
+            foreach ($idetails as $idetail) {
+                $makeids = explode(',', $idetail->make);
+                $makenameall = '';
+                if (@$makeids) {
+                    foreach ($makeids as $mid) {
+                        $makename = \common\models\Make::find()->where(['id' => $mid])->one();
+                        if (@$makename) {
+                            $makenameall .= $makename->make . ',';
+                        }
+                    }
+                }
+                $idetail->make = rtrim($makenameall, ',');
+            }
+        }
+        return $this->render('viewitem', [
+                    'idetails' => $idetails,
+                    'tid' => $tid,
+                    'tname' => $tender->tender_id,
+                    'tdetails' => $tender
+        ]);
+    }
+
+    public function actionMakes() {
+        $user = Yii::$app->user->identity;
+        if (isset($_POST['mtypesort']) && $_POST['mtypesort'] != '') {
+            $makes = \common\models\Make::find()->where(['mtype' => $_POST['mtypesort']])->all();
+        } else {
+            $makes = \common\models\Make::find()->where(['status' => '1'])->all();
+        }
+        return $this->render('makes', [
+                    'makes' => $makes
+        ]);
+    }
+
+    public function actionCreateMake() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Make::find()->where(['id' => $_POST['id']])->one();
+                $model->mtype = $_POST['mtype'];
+                $model->make = $_POST['make'];
+                $model->email = $_POST['email'];
+
+                $make = \common\models\Make::find()->where(['make' => $_POST['make'], 'email' => $_POST['email'], 'mtype' => $_POST['mtype']])->andWhere(['!=', 'id', $_POST['id']])->one();
+                if ($make) {
+                    Yii::$app->session->setFlash('error', "Make already existed");
+                } else {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', "Make successfully updated");
+                    }
+                }
+                return $this->redirect(array('site/makes'));
+            } else {
+                $model = new \common\models\Make();
+                $model->mtype = $_POST['mtype'];
+                $model->make = $_POST['make'];
+                $model->email = $_POST['email'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                $make = \common\models\Make::find()->where(['make' => $_POST['make'], 'email' => $_POST['email'], 'mtype' => $_POST['mtype']])->one();
+                if ($make) {
+                    Yii::$app->session->setFlash('error', "Make already existed");
+                } else {
+                    $tender = \Yii::$app
+                            ->db
+                            ->createCommand()
+                            ->insert('makes', $model)
+                            ->execute();
+
+
+                    if ($tender) {
+                        Yii::$app->session->setFlash('success', "Make successfully added");
+                    }
+                }
+                return $this->redirect(array('site/create-make'));
+            }
+
+
+
+            die();
+        } else {
+            if ($id) {
+                $make = \common\models\Make::find()->where(['id' => $id])->one();
+            } else {
+                $make = [];
+            }
+
+            return $this->render('createmake', [
+                        'make' => $make
+            ]);
+        }
+    }
+
+    public function actionDeleteMake() {
+        $id = $_GET['id'];
+        $delete = \common\models\Make::deleteAll(['id' => $id]);
+        if ($delete) {
+            Yii::$app->session->setFlash('success', "Make successfully deleted");
+            return $this->redirect(array('site/makes'));
+        }
+    }
+
+    public function actionDeleteItem() {
+        $id = $_GET['id'];
+        $tid = $_GET['tid'];
+        $delete = \common\models\ItemDetails::deleteAll(['id' => $id]);
+        if ($delete) {
+            \common\models\MakeDetails::deleteAll(['item_detail_id' => $id]);
+            Yii::$app->session->setFlash('success', "Item successfully deleted");
+            return $this->redirect(array('site/view-items?id=' . $tid . ''));
+        }
+    }
+
+    public function actionEditItem($id) {
+
+        if (isset($_POST['submit'])) {
+            $user = Yii::$app->user->identity;
+            if ($_POST['id']) {
+                $item = \common\models\Item::find()->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['itemdetails.id' => $id])->one();
+                $model = \common\models\ItemDetails::find()->where(['id' => $_POST['id']])->one();
+                $model->itemtender = $_POST['itemtender'];
+                $model->description = $_POST['description'];
+                $model->units = $_POST['units'];
+                $model->quantity = $_POST['quantity'];
+                $model->make = implode(',', $_POST['makes']);
+                $model->makeid = $_POST['makeid'];
+
+                $mitem = \common\models\MakeDetails::deleteAll(['item_detail_id' => $_POST['id']]);
+
+                if (@$_POST['makes']) {
+                    foreach ($_POST['makes'] as $make_ids) {
+                        $mdetail = new \common\models\MakeDetails();
+                        $mdetail->itemtender = $_POST['itemtender'];
+                        $mdetail->description = $_POST['description'];
+                        $mdetail->units = $_POST['units'];
+                        $mdetail->quantity = $_POST['quantity'];
+                        $mdetail->make = $make_ids;
+                        $mdetail->makeid = $_POST['makeid'];
+                        $mdetail->user_id = $user->id;
+                        $mdetail->item_id = $_POST['item_id'];
+                        $mdetail->item_detail_id = $_POST['id'];
+                        $mdetail->createdon = date('Y-m-d h:i:s');
+                        if ($user->group_id == 3) {
+                            $mdetail->status = 0;
+                        } else {
+                            $mdetail->status = 1;
+                        }
+                        $mdetail->save();
+                    }
+                }
+
+
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Item successfully updated");
+                }
+            }
+            return $this->redirect(array('site/view-items?id=' . $item->tender_id . ''));
+        } else {
+            $user = Yii::$app->user->identity;
+            $item = \common\models\Item::find()->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['itemdetails.id' => $id])->one();
+            $makes = \common\models\Make::find()->where(['mtype' => $item->tenderfour])->all();
+            $idetails = \common\models\ItemDetails::find()->where(['id' => $id])->one();
+            return $this->render('edititem', [
+                        'item' => $idetails,
+                        'makes' => $makes
+            ]);
+        }
+    }
+
+    public function actionGetmakes() {
+        $user = Yii::$app->user->identity;
+        $makes = [];
+        $allmakes = [];
+        $id = $_REQUEST['value'];
+        if ($id) {
+            $makes = \common\models\Make::find()->where(['mtype' => $id, 'status' => 1])->all();
+        } else {
+            $makes = \common\models\Make::find()->where(['status' => 1])->all();
+        }
+
+        if ($makes) {
+            foreach ($makes as $_make) {
+                $allmakes[$_make->id] = $_make->make;
+            }
+        } else {
+            $allmakes['0'] = 'No Makes';
+        }
+
+        echo json_encode($allmakes);
+        die;
+    }
+
+    public function actionApprovetender() {
+        $id = $_REQUEST['value'];
+        $tender = \common\models\Tender::find()->where(['id' => $id])->one();
+        $tender->status = 1;
+        if ($tender->save()) {
+            echo json_encode(['status' => '1']);
+        } else {
+            echo json_encode(['status' => '0']);
+        }
+        die;
+    }
+
+}

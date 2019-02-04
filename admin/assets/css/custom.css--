@@ -1,0 +1,16 @@
+/* Write your custom CSS here */
+.select-wrapper span.caret {
+    color: #ffffff;
+    font-size: 10px;
+    position: absolute;
+    right: 0;
+    top: 16px;
+}
+.select-wrapper {
+    line-height: normal !important;
+    margin-top: 7px;
+    position: relative;
+}
+.select-wrapper .dropdown-content.select-dropdown {
+    width: 100% !important;
+}

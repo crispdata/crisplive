@@ -22,7 +22,7 @@ $image_url = Yii::$app->params['IMAGE_URL'];
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="user_email" content="<?= @Yii::$app->user->identity->email; ?>">
+     <link rel="shortcut icon" href="<?= $image_url ?>/images/favicon.ico" /> 
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>

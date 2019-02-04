@@ -1,0 +1,646 @@
+var baseUrl = $('#base_url').val();
+var clients = {};
+var csrf_token = $('meta[name="csrf-token"]').attr('content');
+
+$(document).ready(function () {
+
+    // Write your custom Javascript codes here...
+
+    $('.project-success-sweetalert').on('click', function () {
+        swal("Success !!!", "Project has created successfully!", "success");
+    });
+    $('.contact-success-sweetalert').on('click', function () {
+        swal("Success !!!", "contact has created successfully!", "success");
+    });
+
+    $('.project-update-sweetalert').on('click', function () {
+        swal("Success !!!", "Project has updated successfully!", "success");
+    });
+
+    $("#ClientAuto").autocomplete({
+        source: function (request, response) {
+            $.ajax({
+                type: 'post',
+                url: baseUrl + 'client/get',
+                dataType: "json",
+                data: {'client': request.term, '_csrf-backend': csrf_token},
+                success: function (resultData) {
+                    response(resultData);
+                }
+            });
+        },
+        select: function (event, ui) {
+            $('#ClientAuto').val(ui.item.label);
+            $('#ClientId').val(ui.item.value);
+            return false;
+        }
+    });
+
+    $(document).on('keypress', '.contact_name', function () {
+
+        var form_clients = $(".contact_id");
+        var c_form = {};
+        var cl = [];
+        var inc = 0;
+
+        for (var n = 0; n < form_clients.length; n++) {
+            if ($(form_clients[n]).val()) {
+                c_form[n] = $(form_clients[n]).val();
+            }
+        }
+
+        $(".contact_name").autocomplete({
+
+            source: function (request, response) {
+                $.ajax({
+                    type: 'post',
+                    url: baseUrl + 'contact/get',
+                    dataType: "json",
+                    data: {'contact': request.term, '_csrf-backend': csrf_token},
+                    success: function (resultData) {
+                        $.each(resultData, function (i, e) {
+                            $.each(c_form, function (index, element) {
+
+                                if (element == e.value) {
+                                    console.log('data: ' + e.value);
+                                    console.log('input: ' + element);
+
+                                    delete resultData[i]
+                                    return true;
+                                }
+                            });
+
+                        });
+                        $.each(resultData, function (i, e) {
+                            if (e) {
+                                cl[inc] = e;
+                                inc++;
+                            }
+                        });
+                        response(cl);
+                    }
+                });
+            },
+            select: function (event, ui) {
+                $(this).val(ui.item.label);
+                $(this).next().val(ui.item.value);
+
+                return false;
+            }
+        });
+    });
+
+
+
+    $('.picker__box').on('change', function () {
+        $('.picker__day--infocus').on('click', function () {
+            console.log('date clicked');
+            $('.picker__close').trigger("click");
+        });
+    });
+    $('.picker__day--infocus').on('click', function () {
+        console.log('date clicked');
+        $('.picker__close').trigger("click");
+    });
+
+    $(".wizard .actions #finish").on("click", function () {
+        console.log('works');
+    });
+
+    $("#add-page-project").on("click", function () {
+
+        $("#add-page-html").append('<div class="row"><div class="input-field col s12"><input type="text" name = "CreateProject[PageName][]" class="validate"><label>Page Name</label></div></div>');
+    });
+
+    $("#add-role-project").on("click", function () {
+
+        $("#add-role-html").append('<div class="row"><div class="input-field col s7 m7"><input type="text" class = "contact_name validate" name = "ContactId[]"><input type="hidden" class = "contact_id validate" name = "CreateProject[ContactId][]"><label>Contact Name</label></div><div class="input-field col s2 m2 c_contact_modal"><a class="btn-floating btn-small waves-effect waves-light blue modal-trigger"><i class="material-icons">add</i></a></div><div class="input-field col s3 m3"><select class="browser-default" name = "CreateProject[RoleName][]"><option disabled selected>Choose Role</option><option value="PM">PM</option><option value="TL">TL</option><option value="DEV">DEV</option><option value="QA" >QA</option></select></div></div>');
+    });
+
+    $('#header_project').on('change', function () {
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/set-session',
+            dataType: "json",
+            data: {'key': 'header_project', 'value': $(this).val(), '_csrf-backend': csrf_token},
+            success: function (resultData) {
+                if (resultData) {
+                    window.location.href = window.location.href;
+                }
+            }
+        });
+    });
+
+    $('#current_project_sort').on('change', function () {
+        $('#current-project-sort-form').submit();
+    });
+
+    $('.confirm-delete').on('click', function () {
+        var id = $(this).attr("data-id");
+
+        if (id) {
+            $('#' + id).submit();
+        }
+    });
+
+    $('.proj-delete').on('click', function () {
+        var id = $(this).parent().attr("id");
+        $('.confirm-delete').attr('data-id', id);
+
+    });
+    $('.confirm-dismiss').on('click', function () {
+
+        var id = $(this).attr("data-id");
+
+        if (id) {
+            $.ajax({
+                type: 'post',
+                url: baseUrl + 'recentchanges/change-isdismiss',
+                dataType: "json",
+                data: {'id': id, '_csrf-backend': csrf_token},
+                success: function (resultData) {
+                    if (resultData)
+                        ;
+                    $('#tr-' + id).removeClass('activity');
+                    $('#tr-' + id).addClass('dismiss');
+                }
+            });
+        }
+
+    });
+    $('.confirm-dismiss-todo').on('click', function () {
+
+        var id = $(this).attr("data-id");
+
+        if (id) {
+            $.ajax({
+                type: 'post',
+                url: baseUrl + 'site/change-isdismiss',
+                dataType: "json",
+                data: {'id': id, '_csrf-backend': csrf_token},
+                success: function (resultData) {
+                    if (resultData)
+                        ;
+                    $('#tr-' + id).removeClass('activity');
+                    $('#tr-' + id).addClass('dismiss');
+                }
+            });
+        }
+
+    });
+    $('#submit-add-contact-modal').on('click', function () {
+        $("#add-contact-modal").validate().settings.ignore = ":disabled,:hidden";
+
+        if ($("#add-contact-modal").valid()) {
+            var data = $("#add-contact-modal").serialize();
+            $.ajax({
+                type: 'post',
+                url: baseUrl + 'site/create-contact-modal',
+                data: data,
+                success: function (resultData) {
+                    if (resultData == "success") {
+                        $('#add-contact-modal-cancel').trigger('click');
+                        $('.contact-success-sweetalert').trigger('click');
+                    }
+                }
+            });
+        }
+    });
+    $('.go-to-project').on('click', function () {
+        var ProjectId = $(this).closest("tr").attr("data-id");
+        window.location.href = baseUrl + "site/project-details?project=" + ProjectId;
+    });
+    $('.go-to-page').on('click', function () {
+        var ProjectId = $(this).closest("tr").attr("data-id");
+        window.location.href = baseUrl + "page/page-details?page=" + ProjectId;
+    });
+    $('.go-to-contact').on('click', function () {
+        var ContactId = $(this).closest("tr").attr("data-id");
+        window.location.href = baseUrl + "site/contact-details?contact=" + ContactId;
+    });
+
+    $(document).on('click', '.c_contact_modal', function () {
+        $('#c_contact_modal').trigger('click');
+    });
+
+    $('.tabs').find('li').each(function () {
+        $(this).removeClass("disabled");
+    });
+
+    $('.peoplebox input.all:checkbox').click(function () {
+        var itemId = $(this).attr('data-item');
+        var $inputs = $('.people' + itemId + ' input:checkbox')
+        if ($(this).is(':checked')) {
+            $inputs.not(this).prop('disabled', true); // <-- disable all but checked one
+            $inputs.not(this).next().css("background-color", "gray");
+            $inputs.not(this).next().css("color", "#9e9e9e");
+        } else {
+            $inputs.prop('disabled', false); // <--
+            $inputs.not(this).next().removeAttr("style");
+        }
+    })
+
+    $('.peoplebox input.none:checkbox').click(function () {
+        var itemId = $(this).attr('data-item');
+        var $inputs = $('.people' + itemId + ' input:checkbox')
+        if ($(this).is(':checked')) {
+            $inputs.not(this).prop('disabled', true); // <-- disable all but checked one
+            $inputs.not(this).next().css("background-color", "gray");
+            $inputs.not(this).next().css("color", "#9e9e9e");
+        } else {
+            $inputs.prop('disabled', false); // <--
+            $inputs.not(this).next().removeAttr("style");
+        }
+    })
+    $('.pagesbox input.all:checkbox').click(function () {
+        var itemId = $(this).attr('data-item');
+        var $inputs = $('.pages' + itemId + ' input:checkbox')
+        if ($(this).is(':checked')) {
+            $inputs.not(this).prop('disabled', true); // <-- disable all but checked one
+            $inputs.not(this).next().css("background-color", "gray");
+            $inputs.not(this).next().css("color", "#9e9e9e");
+        } else {
+            $inputs.prop('disabled', false); // <--
+            $inputs.not(this).next().removeAttr("style");
+        }
+    })
+
+    $('.pagesbox input.none:checkbox').click(function () {
+        var itemId = $(this).attr('data-item');
+        var $inputs = $('.pages' + itemId + ' input:checkbox')
+        if ($(this).is(':checked')) {
+            $inputs.not(this).prop('disabled', true); // <-- disable all but checked one
+            $inputs.not(this).next().css("background-color", "gray");
+            $inputs.not(this).next().css("color", "#9e9e9e");
+        } else {
+            $inputs.prop('disabled', false); // <--
+            $inputs.not(this).next().removeAttr("style");
+        }
+    })
+
+    $("#current-project").on("click", ".showSingle", function () {
+        var $inputs = $('tbody tr .showSingle');
+        $inputs.attr('class', 'showSingle btn blue');
+        $inputs.not(this).attr('class', 'showSingle');
+        $('.targetDiv').hide();
+        $('#div' + $(this).attr('target')).show();
+    });
+
+    // $('.timepicker').timepicki();
+
+
+    $("#post_list").sortable({
+        placeholder: "ui-state-highlight",
+        update: function (event, ui)
+        {
+            var post_order_ids = new Array();
+            $('#post_list tr').each(function () {
+                post_order_ids.push($(this).data("post-id"));
+            });
+            $.ajax({
+                url: baseUrl + 'page/saveitemorder',
+                method: "POST",
+                data: {post_order_ids: post_order_ids, '_csrf-backend': csrf_token},
+                success: function (data)
+                {
+
+                }
+            });
+        }
+    });
+
+    $("#documents_list").sortable({
+        placeholder: "ui-state-highlight",
+        update: function (event, ui)
+        {
+            var post_order_ids = new Array();
+            $('#documents_list tr').each(function () {
+                post_order_ids.push($(this).data("post-id"));
+            });
+            $.ajax({
+                url: baseUrl + 'documents/saveitemorder',
+                method: "POST",
+                data: {post_order_ids: post_order_ids, '_csrf-backend': csrf_token},
+                success: function (data)
+                {
+
+                }
+            });
+        }
+    });
+
+    $("#timeline_list").sortable({
+        placeholder: "ui-state-highlight",
+        update: function (event, ui)
+        {
+            var post_order_ids = new Array();
+            $('#timeline_list tr').each(function () {
+                post_order_ids.push($(this).data("post-id"));
+            });
+            $.ajax({
+                url: baseUrl + 'timeline/saveitemorder',
+                method: "POST",
+                data: {post_order_ids: post_order_ids, '_csrf-backend': csrf_token},
+                success: function (data)
+                {
+
+                }
+            });
+        }
+    });
+
+    $("#tool").click(function () {
+
+        //$("#current-project").load(" #current-project > *");
+        $("#listing").toggle();
+        $("#drawing").toggle();
+
+    });
+
+    $('.image-popup-no-margins').magnificPopup({
+        type: 'image',
+        closeOnContentClick: true,
+        closeBtnInside: false,
+        fixedContentPos: true,
+        mainClass: 'mfp-no-margins mfp-with-zoom', // class to remove default margin from left and right side
+        image: {
+            verticalFit: true
+        },
+        zoom: {
+            enabled: true,
+            duration: 300 // don't foget to change the duration also in CSS
+        }
+    });
+
+    $("#current-project").on("click", ".showthreaddiv", function () {
+        var $inputs = $('tbody tr button.showthreaddiv');
+        $inputs.attr('class', 'showthreaddiv btn blue');
+        $inputs.not(this).attr('class', 'showthreaddiv btn-flat');
+        $('.targetthreaddiv').hide();
+        $('#divthread' + $(this).attr('target')).show();
+
+    });
+
+
+
+
+    /* $('#btnShow').click(function () {
+     var link = $(this).attr('href');
+     $("#dialog").dialog();
+     $("#frame").attr("src", link);
+     });*/
+
+
+
+
+});
+
+function isView(id) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'recentchanges/change-isview',
+        dataType: "json",
+        data: {'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            if (resultData) {
+                $('#tr-' + id).removeClass('activity');
+            }
+        }
+    });
+}
+
+function isDismiss(id) {
+    if ($('#dismis-' + id).prop("checked") == true) {
+        $('.confirm-dismiss').attr('data-id', id);
+        $('#dismiss-modal').trigger('click');
+    }
+}
+
+function isDismissTodo(id) {
+    if ($('#dismis-' + id).prop("checked") == true) {
+        $('.confirm-dismiss-todo').attr('data-id', id);
+        $('#dismiss-modal').trigger('click');
+    }
+}
+
+
+
+
+/** Pages **/
+
+function savecolor(val, id) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savecolor',
+        dataType: "json",
+        data: {'val': val, 'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#colorshow" + id + "").css({
+                'background-color': val,
+            });
+
+        }
+    });
+}
+
+function savedocumentcolor(val, id) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'documents/savecolor',
+        dataType: "json",
+        data: {'val': val, 'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#colorshow" + id + "").css({
+                'background-color': val,
+            });
+
+        }
+    });
+}
+
+function savepeople(val, attr, id) {
+    var checked = $('#all' + id + ':checkbox:checked').length > 0;
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savepeople',
+        dataType: "json",
+        data: {'val': val, 'id': id, 'attr': attr, 'checked': checked, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedocumentpeople(val, attr, id) {
+    var checked = $('#all' + id + ':checkbox:checked').length > 0;
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'documents/savepeople',
+        dataType: "json",
+        data: {'val': val, 'id': id, 'attr': attr, 'checked': checked, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function saveflag(id) {
+    var x = document.getElementById("flagtext" + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/saveflag',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedocumentflag(id) {
+    var x = document.getElementById("flagtext" + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'documents/saveflag',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savetimeline(attr, id, pid) {
+    var x = document.getElementById(attr + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savetimeline',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, 'attr': attr, 'pid': pid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savetodo(attr, id) {
+    var x = document.getElementById(attr + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savetodo',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, 'attr': attr, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedocumenttodo(attr, id) {
+    var x = document.getElementById(attr + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'documents/savetodo',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, 'attr': attr, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savepages(val, attr, id) {
+    var checked = $('#pageall' + id + ':checkbox:checked').length > 0;
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savepages',
+        dataType: "json",
+        data: {'val': val, 'id': id, 'attr': attr, 'checked': checked, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedetails(attr, pid, id) {
+    var x = document.getElementById(attr + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savedetails',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, 'pid': pid, 'attr': attr, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedocumentdetails(attr, pid, id) {
+    var x = document.getElementById(attr + id);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'documents/savedetails',
+        dataType: "json",
+        data: {'txt': x.value, 'id': id, 'pid': pid, 'attr': attr, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function savedoc(val, id, did) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'page/savedoc',
+        dataType: "json",
+        data: {'val': did, 'id': id, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+        }
+    });
+}
+
+function sendmessage(tid) {
+    var message = document.getElementById('message' + tid + '').value;
+    var pid = $('#pid' + tid + '').val();
+    var rid = $('#rid' + tid + '').val();
+    var tid = $('#threadid' + tid + '').val();
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'message/acceptmessages',
+        dataType: "json",
+        data: {'message': message, 'pid': pid, 'rid': rid, 'tid': tid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#message" + tid + "").val('');
+            $("#chat_main" + tid + "").html(resultData.messages);
+
+        }
+    });
+}
+
+function getmessages(rid, pid, tid) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'message/getmessages',
+        dataType: "json",
+        data: {'rid': rid, 'pid': pid, 'tid': tid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#message" + tid + "").val('');
+            $("#message" + tid + "").attr('disabled', false);
+            $(".roleslist" + tid + " a").not("#role" + rid + "-" + tid + "").css({'color': '#0277bb;', 'background-color': 'transparent'});
+            $("#role" + rid + "-" + tid + "").css({'color': '#fff;', 'background-color': 'lightskyblue'});
+            document.getElementById("rid" + tid + "").value = resultData.rid;
+            $("#chat_main" + tid + "").html(resultData.messages);
+
+
+        }
+    });
+}
+
+function refresh() {
+    location.reload();
+}
+
+
+
+/** end **/

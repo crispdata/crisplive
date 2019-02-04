@@ -1,0 +1,110 @@
+<?php
+/* @var $this yii\web\View */
+
+$this->title = 'Edit Item';
+$user = Yii::$app->user->identity;
+$baseURL = Yii::$app->params['BASE_URL'];
+$imageURL = Yii::$app->params['IMAGE_URL'];
+?>
+<style>
+    .actions{display:none!important;}    
+    .steps{display:none!important;}    
+</style>
+
+<main class="mn-inner">
+    <div class="row">
+        <div class="col s12">
+            <div class="page-title"><?= $this->title ?></div>
+        </div>
+
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
+            <script>
+                swal({
+                    title: "<?= Yii::$app->session->getFlash('success'); ?>",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                });
+                //sweetAlert('Success', '<?= Yii::$app->session->getFlash('success'); ?>', 'success');
+            </script>
+        <?php endif; ?>
+
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
+            <div class="alert alert-danger">
+                <?= Yii::$app->session->getFlash('error'); ?>
+            </div>
+        <?php endif; ?>
+
+        <div class="col s12 m12 l12">
+            <div class="card">
+                <div class="card-content">
+
+                    <div class="row">
+                        <form id="create-project-form" class="col s12" method = "post" action = "<?= $baseURL ?>site/edit-item?id=<?= @$item->id; ?>" enctype="multipart/form-data">
+                            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+
+                            <input type="hidden" name="id" value="<?= @$item->id; ?>" />
+                            <input type="hidden" name="item_id" value="<?= @$item->item_id; ?>" />
+                            <div class='row'>
+                                <div class="input-field col s6">
+                                    <input id="username" type="text" name = "itemtender" class="validate required" value="<?= $item->itemtender; ?>">
+                                    <label for="username">Item Sr. No. Tender</label>
+                                </div>
+                                <div class="input-field col s6">
+                                    <input id="password" type="text" name = "units" class="validate" value="<?= $item->units; ?>">
+                                    <label for="password">Units</label>
+                                </div>
+                            </div>
+                            <div class="row">
+
+                                <div class="input-field col s12">
+                                    <textarea id="username" name = "description" class="materialize-textarea validate required" required=""><?= $item->description; ?></textarea>
+                                    <label for="username">Item Description</label>
+                                </div>
+
+
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input id="FirstName" type="text" name = "quantity" class="validate required" value="<?= $item->quantity; ?>">
+                                    <label for="FirstName">Quantity</label>
+                                </div>
+
+                                <div class="input-fields col s6 row">
+                                    <label>Select Makes</label>
+                                    <select class="validate required materialSelect" required="" name="makes[]" multiple id="makes0">
+                                        <?php
+                                        if ($makes) {
+                                            $allmakes = explode(',',$item->make);
+                                            foreach ($makes as $_make) {
+                                                ?>
+                                        <option value="<?= $_make->id ?>" <?php if(in_array($_make->id,$allmakes)){echo "selected";}?>><?= $_make->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <input id="Street" type="text" name = "makeid" class="validate required" value="<?= $item->makeid; ?>">
+                                    <label for="Street">Cat Part Id</label>
+                                </div>
+
+                            </div>
+
+
+
+                            <input class="waves-effect waves-light btn blue m-b-xs" type="submit" name='submit' value="Submit">
+
+                        </form>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+

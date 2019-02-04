@@ -4,10 +4,31 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=contractinfo',
-            'username' => 'contractinfo',
-            'password' => '',
+            'dsn' => 'mysql:host=localhost;dbname=crispdata',
+            'username' => 'root',
+            'password' => 'onlyican21<>',
             'charset' => 'utf8',
+            'enableSchemaCache' => true,
+        ],
+        'mail' => [
+            'class' => 'yashop\ses\Mailer',
+            'viewPath' => '@common/mail',
+            'access_key' => 'AKIAJOYFSXBHL7QCKZ4Q',
+            'secret_key' => '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',
+            'host' => 'email.us-east-1.amazonaws.com' // not required
+        ],
+        'cache' => [
+            'class' => 'yii\caching\FileCache',
+        ],
+        'awssdk' => [
+            'class' => 'fedemotta\awssdk\AwsSdk',
+            'credentials' => [
+                //you can use a different method to grant access
+                'key' => 'AKIAJGW5E2T6RA2WJDSA',
+                'secret' => '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',
+            ],
+            'region' => 'ap-south-1', //i.e.: 'us-east-1'
+            'version' => 'latest', //i.e.: 'latest'
         ],
         'user' => [
             'identityClass' => 'app\models\User',

@@ -12,6 +12,7 @@ class SignupForm extends Model {
 
     public $username;
     public $email;
+    public $group_id;
     public $password;
     public $is_admin;
 
@@ -29,6 +30,7 @@ class SignupForm extends Model {
             ['email', 'email'],
             ['email', 'string', 'max' => 255],
             ['email', 'unique', 'targetClass' => '\common\models\User', 'message' => 'This email address has already been taken.'],
+            ['group_id', 'required'],
             ['password', 'required'],
             ['password', 'string', 'min' => 6],
         ];
@@ -57,6 +59,7 @@ class SignupForm extends Model {
         $user = new User();
         $user->username = $this->username;
         $user->email = $this->email;
+        $user->group_id = $this->group_id;
         $user->is_admin = $this->is_admin ? '1' : '0';
         $user->password = $this->password;
         $user->setPassword($this->password);

@@ -42,11 +42,48 @@ if (($controller == 'site' && ( $action == 'manage-templates' || $action == 'cre
 $pages = [];
 $projectid = '';
 $allroles = [];
-
 ?>
-<script src="https://code.jquery.com/jquery-1.12.4.min.js"></script>
+
+<script src="//code.jquery.com/jquery-2.2.4.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 <input type = "hidden" value = "<?= $baseURL ?>" id = "base_url">
+<style>
+    .header-title span{margin:8px 0;}
+    .chapter-title img {
+        width: 150px;
+    }
+    .header-title {
+        float: left;
+        width: 25%;
+    }
+
+    .modalclose {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 1040;
+    }
+    form.left.search.col.s2.hide-on-small-and-down {
+        float: left;
+        margin-left: 150px;
+    }
+    a#sbutton {
+        margin-left: 10px;
+    }
+    .fetchmess p {
+        font-size: 35px;
+        color: #00ACC1!important;
+        margin-top: 25px!important;
+    }
+    span.fetchmess {
+        text-align: center;
+    }
+    .select-wrapper span.caret{color:#000!important;}
+
+</style>
 <div class="loader-bg"></div>
 <div class="loader">
     <div class="preloader-wrapper big active">
@@ -98,10 +135,19 @@ $allroles = [];
                     </a>
                 </section>
                 <div class="header-title">      
-                    <span class="chapter-title"><a href="<?= $baseURL; ?>">Crisp Data</a></span>
+                    <span class="chapter-title"><a href="<?= $baseURL; ?>"><img src='<?= $imageURL; ?>/images/clogo.png'></a></span>
                 </div>
+                <form id="searchform" class="left search col s2 hide-on-small-and-down">
+                    <div class="input-field">
+                        <input id="searchdata" type="search" placeholder="Search Tenders By Id" autocomplete="off">
+                        <label for="searchdata"><i class="material-icons search-icon">search</i></label>
 
-              
+                    </div>
+
+
+                    <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
+                </form>
+                <a class="btn green" id="sbutton">Search</a>
                 <ul class="right col s7 m3 nav-right-menu setting">
                     <li><a href="javascript:void(0)" data-activates="chat-sidebar" class="chat-button show-on-large"><i class="material-icons">more_vert</i></a></li>
                     <?php
@@ -111,7 +157,7 @@ $allroles = [];
                         $logo = $imageURL . 'assets/images/profile-image.png';
                     }
                     ?>
-                    <li class="hide-on-small-and-down"><a href="javascript:void(0)" data-activates="dropdown1" id="messagebutton" class="dropdown-button dropdown-right show-on-large"><img src="<?= $logo; ?>" class="circle" alt=""><span class="badge"></span></a></li>
+                    <li class="hide-on-small-and-down"><a href="javascript:void(0)" id="messagebuttons" class="dropdown-button dropdown-right show-on-large"><img src="<?= $logo; ?>" class="circle" alt=""><span class="badge"></span></a></li>
                     <li class="hide-on-med-and-up"><a href="javascript:void(0)" class="search-toggle"><i class="material-icons">search</i></a></li>
 
                 </ul>
@@ -129,10 +175,13 @@ $allroles = [];
 
             </div>
         </nav>
+
     </header>
-    <div id="searchdata">
+
+    <div id="searchresult">
 
     </div>
+
     <aside id="chat-sidebar" class="side-nav white">
         <div class="side-nav-wrapper">
             <div id="sidebar-chat-tab" class="col s12 sidebar-messages right-sidebar-panel">
@@ -140,7 +189,7 @@ $allroles = [];
                     <li class="no-padding">
                         <a class="waves-effect waves-grey" href="<?= $baseURL . 'site/editprofile' ?>"><i class="material-icons">perm_identity</i>Profile</a>
                     </li>
-                   
+
                     <li class="divider"></li>
                     <li class="no-padding">
 
@@ -168,68 +217,99 @@ $allroles = [];
                     </a>
                 </li>
                 <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
-                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/tenders">
-                        <i class="material-icons">dashboard</i>
-                        Tenders
+                    <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'tenders' || $action == 'technicaltenders' || $action == 'financialtenders' || $action == 'aoctenders' || $action == 'utenders' || $action == 'atenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li><a href="<?= $baseURL ?>site/tenders" class="<?= ($controller == 'site' && $action == 'tenders') ? 'active-page' : '' ?>">All</a></li>
+                            <li><a href="<?= $baseURL ?>site/utenders" class="<?= ($controller == 'site' && $action == 'utenders') ? 'active-page' : '' ?>">Unapproved</a></li>
+                            <li><a href="<?= $baseURL ?>site/atenders" class="<?= ($controller == 'site' && $action == 'atenders') ? 'active-page' : '' ?>">Approved</a></li>
+                            <li><a href="<?= $baseURL ?>site/technicaltenders" class="<?= ($controller == 'site' && $action == 'technicaltenders') ? 'active-page' : '' ?>">Technical</a></li>
+                            <li><a href="<?= $baseURL ?>site/financialtenders" class="<?= ($controller == 'site' && $action == 'financialtenders') ? 'active-page' : '' ?>">Financial</a></li>
+                            <li><a href="<?= $baseURL ?>site/aoctenders" class="<?= ($controller == 'site' && $action == 'aoctenders') ? 'active-page' : '' ?>">AOC</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <!--li class="no-padding <?= ($controller == 'site' && $action == 'upcomingtenders') ? 'active' : '' ?>">
+                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/upcomingtenders">
+                        <i class="material-icons">assignment</i>
+                        Upcoming Tenders
                     </a>
                 </li>
-                <?php if ($action == 'project-details' || $action == 'page-details' || $action == 'create-page-item' || $action == 'message-screen' || $action == 'documents' || $action == 'timeline' || $action == 'addtimeline' || $action == 'create-thread' || $action == 'generate-report' || $action == 'drawing-tool' || $action == 'add-page' || $action == 'createsheetsort' || $action == 'requests' || $action == 'update-project' || ($controller == 'tool' && $action == 'index') || ($controller == 'tool' && $action == 'all-access') || ($controller == 'tool' && $action == 'assign-diagram')) { ?>
-                    <li class="no-padding <?= ($action == 'project-details') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey " href="<?= $baseURL ?>site/project-details?project=<?= @$projectid; ?>">
-                            <i class="material-icons">details</i>
-                            General Details
+                <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
+                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/tenders">
+                        <i class="material-icons">assignment</i>
+                        All Tenders
+                    </a>
+                </li-->
+                <li class="no-padding <?= ($controller == 'site' && $action == 'makes') ? 'active' : '' ?>">
+                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/makes">
+                        <i class="material-icons">description</i>
+                        Makes
+                    </a>
+                </li>
+                <li class="no-padding <?= ($controller == 'site' && $action == 'sizes') ? 'active' : '' ?>">
+                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/sizes">
+                        <i class="material-icons">description</i>
+                        Sizes
+                    </a>
+                </li>
+                <li class="no-padding <?= ($controller == 'site' && $action == 'fittings') ? 'active' : '' ?>">
+                    <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/fittings">
+                        <i class="material-icons">description</i>
+                        Fittings
+                    </a>
+                </li>
+
+                <li class="no-padding <?= ($controller == 'contractor' && $action == 'index') ? 'active' : '' ?>">
+                    <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'contractor' && ($action == 'index' || $action == 'allcontractors')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Contractors<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                    <div class="collapsible-body">
+                        <ul>
+                            <li><a href="<?= $baseURL ?>contractor/index" class="<?= ($controller == 'contractor' && $action == 'index') ? 'active-page' : '' ?>">Upload</a></li>
+                            <li><a href="<?= $baseURL ?>contractor/allcontractors" class="<?= ($controller == 'contractor' && $action == 'allcontractors') ? 'active-page' : '' ?>">All Contractors</a></li>
+                        </ul>
+                    </div>
+                </li>
+                <?php if ($user->group_id != 3) { ?>
+                    <li class="no-padding <?= ($controller == 'mail' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="<?= $baseURL ?>mail/index">
+                            <i class="material-icons">mail</i>
+                            Mail
                         </a>
                     </li>
-                    <li class="no-padding <?= ($action == 'page-details' || $action == 'add-page') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= (isset($_GET['page']) || (isset($_GET['project']) && $action == 'add-page')) ? 'active' : '' ?>">
-                            <i class="material-icons">pages</i>
-                            Pages
-                            <i class="nav-drop-icon material-icons">keyboard_arrow_right</i>
+                <?php } ?>
+                <?php if ($user->group_id == 1) { ?>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'users') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="<?= $baseURL ?>site/users">
+                            <i class="material-icons">perm_identity</i>
+                            Users
                         </a>
+                    </li>
+                <?php } ?>
+                <?php if ($user->group_id != 3) { ?>
+                   
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'clients') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'dealers' || $action == 'contractors' || $action == 'manufacturers')) ? 'active' : '' ?>"><i class="material-icons">perm_identity</i>Clients<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <?php foreach ($pages as $page) { ?>
-                                    <li><a <?= (isset($_GET['page']) && ($_GET['page'] == $page->PageID)) ? 'class="active-page"' : '' ?> href="<?= $baseURL ?>page/page-details?page=<?= $page->PageID; ?>"><?= $page->PageName; ?></a></li>
-                                <?php } ?>
-                                <li>
-                                    <a class="<?= ($action == 'add-page') ? 'active-page' : '' ?>" href="<?= $baseURL ?>page/add-page?project=<?= @$projectid; ?>">
-                                        Add New Page
-                                    </a>
-                                </li>
+                                <li><a href="<?= $baseURL ?>site/dealers" class="<?= ($controller == 'site' && $action == 'dealers') ? 'active-page' : '' ?>">Dealers</a></li>
+                                <li><a href="<?= $baseURL ?>site/contractors" class="<?= ($controller == 'site' && $action == 'contractors') ? 'active-page' : '' ?>">Contractors</a></li>
+                                <li><a href="<?= $baseURL ?>site/manufacturers" class="<?= ($controller == 'site' && $action == 'manufacturers') ? 'active-page' : '' ?>">Manufacturers</a></li>
                             </ul>
                         </div>
                     </li>
-                    <li class="no-padding <?= ($action == 'timeline') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey " href="<?= $baseURL ?>timeline/timeline?project=<?= @$projectid; ?>">
-                            <i class="material-icons">timeline</i>
-                            Timeline
-                        </a>
-                    </li>
-                    <li class="no-padding <?= ($action == 'message-screen') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey " href="<?= $baseURL ?>message/message-screen?project=<?= @$projectid; ?>">
-                            <i class="material-icons">message</i>
-                            Messages
-                        </a>
-                    </li>
-                    <li class="no-padding <?= ($action == 'documents') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey " href="<?= $baseURL ?>documents/documents?project=<?= @$projectid; ?>">
-                            <i class="material-icons">file_copy</i>
-                            Files
-                        </a>
-                    </li>
-                <?php }?>
+                <?php } ?>
+<!--li class="no-padding <?= ($controller == 'site' && $action == 'items') ? 'active' : '' ?>">
+<a class="waves-effect waves-grey" href="<?= $baseURL ?>site/items">
+<i class="material-icons">assessment</i>
+Items
+</a>
+</li-->
 
-                   
-
-
-
-               
             </ul>
             <div class="footer">
-                <p class="copyright">Crisp data</p>
-                <a href="<?= $baseURL ?>site/privacy">Privacy</a> &amp; <a href="<?= $baseURL ?>site/terms">Terms</a>
+                <p class="copyright">Crispdata</p>
+                <a target="_blank" href="/index.php/site/privacy">Privacy</a> &amp; <a target="_blank" href="/index.php/site/terms">Terms</a>
             </div>
         </div>
     </aside>
-   
-   
+    <div class="modalclose" style="display: none;"></div>

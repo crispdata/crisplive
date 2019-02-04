@@ -6,12 +6,13 @@ use Robo\Task\Development\GenerateMarkdownDoc as Doc;
 
 class RoboFile extends \Robo\Tasks
 {
-    const STABLE_BRANCH = '2.4';
+    const STABLE_BRANCH = '2.5';
     const REPO_BLOB_URL = 'https://github.com/Codeception/Codeception/blob';
 
     public function release()
     {
         $this->say("CODECEPTION RELEASE: ".\Codeception\Codecept::VERSION);
+        $this->versionBump();
         $this->update();
         $this->buildDocs();
         $this->publishDocs();
@@ -20,7 +21,6 @@ class RoboFile extends \Robo\Tasks
         $this->publishPhar();
         $this->publishGit();
         $this->publishBase(null, \Codeception\Codecept::VERSION);
-        $this->versionBump();
         $this->update(); //update dependencies after release, because buildPhar5 set them to old versions
     }
 
@@ -519,8 +519,10 @@ EOF;
                 $releaseFile->line("\n## $branch");
                 if ($major < 2) {
                     $releaseFile->line("*Requires: PHP 5.3 and higher + CURL*\n");
-                } else {
+                } elseif ($major == 2 && $minor < 4) {
                     $releaseFile->line("*Requires: PHP 5.4 and higher + CURL*\n");
+                } else {
+                    $releaseFile->line("*Requires: PHP 5.6 and higher + CURL*\n");
                 }
                 $releaseFile->line("* **[Download Latest $branch Release]($downloadUrl)**");
             }
