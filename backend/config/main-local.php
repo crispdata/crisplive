@@ -6,23 +6,117 @@ $config = [
             // !!! insert a secret key in the following (if it is empty) - this is required by cookie validation
             'cookieValidationKey' => 'rtx_nT29Ai9rkBwZ-wL_BrLTP56VQSSh',
         ],
+        'assetManager' => [
+            'appendTimestamp' => true,
+        ],
         'urlManager' => [
             'class' => 'yii\web\UrlManager',
+            'baseUrl' => 'https://admin.crispdata.co.in/',
             // Hide index.php
-            'showScriptName' => true,
+            'showScriptName' => false,
             // Use pretty URLs
             'enablePrettyUrl' => true,
-            'rules' => [],
+            'enableStrictParsing' => false,
+            'rules' => [
+                [
+                    'pattern'=>'site/edit-user/<id:\d+>',
+                    'route'=>'site/edit-user'
+                ],
+                [
+                    'pattern'=>'site/change-status/<id:\d+>',
+                    'route'=>'site/change-status'
+                ],
+                [
+                    'pattern'=>'site/delete-user/<id:\d+>',
+                    'route'=>'site/delete-user'
+                ],
+                [
+                    'pattern'=>'site/edit-client/<id:\d+>',
+                    'route'=>'site/edit-client'
+                ],
+                [
+                    'pattern'=>'site/change-status-client/<id:\d+>',
+                    'route'=>'site/change-status-client'
+                ],
+                [
+                    'pattern'=>'site/delete-client/<id:\d+>',
+                    'route'=>'site/delete-client'
+                ],
+                [
+                    'pattern'=>'contractor/add-contractor/<id:\d+>',
+                    'route'=>'contractor/add-contractor'
+                ],
+                [
+                    'pattern'=>'contractor/delete-contractor/<id:\d+>',
+                    'route'=>'contractor/delete-contractor'
+                ],
+                [
+                    'pattern'=>'site/create-size/<id:\d+>',
+                    'route'=>'site/create-size'
+                ],
+                [
+                    'pattern'=>'site/delete-size/<id:\d+>',
+                    'route'=>'site/delete-size'
+                ],
+                [
+                    'pattern'=>'site/create-fitting/<id:\d+>',
+                    'route'=>'site/create-fitting'
+                ],
+                [
+                    'pattern'=>'site/delete-fitting/<id:\d+>',
+                    'route'=>'site/delete-fitting'
+                ],
+                [
+                    'pattern'=>'site/create-make-em/<id:\d+>',
+                    'route'=>'site/create-make-em'
+                ],
+                [
+                    'pattern'=>'site/delete-make/<id:\d+>',
+                    'route'=>'site/delete-make'
+                ],
+                [
+                    'pattern'=>'site/create-make-civil/<id:\d+>',
+                    'route'=>'site/create-make-civil'
+                ],
+                [
+                    'pattern'=>'site/create-tender/<id:\d+>',
+                    'route'=>'site/create-tender'
+                ],
+                [
+                    'pattern'=>'site/create-item/<id:\d+>',
+                    'route'=>'site/create-item'
+                ],
+                [
+                    'pattern'=>'site/view-items/<id:\d+>',
+                    'route'=>'site/view-items'
+                ],
+                [
+                    'pattern'=>'site/delete-tender/<id:\d+>',
+                    'route'=>'site/delete-tender'
+                ],
+                [
+                    'pattern'=>'site/edit-item/<id:\d+>',
+                    'route'=>'site/edit-item'
+                ],
+                [
+                    'pattern'=>'site/delete-item/<id:\d+>/<tid:\d+>',
+                    'route'=>'site/delete-item'
+                ],
+                [
+                    'pattern'=>'site/approvetenders/<c:\d+>',
+                    'route'=>'site/approvetenders'
+                ]
+            ]
         ],
     ],
 ];
 
 if (!YII_ENV_TEST) {
     // configuration adjustments for 'dev' environment
-    $config['bootstrap'][] = 'debug';
-    $config['modules']['debug'] = [
-        'class' => 'yii\debug\Module',
-    ];
+    /* $config['bootstrap'][] = 'debug';
+      $config['modules']['debug'] = [
+      'class' => 'yii\debug\Module',
+      ]; */
 
     $config['bootstrap'][] = 'gii';
     $config['modules']['gii'] = [
