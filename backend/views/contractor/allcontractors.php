@@ -1,6 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 use yii\widgets\LinkPager;
+use yii\helpers\Url;
 $this->title = 'Manage Contractors';
 
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -98,7 +99,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $size->email ?></td>
                                             <td>
 
-                                                <a href="<?= $baseURL ?>contractor/add-contractor?id=<?= $size->id; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                                <a href="<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
 
                                                 <a href="#modal<?= $size->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
@@ -114,7 +115,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="modal-footer">
                                             <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= $baseURL ?>contractor/delete-contractor?id=<?= $size->id; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                            <a href="<?= Url::to(['contractor/delete-contractor', 'id' => $size->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
 

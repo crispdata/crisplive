@@ -18,6 +18,11 @@ $(document).ready(function () {
     $("#searchform").submit(function (e) {
         e.preventDefault();
         var val = $("#searchdata").val() // get the current value of the input field.
+        var vallength = $("#searchdata").val().length; // get the current value of the input field.
+        if (vallength < 6) {
+            alert('Please enter minimum 6 digits Tender Id');
+            return false;
+        }
         if (val) {
             $.ajax({
                 url: baseUrl + 'site/searchtender',
@@ -27,7 +32,9 @@ $(document).ready(function () {
                     $(".mn-inner .col .page-title").html('');
                     $(".mn-inner #sort-data").css('display', 'none');
                     $(".mn-inner .add-contact").css('display', 'none');
-                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tenders.....</p></span>');
+                    $(".mn-inner .card.top").css('background-color', '#fff');
+                    $(".mn-inner.inner-active-sidebar").css('display', 'none');
+                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tender.....</p></span>');
                     //$(".mn-inner .card").css('width','1058px');
                     $(".mn-inner form p").css('text-align', 'center');
                 },
@@ -73,8 +80,841 @@ $(document).ready(function () {
     });
 
 
+    $("#getdata").submit(function (e) {
+        e.preventDefault();
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'mail/getdata',
+            data: $('#getdata').serialize(),
+            beforeSend: function () {
+            },
+            success: function (response) {
+
+                alert(response);
+
+            }
+        });
+    });
+
+    $('.fromdatepicker').pickadate({
+        format: 'yyyy-mm-dd',
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15, // Creates a dropdown of 15 years to control year
+        onSet: function (ele) {
+            if (ele.select) {
+                var chosen_date = $('.fromdatepicker').val();
+                $('.todatepicker').pickadate('picker').set('min', chosen_date);
+                $(".todatepicker").removeAttr('disabled');
+                this.close();
+            }
+        }
+    });
+
+    $('.todatepicker').pickadate({
+        format: 'yyyy-mm-dd',
+        selectMonths: true, // Creates a dropdown to control month
+        selectYears: 15, // Creates a dropdown of 15 years to control year
+        onSet: function (ele) {
+            if (ele.select) {
+                var fromdate = $('.fromdatepicker').val();
+                var todate = $('.todatepicker').val();
+                this.close();
+
+                var command = $("#command option:selected").val();
+                var product = $("#product option:selected").val();
+                var make = $("#dashmake option:selected").val();
+                var sizeval = $("#typefour option:selected").val();
+                $("#typeone").prop('selectedIndex', 0);
+                $("#typeone").material_select();
+                $("#typetwo").prop('selectedIndex', 0);
+                $("#typetwo").material_select();
+                $("#typethree").prop('selectedIndex', 0);
+                $("#typethree").material_select();
+                $("#typefour").prop('selectedIndex', 0);
+                $("#typefour").material_select();
+
+                if (make != '') {
+                    if (product == 1) {
+                        $("#cable-size").show();
+                        $("#light-type").hide();
+                        var ext = 'RM';
+                        //$("#light-capacity").hide();
+                    } else {
+                        $("#cable-size").hide();
+                        $("#light-type").show();
+                        var ext = 'NOS';
+                        //$("#light-capacity").show();
+                    }
+
+                }
+
+                var sizes = '';
+                var types = '';
+                var ctypes = '';
+                $.ajax({
+                    type: 'post',
+                    url: baseUrl + 'site/getmakedetails',
+                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+                    beforeSend: function () {
+                        $("#u10").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u20").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u30").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u11").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u21").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u31").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u12").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
+                        if (make != '') {
+                            $("#total").html('<img src="/assets/images/loading.gif" alt="">');
+                            $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
+                            $("#value").html('<img src="/assets/images/loading.gif" alt="">');
+                            $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
+                            //$("#piechart").hide();
+                            $("#p2").hide();
+                            $("#p3").hide();
+                            $("#p4").hide();
+                            $("#p5").hide();
+                        }
+                    },
+                    success: function (response) {
+
+
+                        var myJSON = JSON.parse(response);
+                        if (myJSON) {
+                            if (make != '') {
+                                $("#total").html(myJSON.first.total);
+                                $("#quantity").html(myJSON.first.quantity);
+                                $("#value").html(myJSON.first.value);
+                                var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+                                if (checkone != 0) {
+                                    $("#piechart").show();
+                                    drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+                                } else {
+                                    $("#piechart").html('No Data Available');
+                                }
+
+                            }
+                            $("#u10").html(myJSON.first.aptenderstotal);
+                            $("#u20").html(myJSON.first.aptendersquantity);
+                            $("#u30").html(myJSON.first.aptendersprice);
+                            $("#u11").html(myJSON.first.artenderstotal);
+                            $("#u21").html(myJSON.first.artendersquantity);
+                            $("#u31").html(myJSON.first.artendersprice);
+                            $("#u12").html(myJSON.first.bltenderstotal);
+                            $("#u22").html(myJSON.first.bltendersquantity);
+                            $("#u32").html(myJSON.first.bltendersprice);
+                            if (myJSON.first.artenders == 0) {
+                                $("#cable-size").hide();
+                            }
+                            if (make != '') {
+                                $("#a1").html(myJSON.second.headone);
+                                $("#a2").html('0 ' + ext + '');
+                                $("#a3").html('0 ' + ext + '');
+                                $("#a4").html('0 ' + ext + '');
+                                $("#a5").html('0 ' + ext + '');
+                                $("#b1").html(myJSON.second.headtwo);
+                                $("#b2").html('0 ' + ext + '');
+                                $("#b3").html('0 ' + ext + '');
+                                $("#b4").html('0 ' + ext + '');
+                                $("#b5").html('0 ' + ext + '');
+                                $("#c1").html(myJSON.second.headthree);
+                                $("#c2").html('0 ' + ext + '');
+                                $("#c3").html('0 ' + ext + '');
+                                $("#c4").html('0 ' + ext + '');
+                                $("#c5").html('0 ' + ext + '');
+                                $("#o1").html(myJSON.second.headfour);
+                                $("#o2").html('0 ' + ext + '');
+                                $("#o3").html('0 ' + ext + '');
+                                $("#o4").html('0 ' + ext + '');
+                                $("#o5").html('0 ' + ext + '');
+                                $("#d2").html(myJSON.second.atotallight);
+                                $("#d3").html(myJSON.second.totallight);
+                                $("#d4").html(myJSON.second.withlight);
+                                $("#d5").html(myJSON.second.withoutlight);
+                                $("#e2").html(myJSON.second.totalclight);
+                                $("#e3").html(myJSON.second.withclight);
+                                $("#lighthead").html('With ' + myJSON.makename);
+                                $("#lightheadtwo").html('Without ' + myJSON.makename);
+                                $("#capacityhead").html(myJSON.makename);
+
+
+                                /*$('.materialSelectsize').on('contentChanged', function () {
+                                 $(this).material_select();
+                                 });
+                                 
+                                 $.each(myJSON.sizes, function (key, value) {
+                                 if (key != 0) {
+                                 sizes += '<option value="' + key + '">' + value + '</option>';
+                                 } else {
+                                 sizes += '<option value="" disabled required>No Sizes</option>';
+                                 }
+                                 }
+                                 );
+                                 $("#typefour").html(sizes);
+                                 $("#typefour").trigger('contentChanged');*/
+
+                                $('.materialSelecttype').on('contentChanged', function () {
+                                    $(this).material_select();
+                                });
+
+                                $.each(myJSON.tlights, function (key, value) {
+                                    if (key != 0) {
+                                        types += '<option value="' + key + '">' + value + '</option>';
+                                    } else {
+                                        types += '<option value="" disabled required>No Types</option>';
+                                    }
+                                }
+                                );
+                                $("#typelights").html(types);
+                                $("#typelights").trigger('contentChanged');
+
+                                /*$('.materialSelecttypecapacity').on('contentChanged', function () {
+                                 $(this).material_select();
+                                 });
+                                 
+                                 $.each(myJSON.clights, function (key, value) {
+                                 if (key != 0) {
+                                 ctypes += '<option value="' + key + '">' + value + '</option>';
+                                 } else {
+                                 ctypes += '<option value="" disabled required>No Capacity</option>';
+                                 }
+                                 }
+                                 );
+                                 $("#capacitylights").html(ctypes);
+                                 $("#capacitylights").trigger('contentChanged');*/
+                            }
+                            if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
+                                $("#curve_chart_ce").html('');
+                                $("#chief").hide();
+                            } else {
+                                $("#chief").show();
+                                drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                            }
+                        }
+
+                    }
+                });
+            }
+        }
+    });
+
+    $("#dashmake").on('change', function () {
+        var make = $(this).children("option:selected").val();
+        var product = $("#product option:selected").val();
+        var sizeval = $("#typefour option:selected").val();
+        var command = $("#command option:selected").val();
+        var fromdate = $("#fromdate").val();
+        var todate = $("#todate").val();
+        $("#typeone").prop('selectedIndex', 0);
+        $("#typeone").material_select();
+        $("#typetwo").prop('selectedIndex', 0);
+        $("#typetwo").material_select();
+        $("#typethree").prop('selectedIndex', 0);
+        $("#typethree").material_select();
+        $("#typefour").prop('selectedIndex', 0);
+        $("#typefour").material_select();
+        if (product == 1) {
+            $("#cable-size").show();
+            $("#light-type").hide();
+            var ext = 'RM';
+            //$("#light-capacity").hide();
+        } else {
+            $("#cable-size").hide();
+            $("#light-type").show();
+            var ext = 'NOS';
+            //$("#light-capacity").show();
+        }
+
+        var sizes = '';
+        var types = '';
+        var ctypes = '';
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getmakedetails',
+            data: 'type=2&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+            beforeSend: function () {
+                $("#total").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#value").html('<img src="/assets/images/loading.gif" alt="">');
+                $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
+                //$("#piechart").hide();
+                $("#p2").hide();
+                $("#p3").hide();
+                $("#p4").hide();
+                $("#p5").hide();
+                $("#l2").hide();
+                //$("#p22").html('<img src="/assets/images/loading.gif" alt="">');
+            },
+            success: function (response) {
+
+                var myJSON = JSON.parse(response);
+                if (myJSON) {
+                    $("#total").html(myJSON.first.total);
+                    $("#quantity").html(myJSON.first.quantity);
+                    $("#value").html(myJSON.first.value);
+                    $("#a1").html(myJSON.second.headone);
+                    $("#a2").html('0 ' + ext + '');
+                    $("#a3").html('0 ' + ext + '');
+                    $("#a4").html('0 ' + ext + '');
+                    $("#a5").html('0 ' + ext + '');
+                    $("#b1").html(myJSON.second.headtwo);
+                    $("#b2").html('0 ' + ext + '');
+                    $("#b3").html('0 ' + ext + '');
+                    $("#b4").html('0 ' + ext + '');
+                    $("#b5").html('0 ' + ext + '');
+                    $("#c1").html(myJSON.second.headthree);
+                    $("#c2").html('0 ' + ext + '');
+                    $("#c3").html('0 ' + ext + '');
+                    $("#c4").html('0 ' + ext + '');
+                    $("#c5").html('0 ' + ext + '');
+                    $("#o1").html(myJSON.second.headfour);
+                    $("#o2").html('0 ' + ext + '');
+                    $("#o3").html('0 ' + ext + '');
+                    $("#o4").html('0 ' + ext + '');
+                    $("#o5").html('0 ' + ext + '');
+                    $("#d2").html(myJSON.second.atotallight);
+                    $("#d3").html(myJSON.second.totallight);
+                    $("#d4").html(myJSON.second.withlight);
+                    $("#d5").html(myJSON.second.withoutlight);
+                    $("#e2").html(myJSON.second.totalclight);
+                    $("#e3").html(myJSON.second.withclight);
+                    $("#lighthead").html('With ' + myJSON.makename);
+                    $("#lightheadtwo").html('Without ' + myJSON.makename);
+                    $("#capacityhead").html(myJSON.makename);
+
+                    /*$('.materialSelectsize').on('contentChanged', function () {
+                     $(this).material_select();
+                     });
+                     
+                     $.each(myJSON.sizes, function (key, value) {
+                     if (key != 0) {
+                     sizes += '<option value="' + key + '">' + value + '</option>';
+                     } else {
+                     sizes += '<option value="" disabled required>No Sizes</option>';
+                     }
+                     }
+                     );
+                     $("#typefour").html(sizes);
+                     $("#typefour").trigger('contentChanged');*/
+
+                    $('.materialSelecttype').on('contentChanged', function () {
+                        $(this).material_select();
+                    });
+
+                    $.each(myJSON.tlights, function (key, value) {
+                        if (key != 0) {
+                            types += '<option value="' + key + '">' + value + '</option>';
+                        } else {
+                            types += '<option value="" disabled required>No Types</option>';
+                        }
+                    }
+                    );
+                    $("#typelights").html(types);
+                    $("#typelights").trigger('contentChanged');
+
+                    /*$('.materialSelecttypecapacity').on('contentChanged', function () {
+                     $(this).material_select();
+                     });
+                     
+                     $.each(myJSON.clights, function (key, value) {
+                     if (key != 0) {
+                     ctypes += '<option value="' + key + '">' + value + '</option>';
+                     } else {
+                     ctypes += '<option value="" disabled required>No Capacity</option>';
+                     }
+                     }
+                     );
+                     $("#capacitylights").html(ctypes);
+                     $("#capacitylights").trigger('contentChanged');*/
+                    var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+                    if (checkone != 0) {
+                        $("#piechart").show();
+                        drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+                    } else {
+                        $("#piechart").html('No Data Available');
+                    }
+                    drawLineChart(myJSON.graph, "curve_chart");
+                    if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12) {
+                        $("#curve_chart_ce").html('');
+                        $("#chief").hide();
+                    } else {
+                        $("#chief").show();
+                        drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                    }
+
+                }
+
+            }
+        });
+    });
+
+    $("#command").on('change', function () {
+        var command = $(this).children("option:selected").val();
+        var product = $("#product option:selected").val();
+        var make = $("#dashmake option:selected").val();
+        var sizeval = $("#typefour option:selected").val();
+        var fromdate = $("#fromdate").val();
+        var todate = $("#todate").val();
+        $("#typeone").prop('selectedIndex', 0);
+        $("#typeone").material_select();
+        $("#typetwo").prop('selectedIndex', 0);
+        $("#typetwo").material_select();
+        $("#typethree").prop('selectedIndex', 0);
+        $("#typethree").material_select();
+        $("#typefour").prop('selectedIndex', 0);
+        $("#typefour").material_select();
+
+        if (make != '') {
+            if (product == 1) {
+                $("#cable-size").show();
+                $("#light-type").hide();
+                var ext = 'RM';
+                //$("#light-capacity").hide();
+            } else {
+                $("#cable-size").hide();
+                $("#light-type").show();
+                var ext = 'NOS';
+                //$("#light-capacity").show();
+            }
+
+        }
+
+        var sizes = '';
+        var types = '';
+        var ctypes = '';
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getmakedetails',
+            data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+            beforeSend: function () {
+                $("#u10").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u20").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u30").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u11").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u21").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u31").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u12").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
+                if (make != '') {
+                    $("#total").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#value").html('<img src="/assets/images/loading.gif" alt="">');
+                    $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
+                    //$("#piechart").hide();
+                    $("#p2").hide();
+                    $("#p3").hide();
+                    $("#p4").hide();
+                    $("#p5").hide();
+                }
+            },
+            success: function (response) {
+
+
+                var myJSON = JSON.parse(response);
+                if (myJSON) {
+                    if (make != '') {
+                        $("#total").html(myJSON.first.total);
+                        $("#quantity").html(myJSON.first.quantity);
+                        $("#value").html(myJSON.first.value);
+                        var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+                        if (checkone != 0) {
+                            $("#piechart").show();
+                            drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+                        } else {
+                            $("#piechart").html('No Data Available');
+                        }
+
+                    }
+                    $("#u10").html(myJSON.first.aptenderstotal);
+                    $("#u20").html(myJSON.first.aptendersquantity);
+                    $("#u30").html(myJSON.first.aptendersprice);
+                    $("#u11").html(myJSON.first.artenderstotal);
+                    $("#u21").html(myJSON.first.artendersquantity);
+                    $("#u31").html(myJSON.first.artendersprice);
+                    $("#u12").html(myJSON.first.bltenderstotal);
+                    $("#u22").html(myJSON.first.bltendersquantity);
+                    $("#u32").html(myJSON.first.bltendersprice);
+                    if (myJSON.first.artenders == 0) {
+                        $("#cable-size").hide();
+                    }
+                    if (make != '') {
+                        $("#a1").html(myJSON.second.headone);
+                        $("#a2").html('0 ' + ext + '');
+                        $("#a3").html('0 ' + ext + '');
+                        $("#a4").html('0 ' + ext + '');
+                        $("#a5").html('0 ' + ext + '');
+                        $("#b1").html(myJSON.second.headtwo);
+                        $("#b2").html('0 ' + ext + '');
+                        $("#b3").html('0 ' + ext + '');
+                        $("#b4").html('0 ' + ext + '');
+                        $("#b5").html('0 ' + ext + '');
+                        $("#c1").html(myJSON.second.headthree);
+                        $("#c2").html('0 ' + ext + '');
+                        $("#c3").html('0 ' + ext + '');
+                        $("#c4").html('0 ' + ext + '');
+                        $("#c5").html('0 ' + ext + '');
+                        $("#o1").html(myJSON.second.headfour);
+                        $("#o2").html('0 ' + ext + '');
+                        $("#o3").html('0 ' + ext + '');
+                        $("#o4").html('0 ' + ext + '');
+                        $("#o5").html('0 ' + ext + '');
+                        $("#d2").html(myJSON.second.atotallight);
+                        $("#d3").html(myJSON.second.totallight);
+                        $("#d4").html(myJSON.second.withlight);
+                        $("#d5").html(myJSON.second.withoutlight);
+                        $("#e2").html(myJSON.second.totalclight);
+                        $("#e3").html(myJSON.second.withclight);
+                        $("#lighthead").html('With ' + myJSON.makename);
+                        $("#lightheadtwo").html('Without ' + myJSON.makename);
+                        $("#capacityhead").html(myJSON.makename);
+
+
+                        /*$('.materialSelectsize').on('contentChanged', function () {
+                         $(this).material_select();
+                         });
+                         
+                         $.each(myJSON.sizes, function (key, value) {
+                         if (key != 0) {
+                         sizes += '<option value="' + key + '">' + value + '</option>';
+                         } else {
+                         sizes += '<option value="" disabled required>No Sizes</option>';
+                         }
+                         }
+                         );
+                         $("#typefour").html(sizes);
+                         $("#typefour").trigger('contentChanged');*/
+
+                        $('.materialSelecttype').on('contentChanged', function () {
+                            $(this).material_select();
+                        });
+
+                        $.each(myJSON.tlights, function (key, value) {
+                            if (key != 0) {
+                                types += '<option value="' + key + '">' + value + '</option>';
+                            } else {
+                                types += '<option value="" disabled required>No Types</option>';
+                            }
+                        }
+                        );
+                        $("#typelights").html(types);
+                        $("#typelights").trigger('contentChanged');
+
+                        /*$('.materialSelecttypecapacity').on('contentChanged', function () {
+                         $(this).material_select();
+                         });
+                         
+                         $.each(myJSON.clights, function (key, value) {
+                         if (key != 0) {
+                         ctypes += '<option value="' + key + '">' + value + '</option>';
+                         } else {
+                         ctypes += '<option value="" disabled required>No Capacity</option>';
+                         }
+                         }
+                         );
+                         $("#capacitylights").html(ctypes);
+                         $("#capacitylights").trigger('contentChanged');*/
+                    }
+                    if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
+                        $("#curve_chart_ce").html('');
+                        $("#chief").hide();
+                    } else {
+                        $("#chief").show();
+                        drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                    }
+                }
+
+            }
+        });
+    });
+
+    $(".cables").on('change', function () {
+        var product = $("#product option:selected").val();
+        var make = $("#dashmake option:selected").val();
+        var command = $("#command option:selected").val();
+        var typecable = $(this).attr("data-field");
+        var val = $(this).children("option:selected").val();
+        var fromdate = $("#fromdate").val();
+        var todate = $("#todate").val();
+        var typeone = '';
+        var typetwo = '';
+        var typethree = '';
+        var typefour = '';
+        var sizes = '';
+
+        if (product == 1) {
+            var ext = 'RM';
+        } else {
+            var ext = 'NOS';
+        }
+
+        if (typecable == 1) {
+            typetwo = $("#typetwo option:selected").val();
+            typethree = $("#typethree option:selected").val();
+            typefour = $("#typefour option:selected").val();
+        } else if (typecable == 2) {
+            typeone = $("#typeone option:selected").val();
+            typethree = $("#typethree option:selected").val();
+            typefour = $("#typefour option:selected").val();
+        } else if (typecable == 3) {
+            typeone = $("#typeone option:selected").val();
+            typetwo = $("#typetwo option:selected").val();
+            typefour = $("#typefour option:selected").val();
+        } else {
+            typeone = $("#typeone option:selected").val();
+            typetwo = $("#typetwo option:selected").val();
+            typethree = $("#typethree option:selected").val();
+        }
+
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getsingledata',
+            data: 'val=' + val + '&make=' + make + '&product=' + product + '&command=' + command + '&typetwo=' + typetwo + '&typethree=' + typethree + '&typeone=' + typeone + '&typefour=' + typefour + '&type=' + typecable + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+            beforeSend: function () {
+                if (typecable == 1) {
+                    $("#p2").hide();
+                    $("#p3").hide();
+                    $("#p4").hide();
+                    $("#p5").hide();
+                    $("#a2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c5").html('<img src="/assets/images/loading.gif" alt="">');
+                } else if (typecable == 2) {
+                    $("#p3").hide();
+                    $("#p4").hide();
+                    $("#p5").hide();
+                    $("#a3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c5").html('<img src="/assets/images/loading.gif" alt="">');
+                } else if (typecable == 3) {
+                    $("#p4").hide();
+                    $("#p5").hide();
+                    $("#a4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#a5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c5").html('<img src="/assets/images/loading.gif" alt="">');
+                } else {
+                    $("#p5").hide();
+                    $("#a5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#b5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#c5").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#o5").html('<img src="/assets/images/loading.gif" alt="">');
+                }
+
+            },
+            success: function (response) {
+
+                var myJSON = JSON.parse(response);
+                if (myJSON) {
+
+
+                    if (typecable == 1) {
+                        $("#a2").html(myJSON.quantities.archived);
+                        $("#b2").html(myJSON.quantities.without);
+                        $("#c2").html(myJSON.quantities.with);
+                        $("#o2").html(myJSON.quantities.approved);
+                        $("#a3").html('0 ' + ext + '');
+                        $("#b3").html('0 ' + ext + '');
+                        $("#c3").html('0 ' + ext + '');
+                        $("#o3").html('0 ' + ext + '');
+                        $("#a4").html('0 ' + ext + '');
+                        $("#b4").html('0 ' + ext + '');
+                        $("#c4").html('0 ' + ext + '');
+                        $("#o4").html('0 ' + ext + '');
+                        $("#a5").html('0 ' + ext + '');
+                        $("#b5").html('0 ' + ext + '');
+                        $("#c5").html('0 ' + ext + '');
+                        $("#o5").html('0 ' + ext + '');
+                        var checktwo = myJSON.values[1] + myJSON.values[2];
+                        if (checktwo != 0) {
+                            $("#p2").show();
+                            drawPieChart(myJSON.labels, myJSON.values, "p2");
+                        } else {
+                            $("#p2").hide();
+                        }
+                        $("#p5").html('');
+                        $("#typetwo").prop('selectedIndex', 0);
+                        $("#typetwo").removeAttr('disabled');
+                        $("#typetwo").material_select();
+                        $("#typethree").prop('selectedIndex', 0);
+                        $("#typethree").prop('disabled', true);
+                        $("#typethree").material_select();
+                        $("#typefour").prop('selectedIndex', 0);
+                        $("#typefour").prop('disabled', true);
+                        $("#typefour").material_select();
+                    } else if (typecable == 2) {
+                        $("#a3").html(myJSON.quantities.archived);
+                        $("#b3").html(myJSON.quantities.without);
+                        $("#c3").html(myJSON.quantities.with);
+                        $("#o3").html(myJSON.quantities.approved);
+                        $("#a4").html('0 ' + ext + '');
+                        $("#b4").html('0 ' + ext + '');
+                        $("#c4").html('0 ' + ext + '');
+                        $("#o4").html('0 ' + ext + '');
+                        $("#a5").html('0 ' + ext + '');
+                        $("#b5").html('0 ' + ext + '');
+                        $("#c5").html('0 ' + ext + '');
+                        $("#o5").html('0 ' + ext + '');
+                        var checktwo = myJSON.values[1] + myJSON.values[2];
+                        if (checktwo != 0) {
+                            $("#p3").show();
+                            drawPieChart(myJSON.labels, myJSON.values, "p3");
+                        } else {
+                            $("#p3").hide();
+                        }
+                        $("#p5").html('');
+                        $("#typethree").prop('selectedIndex', 0);
+                        $("#typethree").removeAttr('disabled');
+                        $("#typethree").material_select();
+                        $("#typefour").prop('selectedIndex', 0);
+                        $("#typefour").prop('disabled', true);
+                        $("#typefour").material_select();
+                    } else if (typecable == 3) {
+                        $("#a4").html(myJSON.quantities.archived);
+                        $("#b4").html(myJSON.quantities.without);
+                        $("#c4").html(myJSON.quantities.with);
+                        $("#o4").html(myJSON.quantities.approved);
+                        $("#a5").html('0 ' + ext + '');
+                        $("#b5").html('0 ' + ext + '');
+                        $("#c5").html('0 ' + ext + '');
+                        $("#o5").html('0 ' + ext + '');
+                        var checktwo = myJSON.values[1] + myJSON.values[2];
+                        if (checktwo != 0) {
+                            $("#p4").show();
+                            drawPieChart(myJSON.labels, myJSON.values, "p4");
+                        } else {
+                            $("#p4").hide();
+                        }
+                        $("#p5").html('');
+                        $("#typefour").prop('selectedIndex', 0);
+                        $("#typefour").removeAttr('disabled');
+                        $("#typefour").material_select();
+                    } else {
+                        $("#a5").html(myJSON.quantities.archivedsize);
+                        $("#b5").html(myJSON.quantities.withoutsize);
+                        $("#c5").html(myJSON.quantities.withsize);
+                        $("#o5").html(myJSON.quantities.approvedsize);
+                        var checktwo = myJSON.valuessize[1] + myJSON.valuessize[2];
+                        if (checktwo != 0) {
+                            $("#p5").show();
+                            drawPieChart(myJSON.labels, myJSON.valuessize, "p5");
+                        } else {
+                            $("#p5").hide();
+                        }
+
+                    }
+
+                }
+
+                if (typecable == 2 || typecable == 3) {
+                    $('.materialSelectsizes').on('contentChanged', function () {
+                        $(this).material_select();
+                    });
+
+                    sizes += '<option value="">Select Size</option>';
+                    $.each(myJSON.quantities.sizes, function (key, value) {
+                        if (key != 0) {
+                            sizes += '<option value="' + key + '">' + value + '</option>';
+                        } else {
+                            sizes += '<option value="" disabled required>No Sizes</option>';
+                        }
+                    }
+                    );
+                    $("#typefour").html(sizes);
+                    $("#typefour").trigger('contentChanged');
+                }
+
+            }
+        });
+    });
+
+    $(".lights").on('change', function () {
+        var product = $("#product option:selected").val();
+        var make = $("#dashmake option:selected").val();
+        var command = $("#command option:selected").val();
+        var val = $(this).children("option:selected").val();
+        var fromdate = $("#fromdate").val();
+        var todate = $("#todate").val();
+        var typecable = $(this).attr("data-field");
+        var sizes = '';
+
+
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getsinglelightdata',
+            data: 'val=' + val + '&make=' + make + '&product=' + product + '&type=' + typecable + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+            beforeSend: function () {
+                if (typecable != 5) {
+                    $("#e2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#e3").html('<img src="/assets/images/loading.gif" alt="">');
+                } else {
+                    $("#l2").hide();
+                    $("#d2").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#d3").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#d4").html('<img src="/assets/images/loading.gif" alt="">');
+                    $("#d5").html('<img src="/assets/images/loading.gif" alt="">');
+                }
+            },
+            success: function (response) {
+
+                var myJSON = JSON.parse(response);
+                if (myJSON) {
+                    if (typecable != 5) {
+                        $("#e2").html(myJSON.archivedcsize);
+                        $("#e3").html(myJSON.withcsize);
+                    } else {
+                        $("#d2").html(myJSON.approvedsize);
+                        $("#d3").html(myJSON.archivedsize);
+                        $("#d4").html(myJSON.withsize);
+                        $("#d5").html(myJSON.withoutsize);
+                        var checksix = myJSON.graph[1] + myJSON.graph[2];
+                        if (checksix != 0) {
+                            $("#l2").show();
+                            drawPieChart(myJSON.labels, myJSON.graph, "l2");
+                        }
+                    }
+
+                }
+
+            }
+        });
+    });
+
+
     $('#sbutton').on('click', function () {
         var val = $("#searchdata").val() // get the current value of the input field.
+        var vallength = $("#searchdata").val().length; // get the current value of the input field.
+        if (vallength < 6) {
+            alert('Please enter minimum 6 digits Tender Id');
+            return false;
+        }
         if (val) {
             $.ajax({
                 url: baseUrl + 'site/searchtender',
@@ -84,7 +924,9 @@ $(document).ready(function () {
                     $(".mn-inner .col .page-title").html('');
                     $(".mn-inner #sort-data").css('display', 'none');
                     $(".mn-inner .add-contact").css('display', 'none');
-                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tenders.....</p></span>');
+                    $(".mn-inner .card.top").css('background-color', '#fff');
+                    $(".mn-inner.inner-active-sidebar").css('display', 'none');
+                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tender.....</p></span>');
                     //$(".mn-inner .card").css('width','1058px');
                     $(".mn-inner form p").css('text-align', 'center');
                 },
@@ -149,16 +991,93 @@ function showdivs(val) {
         $("#cables").attr('required', 'true');
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteel").removeAttr('required');
+        $("#ssteel").removeAttr('required');
+        $("#nsteel").removeAttr('required');
     } else if (val == 2) {
         $("#lightdiv").show();
         $("#lighting").attr('required', 'true');
         $("#cablesdiv").hide();
         $("#cables").removeAttr('required');
-    } else {
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteel").removeAttr('required');
+        $("#ssteel").removeAttr('required');
+        $("#nsteel").removeAttr('required');
+    } else if (val == 3) {
         $("#cablesdiv").hide();
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
         $("#cables").removeAttr('required');
+        $("#cementdiv").show();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        $("#cement").attr('required', 'true');
+        $("#rsteel").removeAttr('required');
+        $("#ssteel").removeAttr('required');
+        $("#nsteel").removeAttr('required');
+    } else if (val == 4) {
+        $("#lightdiv").hide();
+        $("#cables").removeAttr('required');
+        $("#cablesdiv").hide();
+        $("#lighting").removeAttr('required');
+        $("#cementdiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteeldiv").show();
+        $("#rsteel").attr('required', 'true');
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        $("#ssteel").removeAttr('required');
+        $("#nsteel").removeAttr('required');
+        //$("#cables").removeAttr('required');
+    } else if (val == 5) {
+        $("#lightdiv").hide();
+        $("#lighting").removeAttr('required');
+        //$("#lighting").attr('required', 'true');
+        $("#cablesdiv").hide();
+        $("#cables").removeAttr('required');
+        $("#cementdiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteeldiv").hide();
+        $("#rsteel").removeAttr('required');
+        $("#ssteeldiv").show();
+        $("#ssteel").attr('required', 'true');
+        $("#nsteeldiv").hide();
+        $("#nsteel").removeAttr('required');
+        //$("#cables").removeAttr('required');
+    } else if (val == 6) {
+        $("#lightdiv").hide();
+        $("#lighting").removeAttr('required');
+        //$("#lighting").attr('required', 'true');
+        $("#cablesdiv").hide();
+        $("#cables").removeAttr('required');
+        $("#cementdiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteeldiv").hide();
+        $("#rsteel").removeAttr('required');
+        $("#ssteeldiv").hide();
+        $("#ssteel").removeAttr('required');
+        $("#nsteeldiv").show();
+        $("#nsteel").attr('required', 'true');
+        //$("#cables").removeAttr('required');
+    } else {
+        $("#cablesdiv").hide();
+        $("#lightdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        //$("#lighting").removeAttr('required');
+        //$("#cables").removeAttr('required');
     }
 }
 
@@ -200,6 +1119,86 @@ function getsubtypes(value) {
     }
 }
 
+function getsubpricetypes(value) {
+    if (value == 1) {
+        $("#second").show();
+        $("#third").show();
+    } else {
+        $("#second").hide();
+        $("#third").hide();
+    }
+}
+
+function getparentonetypes(value) {
+    var one = $('#mtypeone :selected').val();
+    var three = $('#mtypethree :selected').val();
+    var two = value;
+    if (three != '') {
+        $("#fourth").show();
+    }
+    var selects = '';
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'products/getsizes',
+        dataType: "json",
+        data: {'one': one, 'two': two, 'three': three, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            // setup listener for custom event to re-initialize on change
+
+            $('.materialsize').on('contentChanged', function () {
+                $(this).material_select();
+            });
+
+            $.each(resultData.select, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Sizes</option>';
+                }
+            }
+            );
+            $("#mtypefour").html(selects);
+            $("#mtypefour").trigger('contentChanged');
+        }
+    });
+
+}
+
+function getparenttwotypes(value) {
+    var one = $('#mtypeone :selected').val();
+    var two = $('#mtypetwo :selected').val();
+    var three = value;
+    $("#fourth").show();
+    $("#fifth").show();
+    $("#prices").show();
+    var selects = '';
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'products/getsizes',
+        dataType: "json",
+        data: {'one': one, 'two': two, 'three': three, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            // setup listener for custom event to re-initialize on change
+
+            $('.materialsize').on('contentChanged', function () {
+                $(this).material_select();
+            });
+
+            $.each(resultData.select, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Sizes</option>';
+                }
+            }
+            );
+            $("#mtypefour").html(selects);
+            $("#mtypefour").trigger('contentChanged');
+        }
+    });
+
+}
+
 
 function addrow(num) {
     var selected = $('#tenderfour :selected').val();
@@ -215,21 +1214,83 @@ function addrow(num) {
     var rand = Math.floor((Math.random() * 100) + 1);
     var id = rand + time;
     //var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + "' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s2' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>Core 1</option><option value='2'>Core 2</option><option value='3'>Core 3</option><option value='4'>Core 3.5</option><option value='5'>Core 4</option></select></div><div class='input-field col s2' id='typefit" + id + "'><select class='validate required materialSelecttypefit' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' required='' class='validate required' value='RM'><label for='itemunit" + id + "'>Units</label><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='text' name = 'quantity[]' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s3'><select class='validate required materialSelect" + id + " browser-default' required='' name='makes[]' multiple id='makes" + newnum + "'></select></div><div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
-    var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option></select></div><div class='input-field col s2' id='typefit" + id + "'><select class='validate required materialSelecttypefit' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s3' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' required='' class='validate required' value='RM'><label for='itemunit" + id + "'>Units</label><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='text' name = 'quantity[]' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
+    var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' required='' class='validate required' value='RM'><label for='itemunit" + id + "'>Units</label><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='text' name = 'quantity[]' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
     var row = "<div id=info" + id + "><div class='col s12'><div class='input-fields col s2 row'><label>Select type of work</label><select class='validate required materialSelect' name='tenderone[]' id='tenderone" + id + "' onchange='getdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option><option value='1'>E/M</option></select></div><div id='second" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendertwo[]' id='tendertwo" + id + "' onchange='getseconddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='third" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderthree[]' id='tenderthree" + id + "' onchange='getthirddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fourth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfour[]' id='tenderfour" + id + "' onchange='getfourdatasub(this.value," + id + "," + newnum + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fifth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfive[]' id='tenderfive" + id + "' onchange='getfivedatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='sixth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendersix[]' id='tendersix" + id + "' onchange='getsixdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div></div>" + rowitems + '</div>';
     $("#itemdata").append(rowitems);
     $("#itemunit" + id + "").focus();
+
     if (selected == 1) {
+        $("#typefit" + id + "").hide();
+        $("#type" + newnum + "").removeAttr('required');
+        $("#type" + newnum + "").removeClass('required');
+        $("#capacityfit" + id + "").hide();
+        $("#text" + newnum + "").removeAttr('required');
+        $("#text" + newnum + "").removeClass('required');
+        $("#accessorytwo" + id + "").hide();
+        $("#acctwo" + newnum + "").removeAttr('required');
+        $("#acctwo" + newnum + "").removeClass('required');
+        $("#accessoryone" + id + "").hide();
+        $("#accone" + newnum + "").removeAttr('required');
+        $("#accone" + newnum + "").removeClass('required');
+        $("#sizesdiv" + id + "").show();
+        $("#sizes" + newnum + "").attr('required');
+        $("#sizes" + newnum + "").addClass('required');
+        $("#itemunit" + id + "").val('RM');
         $("#corediv" + id + "").show();
         $("#core" + newnum + "").attr('required');
         $("#core" + newnum + "").addClass('required');
+    } else if (selected == 2) {
+        $("#sizesdiv" + id + "").hide();
+        $("#sizesdiv" + id + "").prop('selectedIndex', '');
+        $("#sizes" + newnum + "").removeAttr('required');
+        $("#sizes" + newnum + "").removeClass('required');
+        $("#corediv" + id + "").hide();
+        $("#core" + newnum + "").removeAttr('required');
+        $("#core" + newnum + "").removeClass('required');
+        $("#accessorytwo" + id + "").hide();
+        $("#acctwo" + newnum + "").removeAttr('required');
+        $("#acctwo" + newnum + "").removeClass('required');
+        $("#accessoryone" + id + "").hide();
+        $("#accone" + newnum + "").removeAttr('required');
+        $("#accone" + newnum + "").removeClass('required');
+        $("#typefit" + id + "").show();
+        $("#type" + newnum + "").attr('required');
+        $("#type" + newnum + "").addClass('required');
+        $("#capacityfit" + id + "").show();
+        $("#text" + newnum + "").attr('required');
+        $("#text" + newnum + "").addClass('required');
+        $("#itemunit" + id + "").val('NOS');
+    } else if (selected == 4) {
+        $("#sizesdiv" + id + "").hide();
+        $("#sizesdiv" + id + "").prop('selectedIndex', '');
+        $("#sizes" + newnum + "").removeAttr('required');
+        $("#sizes" + newnum + "").removeClass('required');
+        $("#corediv" + id + "").hide();
+        $("#core" + newnum + "").removeAttr('required');
+        $("#core" + newnum + "").removeClass('required');
+        $("#typefit" + id + "").hide();
+        $("#type" + newnum + "").removeAttr('required');
+        $("#type" + newnum + "").removeClass('required');
+        $("#capacityfit" + id + "").hide();
+        $("#text" + newnum + "").removeAttr('required');
+        $("#text" + newnum + "").removeClass('required');
+        $("#accessorytwo" + id + "").show();
+        $("#acctwo" + newnum + "").attr('required');
+        $("#acctwo" + newnum + "").addClass('required');
+        $("#accessoryone" + id + "").show();
+        $("#accone" + newnum + "").attr('required');
+        $("#accone" + newnum + "").addClass('required');
+        $("#itemunit" + id + "").val('NOS');
     } else {
         $("#corediv" + id + "").hide();
         $("#core" + newnum + "").removeAttr('required');
         $("#core" + newnum + "").removeClass('required');
-    }
-
-    if (selected != 2) {
+        $("#accessorytwo" + id + "").hide();
+        $("#acctwo" + newnum + "").removeAttr('required');
+        $("#acctwo" + newnum + "").removeClass('required');
+        $("#accessoryone" + id + "").hide();
+        $("#accone" + newnum + "").removeAttr('required');
+        $("#accone" + newnum + "").removeClass('required');
         $("#typefit" + id + "").hide();
         $("#type" + newnum + "").removeAttr('required');
         $("#type" + newnum + "").removeClass('required');
@@ -239,26 +1300,52 @@ function addrow(num) {
         $("#sizesdiv" + id + "").show();
         $("#sizes" + newnum + "").attr('required');
         $("#sizes" + newnum + "").addClass('required');
-    } else if (selected == 2) {
-        $("#typefit" + id + "").show();
-        $("#type" + newnum + "").attr('required');
-        $("#type" + newnum + "").addClass('required');
-        $("#capacityfit" + id + "").show();
-        $("#text" + newnum + "").attr('required');
-        $("#text" + newnum + "").addClass('required');
-        $("#sizesdiv" + id + "").hide();
-        $("#sizesdiv" + id + "").prop('selectedIndex', '');
-        $("#sizes" + newnum + "").removeAttr('required');
-        $("#sizes" + newnum + "").removeClass('required');
-        $("#itemunit" + id + "").val('NOS');
+        $("#itemunit" + id + "").val('RM');
     }
+
+    /*if (selected == 1) {
+     $("#corediv" + id + "").show();
+     $("#core" + newnum + "").attr('required');
+     $("#core" + newnum + "").addClass('required');
+     } else {
+     $("#corediv" + id + "").hide();
+     $("#core" + newnum + "").removeAttr('required');
+     $("#core" + newnum + "").removeClass('required');
+     }
+     
+     if (selected != 2) {
+     $("#typefit" + id + "").hide();
+     $("#type" + newnum + "").removeAttr('required');
+     $("#type" + newnum + "").removeClass('required');
+     $("#capacityfit" + id + "").hide();
+     $("#text" + newnum + "").removeAttr('required');
+     $("#text" + newnum + "").removeClass('required');
+     $("#sizesdiv" + id + "").show();
+     $("#sizes" + newnum + "").attr('required');
+     $("#sizes" + newnum + "").addClass('required');
+     } else if (selected == 2) {
+     $("#typefit" + id + "").show();
+     $("#type" + newnum + "").attr('required');
+     $("#type" + newnum + "").addClass('required');
+     $("#capacityfit" + id + "").show();
+     $("#text" + newnum + "").attr('required');
+     $("#text" + newnum + "").addClass('required');
+     $("#sizesdiv" + id + "").hide();
+     $("#sizesdiv" + id + "").prop('selectedIndex', '');
+     $("#sizes" + newnum + "").removeAttr('required');
+     $("#sizes" + newnum + "").removeClass('required');
+     $("#itemunit" + id + "").val('NOS');
+     }*/
 
 
     $("#makes" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Makes'});
     $("#sizes" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Sizes'});
     $("#core" + newnum + "").material_select();
-    $("#type" + newnum + "").material_select();
+    $("#type" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Type'});
     $("#text" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Capacity'});
+    $("#accone" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Accessory'});
+
+
     /*$("#tenderone" + id + "").material_select();
      $("#tendertwo" + id + "").material_select();
      $("#tenderthree" + id + "").material_select();
@@ -310,7 +1397,7 @@ function addrow(num) {
         }
     });
 
-    if (selected != 2) {
+    if (selected != 2 || selected != 4) {
         $.ajax({
             type: 'post',
             url: baseUrl + 'site/getsizes',
@@ -357,7 +1444,7 @@ function addrow(num) {
                 );
 
                 $("#type" + newnum + "").html(types);
-                $("#type" + newnum + "").material_select();
+                $("#type" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Type'});
 
                 $.each(resultData.allcapacities, function (key, value) {
                     if (key != 0) {
@@ -370,6 +1457,34 @@ function addrow(num) {
 
                 $("#text" + newnum + "").html(cap);
                 $("#text" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Capacity'});
+                $("#addrow").removeAttr('onclick');
+                $("#addrow").attr('onclick', 'addrow("' + newnum + '")');
+            }
+        });
+    }
+
+    if (selected == 4) {
+        var accessories = '';
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'products/getaccessories',
+            dataType: "json",
+            data: {'_csrf-backend': csrf_token},
+            success: function (resultData) {
+                // setup listener for custom event to re-initialize on change
+
+                $.each(resultData.alltypes, function (key, value) {
+                    if (key != 0) {
+                        accessories += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        accessories += '<option value="" disabled required>No Accessories</option>';
+                    }
+
+                }
+                );
+
+                $("#accone" + newnum + "").html(accessories);
+                $("#accone" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Accessory'});
                 $("#addrow").removeAttr('onclick');
                 $("#addrow").attr('onclick', 'addrow("' + newnum + '")');
             }
@@ -401,7 +1516,7 @@ function getcengineer(value) {
             dataType: "json",
             data: {'value': value, '_csrf-backend': csrf_token},
             success: function (resultData) {
-                var arrz = ['1', '3', '4', '5'];
+                var arrz = ['1', '3', '4', '5', '13'];
                 if (arrz.indexOf(value) >= 0) {
                     $("#ge").show();
                     $("#gengineer").html(resultData.data);
@@ -410,6 +1525,7 @@ function getcengineer(value) {
                     $("#gengineer").material_select();
                 } else {
                     $("#cengineer").html(resultData.data);
+                    //$("#ce").show();
                     $("#cwe").hide();
                     $("#ge").hide();
                     $("#cengineer").material_select();
@@ -453,7 +1569,6 @@ function getcwengineer(value) {
         $("#cwe").hide();
         $("#gengineer").material_select('destroy');
         $("#ge").hide();
-
     }
 }
 
@@ -461,7 +1576,7 @@ function getgengineer(value) {
     $("#gengineer").prop('selectedIndex', 0);
     $("#gengineer").material_select();
     $("#ge").hide();
-    var arr = ['24', '25', '39', '44', '46', '49', '52', '53', '57', '58', '59', '64', '69', '84', '85', '90', '91', '92', '103', '111', '125', '126'];
+    var arr = ['24', '25', '39', '44', '46', '49', '52', '53', '57', '58', '59', '64', '69', '84', '85', '90', '91', '92', '103', '111', '125', '126', '134', '136', '137', '138', '139', '140'];
     if (arr.indexOf(value) < 0) {
         $("#ge").show();
         $.ajax({
@@ -551,6 +1666,77 @@ function getdatasub(value, id) {
     });
 }
 
+function changehold(tid) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/on-hold',
+        dataType: "json",
+        data: {'value': tid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            if (resultData.status == '1') {
+                swal("", "Status successfully changed!", "success");
+                if (resultData.hold == '1') {
+                    $("#tenderhold" + tid + "").removeClass('green');
+                    $("#tenderhold" + tid + "").addClass('red');
+                    $("#tenderhold" + tid + "").text('On Hold');
+                } else {
+                    $("#tenderhold" + tid + "").removeClass('red');
+                    $("#tenderhold" + tid + "").addClass('green');
+                    $("#tenderhold" + tid + "").text('Ready');
+                }
+
+            } else {
+                swal("", "Status could not be changed! Please try again.", "error");
+            }
+
+        }
+    });
+}
+
+function movearchive(tid) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/movearchive',
+        dataType: "json",
+        data: {'value': tid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            if (resultData.status == '1') {
+                swal("", "Tender successfully archived!", "success");
+                if (resultData.arc == '1') {
+                    $("#tenderarc" + tid + "").removeClass('blue');
+                    $("#tenderarc" + tid + "").addClass('green');
+                    $("#tenderarc" + tid + "").text('Archived');
+                } else {
+                    $("#tenderhold" + tid + "").removeClass('green');
+                    $("#tenderhold" + tid + "").addClass('blue');
+                    $("#tenderhold" + tid + "").text('Archive');
+                }
+
+            } else {
+                swal("", "Tender could not be archived! Please try again.", "error");
+            }
+
+        }
+    });
+}
+
+function resendmail(email, filename, filepath) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'mail/resendmail',
+        dataType: "json",
+        data: {'email': email, filename: filename, filepath: filepath, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            if (resultData.status == '1') {
+                swal("", "Mail successfully sent!", "success");
+            } else {
+                swal("", "Mail could not be changed! Please try again.", "error");
+            }
+
+        }
+    });
+}
+
 function approvetender(value) {
     $.ajax({
         type: 'post',
@@ -588,6 +1774,7 @@ function approveitem(value) {
 }
 
 function getseconddata(value) {
+    var selects = '';
     $("#tenderfour").prop('selectedIndex', '');
     $("#tenderfour").material_select();
     $('#fourth').hide();
@@ -617,13 +1804,58 @@ function getseconddata(value) {
                 $("#itembutton").hide();
                 $("#tenderthree").material_select();
             } else {
-                $("#third").hide();
-                $("#fourth").hide();
-                $("#fifth").hide();
-                $("#sixth").hide();
-                $("#itemdata").show();
-                $("#makes").show();
-                $("#itembutton").show();
+                if (resultData.value == 14 || resultData.value == 15 || resultData.value == 16 || resultData.value == 17) {
+                    $("#third").hide();
+                    $("#fourth").hide();
+                    $("#fifth").hide();
+                    $("#sixth").hide();
+                    $("#itemtender").removeAttr('required');
+                    $("#sizes0").removeAttr('required');
+                    $("#core0").removeAttr('required');
+                    $("#type0").removeAttr('required');
+                    $("#text0").removeAttr('required');
+                    $("#quantity").removeAttr('required');
+                    $("#itemunit").removeAttr('required');
+                    $("#accessorytwo").hide();
+                    $("#acctwo0").removeAttr('required');
+                    $("#acctwo0").removeClass('required');
+                    $("#accessoryone").hide();
+                    $("#accone0").removeAttr('required');
+                    $("#accone0").removeClass('required');
+                    $("#itemunit").val('');
+                    //$("#itemdata").show();
+                    $("#makes").show();
+                    //$("#itembutton").show();
+                    if ($("#makes0").data('select2')) {
+                        $("#makes0").select2("val", "");
+                    }
+                    // setup listener for custom event to re-initialize on change
+                    $('.materialSelect').on('contentChanged', function () {
+                        $(this).select2({closeOnSelect: true, placeholder: 'Select Makes'});
+                    });
+
+                    $.each(resultData.select, function (key, value) {
+                        if (key != 0) {
+                            selects += '<option value="' + key + '" selected>' + value + '</option>';
+                        } else {
+                            selects += '<option value="" disabled required>No Makes</option>';
+                        }
+                    }
+                    );
+                    //$("#makes0").select2("val", "");
+                    $("#makes0").html(selects);
+                    $("#makes0").trigger('contentChanged');
+
+                } else {
+                    $("#third").hide();
+                    $("#fourth").hide();
+                    $("#fifth").hide();
+                    $("#sixth").hide();
+                    $("#itemdata").show();
+                    $("#makes").show();
+                    $("#itembutton").show();
+                }
+
             }
         }
     });
@@ -753,16 +1985,79 @@ function getfourdata(value) {
     var sizes = '';
     var types = '';
     var capacities = '';
-    if (value != 1) {
-        $("#corediv").hide();
-        $("#core0").removeAttr('required');
-        $("#core0").removeClass('required');
-    } else {
+
+    if (value == 1) {
+        $("#typefit").hide();
+        $("#type0").removeAttr('required');
+        $("#type0").removeClass('required');
+        $("#capacityfit").hide();
+        $("#text0").removeAttr('required');
+        $("#text0").removeClass('required');
+        $("#accessorytwo").hide();
+        $("#acctwo0").removeAttr('required');
+        $("#acctwo0").removeClass('required');
+        $("#accessoryone").hide();
+        $("#accone0").removeAttr('required');
+        $("#accone0").removeClass('required');
+        $("#sizesdiv").show();
+        $("#sizes0").attr('required');
+        $("#sizes0").addClass('required');
+        $("#itemunit").val('RM');
         $("#corediv").show();
         $("#core0").attr('required');
         $("#core0").addClass('required');
-    }
-    if (value != 2) {
+    } else if (value == 2) {
+        $("#sizesdiv").hide();
+        $("#sizesdiv").prop('selectedIndex', '');
+        $("#sizes0").removeAttr('required');
+        $("#sizes0").removeClass('required');
+        $("#corediv").hide();
+        $("#core0").removeAttr('required');
+        $("#core0").removeClass('required');
+        $("#accessorytwo").hide();
+        $("#acctwo0").removeAttr('required');
+        $("#acctwo0").removeClass('required');
+        $("#accessoryone").hide();
+        $("#accone0").removeAttr('required');
+        $("#accone0").removeClass('required');
+        $("#typefit").show();
+        $("#type0").attr('required');
+        $("#type0").addClass('required');
+        $("#capacityfit").show();
+        $("#text0").attr('required');
+        $("#text0").addClass('required');
+        $("#itemunit").val('NOS');
+    } else if (value == 4) {
+        $("#sizesdiv").hide();
+        $("#sizesdiv").prop('selectedIndex', '');
+        $("#sizes0").removeAttr('required');
+        $("#sizes0").removeClass('required');
+        $("#corediv").hide();
+        $("#core0").removeAttr('required');
+        $("#core0").removeClass('required');
+        $("#typefit").hide();
+        $("#type0").removeAttr('required');
+        $("#type0").removeClass('required');
+        $("#capacityfit").hide();
+        $("#text0").removeAttr('required');
+        $("#text0").removeClass('required');
+        $("#accessorytwo").show();
+        $("#acctwo0").attr('required');
+        $("#acctwo0").addClass('required');
+        $("#accessoryone").show();
+        $("#accone0").attr('required');
+        $("#accone0").addClass('required');
+        $("#itemunit").val('NOS');
+    } else {
+        $("#corediv").hide();
+        $("#core0").removeAttr('required');
+        $("#core0").removeClass('required');
+        $("#accessorytwo").hide();
+        $("#acctwo0").removeAttr('required');
+        $("#acctwo0").removeClass('required');
+        $("#accessoryone").hide();
+        $("#accone0").removeAttr('required');
+        $("#accone0").removeClass('required');
         $("#typefit").hide();
         $("#type0").removeAttr('required');
         $("#type0").removeClass('required');
@@ -773,20 +2068,67 @@ function getfourdata(value) {
         $("#sizes0").attr('required');
         $("#sizes0").addClass('required');
         $("#itemunit").val('RM');
-    } else if (value == 2) {
-        $("#typefit").show();
-        $("#type0").attr('required');
-        $("#type0").addClass('required');
-        $("#capacityfit").show();
-        $("#text0").attr('required');
-        $("#text0").addClass('required');
-        $("#sizesdiv").hide();
-        $("#sizesdiv").prop('selectedIndex', '');
-        $("#sizes0").removeAttr('required');
-        $("#sizes0").removeClass('required');
-        $("#itemunit").val('NOS');
     }
 
+
+    /*if (value != 1) {
+     $("#corediv").hide();
+     $("#core0").removeAttr('required');
+     $("#core0").removeClass('required');
+     } else {
+     $("#corediv").show();
+     $("#core0").attr('required');
+     $("#core0").addClass('required');
+     }
+     if (value != 2) {
+     $("#typefit").hide();
+     $("#type0").removeAttr('required');
+     $("#type0").removeClass('required');
+     $("#capacityfit").hide();
+     $("#text0").removeAttr('required');
+     $("#text0").removeClass('required');
+     $("#sizesdiv").show();
+     $("#sizes0").attr('required');
+     $("#sizes0").addClass('required');
+     $("#itemunit").val('RM');
+     } else if (value == 2) {
+     $("#typefit").show();
+     $("#type0").attr('required');
+     $("#type0").addClass('required');
+     $("#capacityfit").show();
+     $("#text0").attr('required');
+     $("#text0").addClass('required');
+     $("#sizesdiv").hide();
+     $("#sizesdiv").prop('selectedIndex', '');
+     $("#sizes0").removeAttr('required');
+     $("#sizes0").removeClass('required');
+     $("#itemunit").val('NOS');
+     }
+     
+     if (value != 4) {
+     $("#accessorytwo").hide();
+     $("#acctwo0").removeAttr('required');
+     $("#acctwo0").removeClass('required');
+     $("#accessoryone").hide();
+     $("#accone0").removeAttr('required');
+     $("#accone0").removeClass('required');
+     $("#sizesdiv").show();
+     $("#sizes0").attr('required');
+     $("#sizes0").addClass('required');
+     $("#itemunit").val('RM');
+     } else if (value == 4) {
+     $("#accessorytwo").show();
+     $("#acctwo0").attr('required');
+     $("#acctwo0").addClass('required');
+     $("#accessoryone").show();
+     $("#accone0").attr('required');
+     $("#accone0").addClass('required');
+     $("#sizesdiv").hide();
+     $("#sizesdiv").prop('selectedIndex', '');
+     $("#sizes0").removeAttr('required');
+     $("#sizes0").removeClass('required');
+     $("#itemunit").val('NOS');
+     }*/
 
     $.ajax({
         type: 'post',
@@ -812,7 +2154,9 @@ function getfourdata(value) {
                 $("#makes").show();
                 $("#itembutton").show();
             }
-
+            if ($("#makes0").data('select2')) {
+                $("#makes0").select2("val", "");
+            }
             // setup listener for custom event to re-initialize on change
             $('.materialSelect').on('contentChanged', function () {
                 $(this).select2({closeOnSelect: true, placeholder: 'Select Makes'});
@@ -830,7 +2174,7 @@ function getfourdata(value) {
             $("#makes0").html(selects);
             $("#makes0").trigger('contentChanged');
 
-            if (value != 2) {
+            if (value != 2 || value != 4) {
                 $('.materialSelectsize').on('contentChanged', function () {
                     $(this).select2({closeOnSelect: true, placeholder: 'Select Sizes'});
                 });
@@ -849,7 +2193,7 @@ function getfourdata(value) {
 
             if (value == 2) {
                 $('.materialSelecttypefit').on('contentChanged', function () {
-                    $(this).material_select();
+                    $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
                 });
 
                 $.each(resultData.types, function (key, value) {
@@ -877,6 +2221,23 @@ function getfourdata(value) {
                 );
                 $("#text0").html(capacities);
                 $("#text0").trigger('contentChanged');
+            }
+            var accessories = '';
+            if (value == 4) {
+                $('.materialSelectaccessoryone').on('contentChanged', function () {
+                    $(this).select2({closeOnSelect: true, placeholder: 'Select Accessory'});
+                });
+
+                $.each(resultData.accessories, function (key, value) {
+                    if (key != 0) {
+                        accessories += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        accessories += '<option value="" disabled required>No Accessories</option>';
+                    }
+                }
+                );
+                $("#accone0").html(accessories);
+                $("#accone0").trigger('contentChanged');
             }
         }
     });
@@ -1001,9 +2362,9 @@ function getsixdata(value) {
             $("#itemdata .added").remove();
             // setup listener for custom event to re-initialize on change
             $('.materialSelectsize').on('contentChanged', function () {
-                $(this).material_select();
+                $(this).select2({closeOnSelect: true, placeholder: 'Select Sizes'});
             });
-
+            
             $.each(resultData.sizes, function (key, value) {
                 if (key != 0) {
                     selects += '<option value="' + key + '">' + value + '</option>';
@@ -1013,7 +2374,8 @@ function getsixdata(value) {
             }
             );
             $("#sizes0").html(selects);
-            $("#sizes0").material_select();
+            $("#sizes0").trigger('contentChanged');
+
         }
     });
 }
@@ -1043,15 +2405,15 @@ function deletebutton(id) {
          $('#tenderfive' + id + '').prop('selectedIndex', 0);
          $('#tendersix' + id + '').prop('selectedIndex', 0);*/
     } else {
-        $('#inforows').remove();
-        document.getElementById('itemunit').reset();
-        document.getElementById('quantity').reset();
-        document.getElementById('makeid').reset();
-        $('.materialSelect').prop('selectedIndex', 0);
-        $('.materialSelectsize').prop('selectedIndex', 0);
-        $('.materialSelectcore' + id + '').prop('selectedIndex', 0);
-        $('.materialSelecttypefit' + id + '').prop('selectedIndex', 0);
-        $('.materialSelectcapacityfit' + id + '').prop('selectedIndex', 0);
+        /*$('#inforows').remove();
+         document.getElementById('itemunit').reset();
+         document.getElementById('quantity').reset();
+         document.getElementById('makeid').reset();
+         $('.materialSelect').prop('selectedIndex', 0);
+         $('.materialSelectsize').prop('selectedIndex', 0);
+         $('.materialSelectcore' + id + '').prop('selectedIndex', 0);
+         $('.materialSelecttypefit' + id + '').prop('selectedIndex', 0);
+         $('.materialSelectcapacityfit' + id + '').prop('selectedIndex', 0);*/
         /*$('#tenderone').prop('selectedIndex', 0);
          $('#tendertwo').prop('selectedIndex', 0);
          $('#tenderthree').prop('selectedIndex', 0);

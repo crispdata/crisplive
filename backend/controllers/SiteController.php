@@ -18,6 +18,8 @@ use frontend\models\SignupForm;
 use yii\db\Query;
 use yii\db\ActiveQuery;
 use Aws\S3\S3Client;
+use Aws\Common\Exception\MultipartUploadException;
+use Aws\S3\MultipartUploader;
 use Aws\S3\Exception\S3Exception;
 use yii\web\UploadedFile;
 use app\models\UploadForm;
@@ -42,7 +44,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'tenders', 'delete-user', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'makes', 'create-make', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -68,14 +70,1812 @@ class SiteController extends Controller {
         ];
     }
 
+    public function actionMoneyformat($number) {
+        $decimal = (string) ($number - floor($number));
+        $money = floor($number);
+        $length = strlen($money);
+        $delimiter = '';
+        $money = strrev($money);
+
+        for ($i = 0; $i < $length; $i++) {
+            if (( $i == 3 || ($i > 3 && ($i - 1) % 2 == 0) ) && $i != $length) {
+                $delimiter .= ',';
+            }
+            $delimiter .= $money[$i];
+        }
+
+        $result = strrev($delimiter);
+        $decimal = preg_replace("/0\./i", ".", $decimal);
+        $decimal = substr($decimal, 0, 3);
+
+        if ($decimal != '0') {
+            $result = $result . $decimal;
+        }
+
+        return $result;
+    }
+
     public function actionIndex() {
         $user = Yii::$app->user->identity;
-        $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->orderBy(['itemdetails.id' => SORT_DESC])->all();
-        $tenders = \common\models\Tender::find()->where(['>=', 'bid_end_date', date('d-m-Y')])->orderBy(['bid_end_date' => SORT_ASC])->all();
+        $type = @$_POST['type'];
+        $finalarr = [];
+        $head = '';
+        $makes = [];
+        $sizes = [];
+        $labelsone = '';
+        $valuesone = '';
+        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
+        $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
+
+        $finalgraph[] = ['Command', 'Approved Tenders'];
+        //commands
+        for ($i = 1; $i <= 13; $i++) {
+            $tidsc = [];
+            $iidsc = [];
+            $archivetidsc = [];
+            $archiveiidsc = [];
+            $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
+            $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
+            $command = $this->actionGetcommandgraph($i);
+
+            if (isset($tenderscommand) && count($tenderscommand)) {
+                foreach ($tenderscommand as $_tender) {
+                    $tidsc[] = $_tender->id;
+                }
+            }
+            $itemsc = \common\models\Item::find()->where(['tender_id' => $tidsc, 'tenderfour' => $type])->all();
+            if (isset($itemsc) && count($itemsc)) {
+                foreach ($itemsc as $_item) {
+                    $iidsc[] = $_item->id;
+                }
+            }
+
+            $graphonequantity = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    if ($_idetail->quantity != '') {
+                        $graphonequantity += $_idetail->quantity;
+                    }
+                }
+            }
+
+
+
+            //archive
+            if (isset($archivetenderscommand) && count($archivetenderscommand)) {
+                foreach ($archivetenderscommand as $_tender) {
+                    $archivetidsc[] = $_tender->id;
+                }
+            }
+            $items = \common\models\Item::find()->where(['tender_id' => $archivetidsc, 'tenderfour' => $type])->all();
+            if (isset($items) && count($items)) {
+                foreach ($items as $_item) {
+                    $archiveiidsc[] = $_item->id;
+                }
+            }
+
+            $graphtwoquantity = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $archiveiidsc])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    if ($_idetail->quantity != '') {
+                        $graphtwoquantity += $_idetail->quantity;
+                    }
+                }
+            }
+
+            $finalgraph[] = [$command, $graphonequantity];
+        }
+        //values
+        $tids = [];
+        $iids = [];
+        $iidsone = [];
+        $iidstwo = [];
+        $iidsthree = [];
+        $iidsfour = [];
+        $iidsfive = [];
+        $iidssix = [];
+        $eprice = 0;
+
+        //Lt
+        $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+        $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+        $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+        $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+        //Ht
+        $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+        $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+        if (isset($itemsone)) {
+            foreach ($itemsone as $_item) {
+                $iidsone[] = $_item->id;
+            }
+        }
+        $itemdetailone = \common\models\ItemDetails::find()->where(['item_id' => $iidsone])->all();
+        if (isset($itemdetailone)) {
+            foreach ($itemdetailone as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemstwo)) {
+            foreach ($itemstwo as $_item) {
+                $iidstwo[] = $_item->id;
+            }
+        }
+
+        $itemdetailtwo = \common\models\ItemDetails::find()->where(['item_id' => $iidstwo])->all();
+
+        if (isset($itemdetailtwo)) {
+            foreach ($itemdetailtwo as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsthree)) {
+            foreach ($itemsthree as $_item) {
+                $iidsthree[] = $_item->id;
+            }
+        }
+
+        $itemdetailthree = \common\models\ItemDetails::find()->where(['item_id' => $iidsthree])->all();
+
+        if (isset($itemdetailthree)) {
+            foreach ($itemdetailthree as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfour)) {
+            foreach ($itemsfour as $_item) {
+                $iidsfour[] = $_item->id;
+            }
+        }
+
+        $itemdetailfour = \common\models\ItemDetails::find()->where(['item_id' => $iidsfour])->all();
+
+        if (isset($itemdetailfour)) {
+            foreach ($itemdetailfour as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfive)) {
+            foreach ($itemsfive as $_item) {
+                $iidsfive[] = $_item->id;
+            }
+        }
+
+        $itemdetailfive = \common\models\ItemDetails::find()->where(['item_id' => $iidsfive])->all();
+
+        if (isset($itemdetailfive)) {
+            foreach ($itemdetailfive as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemssix)) {
+            foreach ($itemssix as $_item) {
+                $iidssix[] = $_item->id;
+            }
+        }
+
+        $itemdetailsix = \common\models\ItemDetails::find()->where(['item_id' => $iidssix])->all();
+
+        if (isset($itemdetailsix)) {
+            foreach ($itemdetailsix as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $eprice += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+//values
+        $tids = [];
+        $iids = [];
+        $iidsone = [];
+        $iidstwo = [];
+        $iidsthree = [];
+        $iidsfour = [];
+        $iidsfive = [];
+        $iidssix = [];
+        $epriceone = 0;
+
+        //Lt
+        $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+        $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+        $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+        $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+        //Ht
+        $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+        $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+        if (isset($itemsone)) {
+            foreach ($itemsone as $_item) {
+                $iidsone[] = $_item->id;
+            }
+        }
+        $itemdetailone = \common\models\ItemDetails::find()->where(['item_id' => $iidsone])->all();
+        if (isset($itemdetailone)) {
+            foreach ($itemdetailone as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemstwo)) {
+            foreach ($itemstwo as $_item) {
+                $iidstwo[] = $_item->id;
+            }
+        }
+
+        $itemdetailtwo = \common\models\ItemDetails::find()->where(['item_id' => $iidstwo])->all();
+
+        if (isset($itemdetailtwo)) {
+            foreach ($itemdetailtwo as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsthree)) {
+            foreach ($itemsthree as $_item) {
+                $iidsthree[] = $_item->id;
+            }
+        }
+
+        $itemdetailthree = \common\models\ItemDetails::find()->where(['item_id' => $iidsthree])->all();
+
+        if (isset($itemdetailthree)) {
+            foreach ($itemdetailthree as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfour)) {
+            foreach ($itemsfour as $_item) {
+                $iidsfour[] = $_item->id;
+            }
+        }
+
+        $itemdetailfour = \common\models\ItemDetails::find()->where(['item_id' => $iidsfour])->all();
+
+        if (isset($itemdetailfour)) {
+            foreach ($itemdetailfour as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfive)) {
+            foreach ($itemsfive as $_item) {
+                $iidsfive[] = $_item->id;
+            }
+        }
+
+        $itemdetailfive = \common\models\ItemDetails::find()->where(['item_id' => $iidsfive])->all();
+
+        if (isset($itemdetailfive)) {
+            foreach ($itemdetailfive as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemssix)) {
+            foreach ($itemssix as $_item) {
+                $iidssix[] = $_item->id;
+            }
+        }
+
+        $itemdetailsix = \common\models\ItemDetails::find()->where(['item_id' => $iidssix])->all();
+
+        if (isset($itemdetailsix)) {
+            foreach ($itemdetailsix as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+
+        $finalgraphce[] = ['Cheif Engineers', 'Approved Tenders'];
+        $cengineers = \common\models\Cengineer::find()->where(['command' => [6, 7, 8, 9, 10, 11]])->all();
+        //commands
+        if (isset($cengineers) && count($cengineers)) {
+            foreach ($cengineers as $_cengineer) {
+                $tidsc = [];
+                $iidsc = [];
+                $archivetidsc = [];
+                $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.cengineer' => $_cengineer->cid, 'items.tenderfour' => $type])->all();
+                $cengineer = str_replace(' - MES', '', str_replace('AND ', '', strstr($_cengineer->text, 'AND ')));
+
+                if (isset($tenderscommand) && count($tenderscommand)) {
+                    foreach ($tenderscommand as $_tender) {
+                        $tidsc[] = $_tender->id;
+                    }
+                }
+                $itemsc = \common\models\Item::find()->where(['tender_id' => $tidsc, 'tenderfour' => $type])->all();
+                if (isset($itemsc) && count($itemsc)) {
+                    foreach ($itemsc as $_item) {
+                        $iidsc[] = $_item->id;
+                    }
+                }
+
+                $graphonequantity = 0;
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        if ($_idetail->quantity != '') {
+                            $graphonequantity += $_idetail->quantity;
+                        }
+                    }
+                }
+
+                $finalgraphce[] = [$cengineer, $graphonequantity];
+            }
+        }
+
+        if (isset($type)) {
+            if (isset($tenders) && count($tenders)) {
+                foreach ($tenders as $_tender) {
+                    $tids[] = $_tender->id;
+                }
+            }
+            $items = \common\models\Item::find()->where(['tender_id' => $tids, 'tenderfour' => $type])->all();
+            if (isset($items) && count($items)) {
+                foreach ($items as $_item) {
+                    $iids[] = $_item->id;
+                }
+            }
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iids])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allquantity[] = ['quantity' => $_idetail->quantity];
+                }
+            }
+
+            if (isset($archivetenders) && count($archivetenders)) {
+                foreach ($archivetenders as $_tender) {
+                    $archivetids[] = $_tender->id;
+                }
+            }
+            $items = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderfour' => $type])->all();
+            if (isset($items) && count($items)) {
+                foreach ($items as $_item) {
+                    $archiveiids[] = $_item->id;
+                }
+            }
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $archiveiids])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    if ($_idetail->quantity != '') {
+                        $archivequantity[] = ['quantity' => $_idetail->quantity];
+                    }
+                }
+            }
+
+            $sizes = [];
+            $onequantity = 0;
+            if (isset($allquantity) && count($allquantity)) {
+                foreach ($allquantity as $_quantity) {
+                    $onequantity += $_quantity['quantity'];
+                }
+            }
+
+            $sizes = [];
+            $twoquantity = 0;
+            if (isset($archivequantity) && count($archivequantity)) {
+                foreach ($archivequantity as $_quantity) {
+                    $twoquantity += $_quantity['quantity'];
+                }
+            }
+
+            if ($type == 1) {
+                $unit = 'RM';
+                $head = 'Quantity in Metres';
+            } else {
+                $unit = 'NOS';
+                $head = 'No. of Fixtures';
+            }
+
+            $labelsone = 'ALL MAKES';
+            $valuesone = $onequantity;
+
+            $balanced = (count($tenders) - count($archivetenders));
+            $balancedq = ($onequantity - $twoquantity);
+            $balancedprice = ($eprice - $epriceone);
+            $makes = \common\models\Make::find()->where(['mtype' => $type, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+            $sizes = \common\models\Size::find()->where(['mtypeone' => 1, 'mtypetwo' => 1, 'mtypethree' => 1, 'status' => 1])->all();
+            $finalarr[] = ['title' => 'All Tenders', 'total' => count($tenders), 'quantity' => $onequantity, 'value' => $this->actionMoneyformat($eprice)];
+            $finalarr[] = ['title' => 'Archived Tenders', 'total' => count($archivetenders), 'quantity' => $twoquantity, 'value' => $this->actionMoneyformat($epriceone)];
+            $finalarr[] = ['title' => 'Balance Tenders', 'total' => $balanced, 'quantity' => $balancedq, 'value' => $this->actionMoneyformat($balancedprice)];
+        }
+
         return $this->render('index', [
-                    'tenders' => $tenders,
-                    'items' => $idetails
+                    'details' => $finalarr,
+                    'makes' => $makes,
+                    'head' => $head,
+                    'sizes' => $sizes,
+                    'labels' => $labelsone,
+                    'values' => $valuesone,
+                    'graphs' => $finalgraph,
+                    'graphsce' => $finalgraphce
         ]);
+    }
+
+    public function actionGetmakedetails() {
+        $user = Yii::$app->user->identity;
+        $make = @$_REQUEST['make'];
+        $type = @$_REQUEST['product'];
+        $sizeval = @$_REQUEST['sizeval'];
+        $command = @$_REQUEST['command'];
+        $searchtype = @$_REQUEST['type'];
+        $fromdate = @$_REQUEST['fromdate'];
+        $todate = @$_REQUEST['todate'];
+        $finalarr = [];
+        $makes = [];
+        $iids = [];
+        $tids = [];
+        $archivetids = [];
+        $lighttids = [];
+        $arcitems = [];
+        $fullitems = [];
+        $arciids = [];
+        $fulliids = [];
+        $cquantity = 0;
+        $caquantity = 0;
+
+        if (isset($command) && $command != '' && $command != 14) {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $lighttenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $lighttenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+            }
+        } else {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $lighttenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $lighttenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
+            }
+        }
+
+        //value
+        $tids = [];
+        $iids = [];
+        $iidsone = [];
+        $iidstwo = [];
+        $iidsthree = [];
+        $iidsfour = [];
+        $iidsfive = [];
+        $iidssix = [];
+        $epricemake = 0;
+
+        if (isset($command) && $command != '' && $command != 14) {
+
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                //Approved
+                //Lt
+                $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                //Ht
+                $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+
+                //Archived
+                //Lt
+                $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                //Ht
+                $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                //Approved
+                //Lt
+                $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+                $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+                $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+                //Ht
+                $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+
+                //Archived
+                //Lt
+                $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+                $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+                $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+                //Ht
+                $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $command, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+            }
+        } else {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                //Lt
+                $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                //Ht
+                $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                //Lt
+                $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+                $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+                $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+                //Ht
+                $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+            }
+
+            if ($searchtype == 1) {
+
+                if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                    //Lt
+                    $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                    $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                    $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                    $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                    //Ht
+                    $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                    $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                } else {
+                    //Lt
+                    $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                    $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
+                    $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+                    $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
+                    //Ht
+                    $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
+                    $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
+                }
+            }
+        }
+
+        if (isset($make)) {
+            if (isset($itemsone)) {
+                foreach ($itemsone as $_item) {
+                    $iidsone[] = $_item->id;
+                }
+            }
+
+            $itemdetailone = \common\models\ItemDetails::find()->where(['item_id' => $iidsone])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+            if (isset($itemdetailone)) {
+                foreach ($itemdetailone as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemstwo)) {
+                foreach ($itemstwo as $_item) {
+                    $iidstwo[] = $_item->id;
+                }
+            }
+
+            $itemdetailtwo = \common\models\ItemDetails::find()->where(['item_id' => $iidstwo])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+
+            if (isset($itemdetailtwo)) {
+                foreach ($itemdetailtwo as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsthree)) {
+                foreach ($itemsthree as $_item) {
+                    $iidsthree[] = $_item->id;
+                }
+            }
+
+            $itemdetailthree = \common\models\ItemDetails::find()->where(['item_id' => $iidsthree])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+
+            if (isset($itemdetailthree)) {
+                foreach ($itemdetailthree as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsfour)) {
+                foreach ($itemsfour as $_item) {
+                    $iidsfour[] = $_item->id;
+                }
+            }
+
+            $itemdetailfour = \common\models\ItemDetails::find()->where(['item_id' => $iidsfour])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+
+            if (isset($itemdetailfour)) {
+                foreach ($itemdetailfour as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsfive)) {
+                foreach ($itemsfive as $_item) {
+                    $iidsfive[] = $_item->id;
+                }
+            }
+
+            $itemdetailfive = \common\models\ItemDetails::find()->where(['item_id' => $iidsfive])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+
+            if (isset($itemdetailfive)) {
+                foreach ($itemdetailfive as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemssix)) {
+                foreach ($itemssix as $_item) {
+                    $iidssix[] = $_item->id;
+                }
+            }
+
+            $itemdetailsix = \common\models\ItemDetails::find()->where(['item_id' => $iidssix])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+
+            if (isset($itemdetailsix)) {
+                foreach ($itemdetailsix as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricemake += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+        }
+
+        $iidsone = [];
+        $iidstwo = [];
+        $iidsthree = [];
+        $iidsfour = [];
+        $iidsfive = [];
+        $iidssix = [];
+        $epriceone = 0;
+
+        if (isset($itemsone)) {
+            foreach ($itemsone as $_item) {
+                $iidsone[] = $_item->id;
+            }
+        }
+
+        $itemdetailone = \common\models\ItemDetails::find()->where(['item_id' => $iidsone])->all();
+        if (isset($itemdetailone)) {
+            foreach ($itemdetailone as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemstwo)) {
+            foreach ($itemstwo as $_item) {
+                $iidstwo[] = $_item->id;
+            }
+        }
+
+        $itemdetailtwo = \common\models\ItemDetails::find()->where(['item_id' => $iidstwo])->all();
+
+        if (isset($itemdetailtwo)) {
+            foreach ($itemdetailtwo as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsthree)) {
+            foreach ($itemsthree as $_item) {
+                $iidsthree[] = $_item->id;
+            }
+        }
+
+        $itemdetailthree = \common\models\ItemDetails::find()->where(['item_id' => $iidsthree])->all();
+
+        if (isset($itemdetailthree)) {
+            foreach ($itemdetailthree as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfour)) {
+            foreach ($itemsfour as $_item) {
+                $iidsfour[] = $_item->id;
+            }
+        }
+
+        $itemdetailfour = \common\models\ItemDetails::find()->where(['item_id' => $iidsfour])->all();
+
+        if (isset($itemdetailfour)) {
+            foreach ($itemdetailfour as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemsfive)) {
+            foreach ($itemsfive as $_item) {
+                $iidsfive[] = $_item->id;
+            }
+        }
+
+        $itemdetailfive = \common\models\ItemDetails::find()->where(['item_id' => $iidsfive])->all();
+
+        if (isset($itemdetailfive)) {
+            foreach ($itemdetailfive as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        if (isset($itemssix)) {
+            foreach ($itemssix as $_item) {
+                $iidssix[] = $_item->id;
+            }
+        }
+
+        $itemdetailsix = \common\models\ItemDetails::find()->where(['item_id' => $iidssix])->all();
+
+        if (isset($itemdetailsix)) {
+            foreach ($itemdetailsix as $_detail) {
+                $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                if (@$price->price) {
+                    $epriceone += ($_detail->quantity * $price->price);
+                }
+            }
+        }
+
+        $iidsone = [];
+        $iidstwo = [];
+        $iidsthree = [];
+        $iidsfour = [];
+        $iidsfive = [];
+        $iidssix = [];
+        $epricearc = 0;
+
+        if ($searchtype == 1) {
+
+            //Archived
+            if (isset($itemsonearc)) {
+                foreach ($itemsonearc as $_item) {
+                    $iidsone[] = $_item->id;
+                }
+            }
+            $itemdetailone = \common\models\ItemDetails::find()->where(['item_id' => $iidsone])->all();
+            if (isset($itemdetailone)) {
+                foreach ($itemdetailone as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemstwoarc)) {
+                foreach ($itemstwoarc as $_item) {
+                    $iidstwo[] = $_item->id;
+                }
+            }
+
+            $itemdetailtwo = \common\models\ItemDetails::find()->where(['item_id' => $iidstwo])->all();
+
+            if (isset($itemdetailtwo)) {
+                foreach ($itemdetailtwo as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsthreearc)) {
+                foreach ($itemsthreearc as $_item) {
+                    $iidsthree[] = $_item->id;
+                }
+            }
+
+            $itemdetailthree = \common\models\ItemDetails::find()->where(['item_id' => $iidsthree])->all();
+
+            if (isset($itemdetailthree)) {
+                foreach ($itemdetailthree as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsfourarc)) {
+                foreach ($itemsfourarc as $_item) {
+                    $iidsfour[] = $_item->id;
+                }
+            }
+
+            $itemdetailfour = \common\models\ItemDetails::find()->where(['item_id' => $iidsfour])->all();
+
+            if (isset($itemdetailfour)) {
+                foreach ($itemdetailfour as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemsfivearc)) {
+                foreach ($itemsfivearc as $_item) {
+                    $iidsfive[] = $_item->id;
+                }
+            }
+
+            $itemdetailfive = \common\models\ItemDetails::find()->where(['item_id' => $iidsfive])->all();
+
+            if (isset($itemdetailfive)) {
+                foreach ($itemdetailfive as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+
+            if (isset($itemssixarc)) {
+                foreach ($itemssixarc as $_item) {
+                    $iidssix[] = $_item->id;
+                }
+            }
+
+            $itemdetailsix = \common\models\ItemDetails::find()->where(['item_id' => $iidssix])->all();
+
+            if (isset($itemdetailsix)) {
+                foreach ($itemdetailsix as $_detail) {
+                    $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                    if (@$price->price) {
+                        $epricearc += ($_detail->quantity * $price->price);
+                    }
+                }
+            }
+        }
+
+        $mnamegraph = '';
+        if (isset($make) && $make != '') {
+            $makename = \common\models\Make::find()->where(['id' => $make])->one();
+            $mnamegraph = $makename->make;
+        }
+        $finalgraph[] = ['Command', 'Approved Tenders', $mnamegraph];
+        //commands
+        for ($i = 1; $i <= 13; $i++) {
+            $tidsc = [];
+            $iidsc = [];
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
+            }
+
+            $commandname = $this->actionGetcommandgraph($i);
+
+            if (isset($tenderscommand) && count($tenderscommand)) {
+                foreach ($tenderscommand as $_tender) {
+                    $tidsc[] = $_tender->id;
+                }
+            }
+            $itemsc = \common\models\Item::find()->where(['tender_id' => $tidsc, 'tenderfour' => $type])->all();
+            if (isset($itemsc) && count($itemsc)) {
+                foreach ($itemsc as $_item) {
+                    $iidsc[] = $_item->id;
+                }
+            }
+
+            $graphonequantity = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $graphonequantity += $_idetail->quantity;
+                }
+            }
+
+            $graphthreequantity = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        $graphthreequantity += $_idetail->quantity;
+                    }
+                }
+            }
+
+            $finalgraph[] = [$commandname, $graphonequantity, $graphthreequantity];
+        }
+
+        if ($mnamegraph != '') {
+            $finalgraphce[] = ['Cheif Engineers', 'Approved Tenders', $mnamegraph];
+        } else {
+            $finalgraphce[] = ['Cheif Engineers', 'Approved Tenders'];
+        }
+
+        if (isset($command) && $command == 14) {
+            $cengineers = \common\models\Cengineer::find()->where(['command' => [6, 7, 8, 9, 10, 11]])->all();
+        } else {
+            $cengineers = \common\models\Cengineer::find()->where(['command' => $command])->all();
+        }
+
+
+        //commands
+        if (isset($cengineers) && count($cengineers)) {
+            foreach ($cengineers as $_cengineer) {
+                $tidsc = [];
+                $iidsc = [];
+                $archivetidsc = [];
+                if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.cengineer' => $_cengineer->cid, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                } else {
+                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.cengineer' => $_cengineer->cid, 'items.tenderfour' => $type])->all();
+                }
+
+                $cengineer = str_replace(' - MES', '', str_replace('AND ', '', strstr($_cengineer->text, 'AND ')));
+
+                if (isset($tenderscommand) && count($tenderscommand)) {
+                    foreach ($tenderscommand as $_tender) {
+                        $tidsc[] = $_tender->id;
+                    }
+                }
+                $itemsc = \common\models\Item::find()->where(['tender_id' => $tidsc, 'tenderfour' => $type])->all();
+                if (isset($itemsc) && count($itemsc)) {
+                    foreach ($itemsc as $_item) {
+                        $iidsc[] = $_item->id;
+                    }
+                }
+
+
+                $graphonequantity = 0;
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        $graphonequantity += $_idetail->quantity;
+                    }
+                }
+
+                if ($mnamegraph != '') {
+                    $graphthreequantity = 0;
+                    $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
+                    if (isset($idetails) && count($idetails)) {
+                        foreach ($idetails as $_idetail) {
+                            $allmakes = explode(',', $_idetail->make);
+                            if (in_array($make, $allmakes)) {
+                                $graphthreequantity += $_idetail->quantity;
+                            }
+                        }
+                    }
+                }
+
+                if ($mnamegraph != '') {
+                    $finalgraphce[] = [$cengineer, $graphonequantity, $graphthreequantity];
+                } else {
+                    $finalgraphce[] = [$cengineer, $graphonequantity];
+                }
+            }
+        }
+
+        if (isset($type)) {
+            if (isset($tenders) && count($tenders)) {
+                foreach ($tenders as $_tender) {
+                    $tids[] = $_tender->id;
+                }
+            }
+            if (isset($lighttenders) && count($lighttenders)) {
+                foreach ($lighttenders as $_tender) {
+                    $lighttids[] = $_tender->id;
+                }
+            }
+
+
+            $items = \common\models\Item::find()->where(['tender_id' => $tids, 'tenderfour' => $type])->all();
+            if (isset($items) && count($items)) {
+                foreach ($items as $_item) {
+                    $iids[] = $_item->id;
+                }
+            }
+
+            $allquantity = 0;
+            $allmakes = [];
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iids])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        $allquantity += $_idetail->quantity;
+                    }
+                }
+            }
+
+            if (isset($archivetenders) && count($archivetenders)) {
+                foreach ($archivetenders as $_tender) {
+                    $archivetids[] = $_tender->id;
+                }
+            }
+
+            if (isset($command) && $command != '') {
+                $arcitems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderfour' => $type])->all();
+                $fullitems = \common\models\Item::find()->where(['tender_id' => $lighttids, 'tenderfour' => $type])->all();
+
+                if (isset($arcitems) && count($arcitems)) {
+                    foreach ($arcitems as $_item) {
+                        $arciids[] = $_item->id;
+                    }
+                }
+
+                if (isset($fullitems) && count($fullitems)) {
+                    foreach ($fullitems as $_item) {
+                        $fulliids[] = $_item->id;
+                    }
+                }
+
+                $commandfullquantity = [];
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $fulliids])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        if ($type == 1) {
+                            $commandfullquantity[] = ['quantity' => $_idetail->quantity];
+                        } elseif ($type == 2) {
+                            $commandfullquantity[] = ['quantity' => $_idetail->quantity];
+                        }
+                    }
+                }
+
+                $commandarcquantity = [];
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $arciids])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        if ($type == 1) {
+                            $commandarcquantity[] = ['quantity' => $_idetail->quantity];
+                        } elseif ($type == 2) {
+                            $commandarcquantity[] = ['quantity' => $_idetail->quantity];
+                        }
+                    }
+                }
+
+                $cquantity = 0;
+                if (isset($commandfullquantity) && count($commandfullquantity)) {
+                    foreach ($commandfullquantity as $_quantity) {
+                        $cquantity += $_quantity['quantity'];
+                    }
+                }
+
+                $caquantity = 0;
+                if (isset($commandarcquantity) && count($commandarcquantity)) {
+                    foreach ($commandarcquantity as $_quantity) {
+                        $caquantity += $_quantity['quantity'];
+                    }
+                }
+            }
+
+            /* $ltitems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => 1, 'tenderfour' => $type])->all();
+              $cpitems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => 1, 'tenderfive' => 1, 'tenderfour' => $type])->all();
+              $aritems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => 1, 'tenderfive' => 1, 'tendersix' => 1, 'tenderfour' => $type])->all();
+              $allitems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderfour' => $type])->all();
+              $aallitems = \common\models\Item::find()->where(['tender_id' => $lighttids, 'tenderfour' => $type])->all();
+
+              $archivelt = [];
+              $archivecp = [];
+              $archivear = [];
+              $allsizes = [];
+              $aallsizes = [];
+
+
+              if (isset($ltitems) && count($ltitems)) {
+              foreach ($ltitems as $_item) {
+              $archivelt[] = $_item->id;
+              }
+              }
+              if (isset($cpitems) && count($cpitems)) {
+              foreach ($cpitems as $_item) {
+              $archivecp[] = $_item->id;
+              }
+              }
+              if (isset($aritems) && count($aritems)) {
+              foreach ($aritems as $_item) {
+              $archivear[] = $_item->id;
+              }
+              }
+              if (isset($allitems) && count($allitems)) {
+              foreach ($allitems as $_item) {
+              $allsizes[] = $_item->id;
+              }
+              }
+              if (isset($aallitems) && count($aallitems)) {
+              foreach ($aallitems as $_item) {
+              $aallsizes[] = $_item->id;
+              }
+              }
+
+
+              $quantityltwith = 0;
+              $quantityltwithout = 0;
+
+              $idetails = \common\models\ItemDetails::find()->where(['item_id' => $archivelt])->all();
+              if (isset($idetails) && count($idetails)) {
+              foreach ($idetails as $_idetail) {
+              $allmakes = [];
+              $allmakes = explode(',', $_idetail->make);
+              if (in_array($make, $allmakes)) {
+              $quantityltwith += $_idetail->quantity;
+              } else {
+              $quantityltwithout += $_idetail->quantity;
+              }
+              }
+              }
+
+
+              $quantitycpwith = 0;
+              $quantitycpwithout = 0;
+
+              $idetails = \common\models\ItemDetails::find()->where(['item_id' => $archivecp])->all();
+              if (isset($idetails) && count($idetails)) {
+              foreach ($idetails as $_idetail) {
+              $allmakes = [];
+              $allmakes = explode(',', $_idetail->make);
+              if (in_array($make, $allmakes)) {
+              $quantitycpwith += $_idetail->quantity;
+              } else {
+              $quantitycpwithout += $_idetail->quantity;
+              }
+              }
+              }
+
+
+              $quantityarwith = 0;
+              $quantityarwithout = 0;
+              $idetails = \common\models\ItemDetails::find()->where(['item_id' => $archivear])->all();
+              if (isset($idetails) && count($idetails)) {
+              foreach ($idetails as $_idetail) {
+              $allmakes = [];
+              $allmakes = explode(',', $_idetail->make);
+              if (in_array($make, $allmakes)) {
+              $quantityarwith += $_idetail->quantity;
+              } else {
+              $quantityarwithout += $_idetail->quantity;
+              }
+              }
+              }
+
+
+              $quantityallwith = 0;
+              $quantityallwithout = 0;
+              $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+              if (isset($idetails) && count($idetails)) {
+              foreach ($idetails as $_idetail) {
+              $allmakes = [];
+              $allmakes = explode(',', $_idetail->make);
+              if (in_array($make, $allmakes)) {
+              if ($_idetail->description == $sizeval) {
+              $quantityallwith += $_idetail->quantity;
+              }
+              } else {
+              if ($_idetail->description == $sizeval) {
+              $quantityallwithout += $_idetail->quantity;
+              }
+              }
+              }
+              } */
+
+            $allitems = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderfour' => $type])->all();
+            $aallitems = \common\models\Item::find()->where(['tender_id' => $lighttids, 'tenderfour' => $type])->all();
+
+            $allsizes = [];
+            $aallsizes = [];
+
+            $allsizes = [];
+            if (isset($allitems) && count($allitems)) {
+                foreach ($allitems as $_item) {
+                    $allsizes[] = $_item->id;
+                }
+            }
+
+            $aallsizes = [];
+            if (isset($aallitems) && count($aallitems)) {
+                foreach ($aallitems as $_item) {
+                    $aallsizes[] = $_item->id;
+                }
+            }
+
+            $quantitytotallight = 0;
+            $quantitywithlight = 0;
+            $quantitywithoutlight = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = [];
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        if ($_idetail->typefitting == 4) {
+                            $quantitywithlight += $_idetail->quantity;
+                        }
+                    } else {
+                        if ($_idetail->typefitting == 4) {
+                            $quantitywithoutlight += $_idetail->quantity;
+                        }
+                    }
+                }
+            }
+
+            $aquantitytotallight = 0;
+            $aquantitywithlight = 0;
+            $aquantitywithoutlight = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $aallsizes])->all();
+
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = [];
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        if ($_idetail->typefitting == 4) {
+                            $aquantitywithlight += $_idetail->quantity;
+                        }
+                    } else {
+                        if ($_idetail->typefitting == 4) {
+                            $aquantitywithoutlight += $_idetail->quantity;
+                        }
+                    }
+                }
+            }
+
+
+
+            /* $quantitytotalclight = 0;
+              $quantitywithclight = 0;
+              $quantitywithoutclight = 0;
+              $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+
+              if (isset($idetails) && count($idetails)) {
+              foreach ($idetails as $_idetail) {
+              $allmakes = [];
+              $allmakes = explode(',', $_idetail->make);
+              if (in_array($make, $allmakes)) {
+              if ($_idetail->capacityfitting == 12) {
+              $quantitywithclight += $_idetail->quantity;
+              }
+              } else {
+              if ($_idetail->capacityfitting == 12) {
+              $quantitywithoutclight += $_idetail->quantity;
+              }
+              }
+              }
+              } */
+            //echo $quantitywithoutlight;
+
+
+            if ($type == 1) {
+                $unit = 'RM';
+            } else {
+                $unit = 'NOS';
+            }
+            $getsizes = [];
+            $gettlights = [];
+            $getclights = [];
+            /* $sizes = \common\models\Size::find()->where(['mtypetwo' => 1, 'mtypethree' => 1])->orderBy(['size' => SORT_ASC])->all();
+              if (isset($sizes) && count($sizes)) {
+              foreach ($sizes as $_size) {
+              $getsizes[$_size->id] = $_size->size;
+              }
+              } */
+            $typelight = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
+            //$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
+
+            if (isset($typelight) && count($typelight)) {
+                foreach ($typelight as $_tlight) {
+                    $gettlights[$_tlight->id] = $_tlight->text;
+                }
+            }
+
+            /* if (isset($capacitylight) && count($capacitylight)) {
+              foreach ($capacitylight as $_clight) {
+              $getclights[$_clight->id] = $_clight->text;
+              }
+              } */
+            $mname = '';
+            if (isset($make) && $make != '') {
+                $makename = \common\models\Make::find()->where(['id' => $make])->one();
+                $quantities['headtwo'] = 'Without ' . $makename->make . '';
+                $quantities['headthree'] = 'With ' . $makename->make . '';
+                $mname = $makename->make;
+            }
+
+            /* $quantities['archivedlt'] = $quantityltwith + $quantityltwithout . ' ' . $unit;
+              $quantities['archivedcp'] = $quantitycpwith + $quantitycpwithout . ' ' . $unit;
+              $quantities['archivedar'] = $quantityarwith + $quantityarwithout . ' ' . $unit;
+              $quantities['archivedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit; */
+            $quantities['headone'] = 'Archived';
+            $quantities['headfour'] = 'Approved';
+
+            /* $quantities['withlt'] = $quantityltwith . ' ' . $unit;
+              $quantities['withcp'] = $quantitycpwith . ' ' . $unit;
+              $quantities['withar'] = $quantityarwith . ' ' . $unit;
+              $quantities['withsize'] = $quantityallwith . ' ' . $unit;
+
+
+              $quantities['withoutlt'] = $quantityltwithout . ' ' . $unit;
+              $quantities['withoutcp'] = $quantitycpwithout . ' ' . $unit;
+              $quantities['withoutar'] = $quantityarwithout . ' ' . $unit;
+              $quantities['withoutsize'] = $quantityallwithout . ' ' . $unit; */
+            $quantities['atotallight'] = $aquantitywithlight + $aquantitywithoutlight . ' ' . $unit;
+            $quantities['totallight'] = $quantitywithlight + $quantitywithoutlight . ' ' . $unit;
+            $quantities['withlight'] = $quantitywithlight . ' ' . $unit;
+            $quantities['withoutlight'] = $quantitywithoutlight . ' ' . $unit;
+            /* $quantities['totalclight'] = $quantitywithclight + $quantitywithoutclight . ' ' . $unit;
+              $quantities['withclight'] = $quantitywithclight . ' ' . $unit;
+              $quantities['withoutclight'] = $quantitywithoutclight . ' ' . $unit; */
+
+
+            $balanced = (count($lighttenders) - count($archivetenders));
+            $balancedq = ($cquantity - $caquantity);
+
+            $finalarr['total'] = count($tenders);
+            $finalarr['quantity'] = $allquantity;
+            $finalarr['value'] = $this->actionMoneyformat($epricemake);
+            $finalarr['aptenderstotal'] = count($lighttenders);
+            $finalarr['artenderstotal'] = count($archivetenders);
+            $finalarr['bltenderstotal'] = $balanced;
+            $finalarr['aptendersquantity'] = $cquantity;
+            $finalarr['artendersquantity'] = $caquantity;
+            $finalarr['bltendersquantity'] = $balancedq;
+            $finalarr['aptendersprice'] = $this->actionMoneyformat($epriceone);
+            $finalarr['artendersprice'] = $this->actionMoneyformat($epricearc);
+            $finalarr['bltendersprice'] = $this->actionMoneyformat(($epriceone - $epricearc));
+            $finalarr['artenders'] = $caquantity;
+
+            $othersone = ($cquantity - $allquantity);
+
+            $labelsone = ['OTHERS', $mname];
+            $valuesone = [$othersone, $allquantity];
+
+            /* $labels = ['Without ' . $mname . '', 'With ' . $mname . ''];
+              $valuestwo = [$quantityltwithout, $quantityltwith];
+
+              $valuesthree = [$quantitycpwithout, $quantitycpwith];
+
+              $valuesfour = [$quantityarwithout, $quantityarwith];
+
+              $valuesfive = [$quantityallwithout, $quantityallwith];
+
+              $valuessix = [$quantitywithoutlight, $quantitywithlight]; */
+
+
+            echo json_encode(['first' => $finalarr, 'second' => $quantities, 'sizes' => $getsizes, 'tlights' => $gettlights, 'clights' => $getclights, 'makename' => $mname, 'labelsone' => $labelsone, 'valuesone' => $valuesone, 'graph' => $finalgraph, 'graphce' => $finalgraphce]);
+
+            die();
+        }
+    }
+
+    public function actionGetsingledata() {
+        $user = Yii::$app->user->identity;
+        $val = @$_REQUEST['val'];
+        $valtype = @$_REQUEST['type'];
+        $type = @$_REQUEST['product'];
+        $make = @$_REQUEST['make'];
+        $command = @$_REQUEST['command'];
+        $typetwo = @$_REQUEST['typetwo'];
+        $typethree = @$_REQUEST['typethree'];
+        $typeone = @$_REQUEST['typeone'];
+        $typefour = @$_REQUEST['typefour'];
+        $fromdate = @$_REQUEST['fromdate'];
+        $todate = @$_REQUEST['todate'];
+        $finalarr = [];
+        $makes = [];
+        $iids = [];
+        $tids = [];
+        $archivetids = [];
+        $alltids = [];
+        $sizes = [];
+        $getsizes = [];
+
+        if (isset($command) && $command != '' && $command != 14) {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $alltenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+                $alltenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+            }
+        } else {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $alltenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
+                $alltenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
+            }
+        }
+
+
+        if (isset($type)) {
+            if (isset($archivetenders) && count($archivetenders)) {
+                foreach ($archivetenders as $_tender) {
+                    $archivetids[] = $_tender->id;
+                }
+            }
+
+            if (isset($alltenders) && count($alltenders)) {
+                foreach ($alltenders as $_tender) {
+                    $alltids[] = $_tender->id;
+                }
+            }
+
+            if ($valtype == 1) {
+                $items = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => $val, 'tenderfour' => $type])->all();
+                $aitems = \common\models\Item::find()->where(['tender_id' => $alltids, 'tenderthree' => $val, 'tenderfour' => $type])->all();
+            } elseif ($valtype == 2) {
+                $items = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => $typeone, 'tenderfive' => $val, 'tenderfour' => $type])->all();
+                $aitems = \common\models\Item::find()->where(['tender_id' => $alltids, 'tenderthree' => $typeone, 'tenderfive' => $val, 'tenderfour' => $type])->all();
+                $sizes = \common\models\Size::find()->where(['mtypetwo' => $val, 'mtypethree' => $typethree])->all();
+            } elseif ($valtype == 3) {
+                $items = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => $typeone, 'tenderfive' => $typetwo, 'tendersix' => $val, 'tenderfour' => $type])->all();
+                $aitems = \common\models\Item::find()->where(['tender_id' => $alltids, 'tenderthree' => $typeone, 'tenderfive' => $typetwo, 'tendersix' => $val, 'tenderfour' => $type])->all();
+                $sizes = \common\models\Size::find()->where(['mtypetwo' => $typetwo, 'mtypethree' => $val])->all();
+            } else {
+                $items = \common\models\Item::find()->where(['tender_id' => $archivetids, 'tenderthree' => $typeone, 'tenderfive' => $typetwo, 'tendersix' => $typethree, 'tenderfour' => $type])->all();
+                $aitems = \common\models\Item::find()->where(['tender_id' => $alltids, 'tenderthree' => $typeone, 'tenderfive' => $typetwo, 'tendersix' => $typethree, 'tenderfour' => $type])->all();
+            }
+
+            if (isset($sizes) && count($sizes)) {
+                foreach ($sizes as $_size) {
+                    $getsizes[$_size->id] = $_size->size;
+                }
+            }
+
+            $itemone = [];
+            $aitemone = [];
+            $allsizes = [];
+            $aallsizes = [];
+
+            $aquantityallwith = 0;
+            $aquantityallwithout = 0;
+
+            $quantityallwith = 0;
+            $quantityallwithout = 0;
+
+            $quantitywith = 0;
+            $quantitywithout = 0;
+
+            $aquantitywith = 0;
+            $aquantitywithout = 0;
+            if ($valtype == 1 || $valtype == 2 || $valtype == 3) {
+                if (isset($items) && count($items)) {
+                    foreach ($items as $_item) {
+                        $itemone[] = $_item->id;
+                    }
+                }
+                if (isset($aitems) && count($aitems)) {
+                    foreach ($aitems as $_item) {
+                        $aitemone[] = $_item->id;
+                    }
+                }
+
+
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $itemone])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        $allmakes = [];
+                        $allmakes = explode(',', $_idetail->make);
+                        if (in_array($make, $allmakes)) {
+                            $quantitywith += $_idetail->quantity;
+                        } else {
+                            $quantitywithout += $_idetail->quantity;
+                        }
+                    }
+                }
+
+
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $aitemone])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        $allmakes = [];
+                        $allmakes = explode(',', $_idetail->make);
+                        if (in_array($make, $allmakes)) {
+                            $aquantitywith += $_idetail->quantity;
+                        } else {
+                            $aquantitywithout += $_idetail->quantity;
+                        }
+                    }
+                }
+            } else {
+                if (isset($items) && count($items)) {
+                    foreach ($items as $_item) {
+                        $allsizes[] = $_item->id;
+                    }
+                }
+
+                if (isset($aitems) && count($aitems)) {
+                    foreach ($aitems as $_item) {
+                        $aallsizes[] = $_item->id;
+                    }
+                }
+
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        $allmakes = [];
+                        $allmakes = explode(',', $_idetail->make);
+                        if (in_array($make, $allmakes)) {
+                            if ($_idetail->description == $val) {
+                                $quantityallwith += $_idetail->quantity;
+                            }
+                        } else {
+                            if ($_idetail->description == $val) {
+                                $quantityallwithout += $_idetail->quantity;
+                            }
+                        }
+                    }
+                }
+
+
+                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $aallsizes])->all();
+                if (isset($idetails) && count($idetails)) {
+                    foreach ($idetails as $_idetail) {
+                        $allmakes = [];
+                        $allmakes = explode(',', $_idetail->make);
+                        if (in_array($make, $allmakes)) {
+                            if ($_idetail->description == $val) {
+                                $aquantityallwith += $_idetail->quantity;
+                            }
+                        } else {
+                            if ($_idetail->description == $val) {
+                                $aquantityallwithout += $_idetail->quantity;
+                            }
+                        }
+                    }
+                }
+            }
+
+
+            if ($type == 1) {
+                $unit = 'RM';
+            } else {
+                $unit = 'NOS';
+            }
+
+            $makename = \common\models\Make::find()->where(['id' => $make])->one();
+
+            $quantities['approved'] = $aquantitywith + $aquantitywithout . ' ' . $unit;
+            $quantities['archived'] = $quantitywith + $quantitywithout . ' ' . $unit;
+            $quantities['approvedsize'] = $aquantityallwith + $aquantityallwithout . ' ' . $unit;
+            $quantities['archivedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit;
+
+            $quantities['with'] = $aquantitywith . ' ' . $unit;
+            $quantities['withsize'] = $aquantityallwith . ' ' . $unit;
+
+            $quantities['without'] = $aquantitywithout . ' ' . $unit;
+            $quantities['withoutsize'] = $aquantityallwithout . ' ' . $unit;
+
+            $quantities['sizes'] = $getsizes;
+
+            $labels = ['Without ' . $makename->make . '', 'With ' . $makename->make . ''];
+            $values = [$aquantitywithout, $aquantitywith];
+
+            $valuessize = [$aquantityallwithout, $aquantityallwith];
+
+            echo json_encode(['quantities' => $quantities, 'labels' => $labels, 'values' => $values, 'valuessize' => $valuessize]);
+
+            die();
+        }
+    }
+
+    public function actionGetsinglelightdata() {
+        $user = Yii::$app->user->identity;
+        $val = @$_REQUEST['val'];
+        $valtype = @$_REQUEST['type'];
+        $type = @$_REQUEST['product'];
+        $make = @$_REQUEST['make'];
+        $command = @$_REQUEST['command'];
+        $fromdate = @$_REQUEST['fromdate'];
+        $todate = @$_REQUEST['todate'];
+        $finalarr = [];
+        $makes = [];
+        $iids = [];
+        $tids = [];
+        $atids = [];
+        $archivetids = [];
+        $sizes = [];
+        $getsizes = [];
+
+        if (isset($command) && $command != '' && $command != 14) {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $arctenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $arctenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'items.tenderfour' => $type])->all();
+            }
+        } else {
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $arctenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+            } else {
+                $arctenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
+            }
+        }
+
+        if (isset($type)) {
+            if (isset($tenders) && count($tenders)) {
+                foreach ($tenders as $_tender) {
+                    $tids[] = $_tender->id;
+                }
+            }
+
+            if (isset($arctenders) && count($arctenders)) {
+                foreach ($arctenders as $_tender) {
+                    $atids[] = $_tender->id;
+                }
+            }
+
+            $allitems = \common\models\Item::find()->where(['tender_id' => $tids, 'tenderfour' => $type])->all();
+            $aallitems = \common\models\Item::find()->where(['tender_id' => $atids, 'tenderfour' => $type])->all();
+
+            $allsizes = [];
+            $aallsizes = [];
+
+
+            if (isset($allitems) && count($allitems)) {
+                foreach ($allitems as $_item) {
+                    $allsizes[] = $_item->id;
+                }
+            }
+
+            if (isset($aallitems) && count($aallitems)) {
+                foreach ($aallitems as $_item) {
+                    $aallsizes[] = $_item->id;
+                }
+            }
+
+            $quantityallwith = 0;
+            $quantityallwithout = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = [];
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        if ($_idetail->typefitting == $val) {
+                            $quantityallwith += $_idetail->quantity;
+                        }
+                    } else {
+                        if ($_idetail->typefitting == $val) {
+                            $quantityallwithout += $_idetail->quantity;
+                        }
+                    }
+                }
+            }
+
+            $aquantityallwith = 0;
+            $aquantityallwithout = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $aallsizes])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = [];
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        if ($_idetail->typefitting == $val) {
+                            $aquantityallwith += $_idetail->quantity;
+                        }
+                    } else {
+                        if ($_idetail->typefitting == $val) {
+                            $aquantityallwithout += $_idetail->quantity;
+                        }
+                    }
+                }
+            }
+
+            $quantityallcwith = 0;
+            $quantityallcwithout = 0;
+            $idetails = \common\models\ItemDetails::find()->where(['item_id' => $allsizes])->all();
+            if (isset($idetails) && count($idetails)) {
+                foreach ($idetails as $_idetail) {
+                    $allmakes = [];
+                    $allmakes = explode(',', $_idetail->make);
+                    if (in_array($make, $allmakes)) {
+                        if ($_idetail->capacityfitting == $val) {
+                            $quantityallcwith += $_idetail->quantity;
+                        }
+                    } else {
+                        if ($_idetail->capacityfitting == $val) {
+                            $quantityallcwithout += $_idetail->quantity;
+                        }
+                    }
+                }
+            }
+
+
+            if ($type == 1) {
+                $unit = 'RM';
+            } else {
+                $unit = 'NOS';
+            }
+
+            $makename = \common\models\Make::find()->where(['id' => $make])->one();
+            $quantities['archivedsize'] = $aquantityallwith + $aquantityallwithout . ' ' . $unit;
+            $quantities['approvedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit;
+
+            $quantities['withsize'] = $quantityallwith . ' ' . $unit;
+
+            $quantities['withoutsize'] = $quantityallwithout . ' ' . $unit;
+
+            $quantities['archivedcsize'] = $quantityallcwith + $quantityallcwithout . ' ' . $unit;
+
+            $quantities['withcsize'] = $quantityallcwith . ' ' . $unit;
+
+            $quantities['withoutcsize'] = $quantityallcwithout . ' ' . $unit;
+
+            $quantities['labels'] = ['Without ' . $makename->make . '', 'With ' . $makename->make . ''];
+            $quantities['graph'] = [$quantityallwithout, $quantityallwith];
+
+            echo json_encode($quantities);
+
+            die();
+        }
     }
 
     public function actionUsers() {
@@ -123,7 +1923,7 @@ class SiteController extends Controller {
             } else {
                 $fresult = 'No Cables Selected';
             }
-        } else {
+        } elseif ($type == 2) {
             if (@$data) {
                 $i = 1;
                 foreach ($data as $_data) {
@@ -138,6 +1938,70 @@ class SiteController extends Controller {
                 }
             } else {
                 $fresult = 'No Lighting Selected';
+            }
+        } elseif ($type == 14) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Cement Selected';
+            }
+        } elseif ($type == 15) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Reinforement Steel Selected';
+            }
+        } elseif ($type == 16) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Structural Steel Selected';
+            }
+        } else {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Non Structural Steel Selected';
             }
         }
         $nresult = rtrim($fresult, ",");
@@ -182,6 +2046,27 @@ class SiteController extends Controller {
         return $this->redirect(array('site/users'));
     }
 
+    public function actionOnHold() {
+        $id = @$_REQUEST['value'];
+        $tender = \common\models\Tender::find()->where(['id' => $id])->one();
+        if ($tender->on_hold == 1) {
+            $hold = '';
+        } else {
+            $hold = 1;
+        }
+        $data = ['on_hold' => $hold];
+        $querydata = \Yii::$app
+                ->db
+                ->createCommand()
+                ->update('tenders', $data, 'id = ' . $tender->id . '')
+                ->execute();
+        if ($querydata) {
+            echo json_encode(['status' => 1, 'hold' => $hold]);
+        } else {
+            echo json_encode(['status' => 0, 'hold' => $hold]);
+        }
+    }
+
     public function actionChangeStatusClient() {
         $id = @$_GET['id'];
         $user = \common\models\Clients::find()->where(['id' => $id])->one();
@@ -192,7 +2077,13 @@ class SiteController extends Controller {
         }
         $user->save();
         Yii::$app->session->setFlash('success', "Status successfully changed");
-        return $this->redirect(array('site/clients'));
+        if ($user['type'] == 2) {
+            return $this->redirect(array('site/contractors'));
+        } elseif ($user['type'] == 3) {
+            return $this->redirect(array('site/dealers'));
+        } else {
+            return $this->redirect(array('site/manufacturers'));
+        }
     }
 
     public function actionEditClient() {
@@ -223,6 +2114,18 @@ class SiteController extends Controller {
                 if (isset($data['lighting']) && count($data['lighting'])) {
                     $client->lighting = implode(',', @$data['lighting']);
                 }
+                if (isset($data['cement']) && count($data['cement'])) {
+                    $client->cements = implode(',', @$data['cement']);
+                }
+                if (isset($data['rsteel']) && count($data['rsteel'])) {
+                    $client->rsteel = implode(',', @$data['rsteel']);
+                }
+                if (isset($data['ssteel']) && count($data['ssteel'])) {
+                    $client->ssteel = implode(',', @$data['ssteel']);
+                }
+                if (isset($data['nsteel']) && count($data['nsteel'])) {
+                    $client->nsteel = implode(',', @$data['nsteel']);
+                }
 
                 if ($client->save()) {
                     Yii::$app->session->setFlash('success', "Client successfully updated");
@@ -248,13 +2151,21 @@ class SiteController extends Controller {
             $cities = \common\models\Cities::find()->Where(['state_id' => $client->state])->all();
             $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->all();
             $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->all();
+            $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->all();
+            $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->all();
+            $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->all();
+            $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->all();
 
             return $this->render('editclient', [
                         'client' => $client,
                         'states' => $states,
                         'cities' => $cities,
                         'cables' => $cables,
-                        'lights' => $lights
+                        'lights' => $lights,
+                        'cements' => $cements,
+                        'rsteel' => $rsteel,
+                        'ssteel' => $ssteel,
+                        'nsteel' => $nsteel
             ]);
         }
     }
@@ -399,7 +2310,7 @@ class SiteController extends Controller {
             } else {
                 Yii::$app->session->setFlash('error', "User has not been updated");
             }
-            return $this->redirect(array('site/edit-user?id=' . $userid . ''));
+            return $this->redirect(array('site/edit-user/' . $userid . ''));
         } else {
             if (@$_GET['id']) {
                 $userdetail = User::find()->where(['UserId' => $_GET['id']])->one();
@@ -685,6 +2596,76 @@ class SiteController extends Controller {
         }
     }
 
+    public function actionSearchtenders() {
+
+        if (isset($_POST['download'])) {
+            $authtype = $_POST['authtype'];
+            if ($authtype == 1) {
+                $make = $_POST['cables'];
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            } elseif ($authtype == 2) {
+                $make = $_POST['lighting'];
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            } elseif ($authtype == 3) {
+                $make = $_POST['cement'];
+                $authtype = 14;
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            } elseif ($authtype == 4) {
+                $make = $_POST['rsteel'];
+                $authtype = 15;
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            } elseif ($authtype == 5) {
+                $make = $_POST['ssteel'];
+                $authtype = 16;
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            } else {
+                $make = $_POST['nsteel'];
+                $authtype = 17;
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            }
+
+
+            //$tenders=[];
+            $contractors = [];
+
+            $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            return $this->render('searchtenders', [
+                        'tenders' => $tenders,
+                        'contractors' => $contractors,
+                        'type' => 'All',
+                        'url' => 'tenders',
+                        'cables' => $cables,
+                        'lights' => $lights,
+                        'cements' => $cements,
+                        'rsteel' => $rsteel,
+                        'ssteel' => $ssteel,
+                        'nsteel' => $nsteel,
+            ]);
+        } else {
+            $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            return $this->render('searchtenders', [
+                        'type' => 'All',
+                        'url' => 'searchtenders',
+                        'cables' => $cables,
+                        'lights' => $lights,
+                        'cements' => $cements,
+                        'rsteel' => $rsteel,
+                        'ssteel' => $ssteel,
+                        'nsteel' => $nsteel,
+            ]);
+        }
+    }
+
     public function actionGettenders() {
 
 
@@ -692,19 +2673,19 @@ class SiteController extends Controller {
         $params = $_REQUEST;
         $where = $sqlTot = $sqlRec = "";
 
-        // check search value exist
+// check search value exist
         if (!empty($params['search']['value'])) {
             $where .= " WHERE ";
             $where .= " ( tender_id LIKE '" . $params['search']['value'] . "%' ";
-            //$where .=" OR employee_salary LIKE '".$params['search']['value']."%' ";
-            //$where .=" OR employee_age LIKE '".$params['search']['value']."%' )";
+//$where .=" OR employee_salary LIKE '".$params['search']['value']."%' ";
+//$where .=" OR employee_age LIKE '".$params['search']['value']."%' )";
         }
 
-        // getting total number records without any search
+// getting total number records without any search
         $sql = "SELECT * FROM `tenders` ";
         $sqlTot .= $sql;
         $sqlRec .= $sql;
-        //concatenate search sql if value exist
+//concatenate search sql if value exist
         if (isset($where) && $where != '') {
 
             $sqlTot .= $where;
@@ -745,7 +2726,7 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['technical_status' => 1])->orderBy(['id' => SORT_DESC]);
+        $tenders = \common\models\Tender::find()->where(['technical_status' => 1, 'financial_status' => null, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -769,7 +2750,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = [];
 
         if ($val) {
@@ -792,7 +2773,7 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['financial_status' => 1])->orderBy(['id' => SORT_DESC]);
+        $tenders = \common\models\Tender::find()->where(['financial_status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -816,7 +2797,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
 
         if ($val) {
@@ -863,7 +2844,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = [];
 
         if ($val) {
@@ -876,6 +2857,202 @@ class SiteController extends Controller {
                         'total' => $countQuery->count(),
                         'type' => 'AOC',
                         'url' => 'aoctenders'
+            ]);
+        }
+    }
+
+    public function actionArchivetenders() {
+
+        $val = @$_POST['sort'];
+        $page = @$_REQUEST['page'];
+        $filter = @$_GET['filter'];
+
+        $tenders = \common\models\Tender::find()->where(['is_archived' => 1])->orderBy(['id' => SORT_DESC]);
+        $countQuery = clone $tenders;
+        if ($val && $page) {
+            $items_per_page = $val;
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+            /* if ($page) {
+              $offset = ($page - 1) * $items_per_page;
+              } else {
+              $offset = 0;
+              } */
+            $offset = $pages->offset;
+        } else {
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '10';
+            }
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+            $offset = $pages->offset;
+            $items_per_page = $fval;
+        }
+
+        $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+//$tenders=[];
+        $contractors = [];
+
+        if ($val) {
+            return $this->redirect(array('site/archivetenders?filter=' . $val . ''));
+        } else {
+            return $this->render('aoctenders', [
+                        'tenders' => $models,
+                        'contractors' => $contractors,
+                        'pages' => $pages,
+                        'total' => $countQuery->count(),
+                        'type' => 'Archived',
+                        'url' => 'archivetenders'
+            ]);
+        }
+    }
+
+    public function actionAocready() {
+
+        $val = @$_POST['sort'];
+        $page = @$_REQUEST['page'];
+        $filter = @$_GET['filter'];
+
+        $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC]);
+        $countQuery = clone $tenders;
+        if ($val && $page) {
+            $items_per_page = $val;
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+            /* if ($page) {
+              $offset = ($page - 1) * $items_per_page;
+              } else {
+              $offset = 0;
+              } */
+            $offset = $pages->offset;
+        } else {
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '10';
+            }
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+            $offset = $pages->offset;
+            $items_per_page = $fval;
+        }
+
+        $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+//$tenders=[];
+        $contractors = [];
+
+        if ($val) {
+            return $this->redirect(array('site/aocready?filter=' . $val . ''));
+        } else {
+            return $this->render('aoctenders', [
+                        'tenders' => $models,
+                        'contractors' => $contractors,
+                        'pages' => $pages,
+                        'total' => $countQuery->count(),
+                        'type' => 'Aoc Ready',
+                        'url' => 'aocready'
+            ]);
+        }
+    }
+
+    public function actionAochold() {
+
+        $val = @$_POST['sort'];
+        $page = @$_REQUEST['page'];
+        $filter = @$_GET['filter'];
+
+        $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC]);
+        $countQuery = clone $tenders;
+        if ($val && $page) {
+            $items_per_page = $val;
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+            /* if ($page) {
+              $offset = ($page - 1) * $items_per_page;
+              } else {
+              $offset = 0;
+              } */
+            $offset = $pages->offset;
+        } else {
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '10';
+            }
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+            $offset = $pages->offset;
+            $items_per_page = $fval;
+        }
+
+        $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+//$tenders=[];
+        $contractors = [];
+
+        if ($val) {
+            return $this->redirect(array('site/aochold?filter=' . $val . ''));
+        } else {
+            return $this->render('aoctenders', [
+                        'tenders' => $models,
+                        'contractors' => $contractors,
+                        'pages' => $pages,
+                        'total' => $countQuery->count(),
+                        'type' => 'Aoc OnHold',
+                        'url' => 'aochold'
+            ]);
+        }
+    }
+
+    public function actionMovetoarchive() {
+
+        if (isset($_POST['submit'])) {
+            $val = @$_POST['sort'];
+            $page = @$_REQUEST['page'];
+            $filter = @$_GET['filter'];
+            $fromdate = $_POST['fromdate'];
+            $todate = $_POST['todate'];
+
+            $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->andWhere(['>=', 'bid_end_date', $fromdate])->andWhere(['<=', 'bid_end_date', $todate])->orderBy(['id' => SORT_DESC]);
+            $countQuery = clone $tenders;
+            if ($val && $page) {
+                $items_per_page = $val;
+                $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+                /* if ($page) {
+                  $offset = ($page - 1) * $items_per_page;
+                  } else {
+                  $offset = 0;
+                  } */
+                $offset = $pages->offset;
+            } else {
+                if ($filter) {
+                    $fval = $filter;
+                } else {
+                    $fval = '10';
+                }
+                $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+                $offset = $pages->offset;
+                $items_per_page = $fval;
+            }
+
+            $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+//$tenders=[];
+            $contractors = [];
+
+            if ($val) {
+                return $this->redirect(array('site/movetoarchive?filter=' . $val . ''));
+            } else {
+                return $this->render('movetoarchive', [
+                            'tenders' => $models,
+                            'contractors' => $contractors,
+                            'pages' => $pages,
+                            'total' => $countQuery->count(),
+                            'type' => 'Aoc OnHold',
+                            'url' => 'movetoarchive'
+                ]);
+            }
+        } else {
+            return $this->render('movetoarchive', [
+                        'url' => 'movetoarchive'
             ]);
         }
     }
@@ -910,7 +3087,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = [];
 
         if ($val) {
@@ -934,7 +3111,7 @@ class SiteController extends Controller {
         $filter = @$_GET['filter'];
 
 
-        $tenders = \common\models\Tender::find()->where(['status' => 1])->orderBy(['id' => SORT_DESC]);
+        $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -958,8 +3135,8 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
-        $contractors = [];
+//$tenders=[];
+        $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
 
         if ($val) {
             return $this->redirect(array('site/atenders?filter=' . $val . ''));
@@ -971,6 +3148,54 @@ class SiteController extends Controller {
                         'total' => $countQuery->count(),
                         'type' => 'Approved',
                         'url' => 'atenders'
+            ]);
+        }
+    }
+
+    public function actionApprovedtenders() {
+
+        $val = @$_POST['sort'];
+        $page = @$_REQUEST['page'];
+        $filter = @$_GET['filter'];
+
+
+        $tenders = \common\models\Tender::find()->where(['status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC]);
+        $countQuery = clone $tenders;
+        if ($val && $page) {
+            $items_per_page = $val;
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+            /* if ($page) {
+              $offset = ($page - 1) * $items_per_page;
+              } else {
+              $offset = 0;
+              } */
+            $offset = $pages->offset;
+        } else {
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '10';
+            }
+            $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+            $offset = $pages->offset;
+            $items_per_page = $fval;
+        }
+
+        $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+//$tenders=[];
+        $contractors = [];
+
+        if ($val) {
+            return $this->redirect(array('site/approvedtenders?filter=' . $val . ''));
+        } else {
+            return $this->render('tenders', [
+                        'tenders' => $models,
+                        'contractors' => $contractors,
+                        'pages' => $pages,
+                        'total' => $countQuery->count(),
+                        'type' => 'Approved',
+                        'url' => 'approvedtenders'
             ]);
         }
     }
@@ -1011,12 +3236,12 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = [];
         $commandname = $this->actionGetcommand($command);
 
         if ($val) {
-            return $this->redirect(array('site/approvetenders?c=' . $cid . '&filter=' . $val . ''));
+            return $this->redirect(array('site/approvetenders/' . $cid . '?filter=' . $val . ''));
         } else {
             return $this->render('approvetenders', [
                         'tenders' => $models,
@@ -1075,8 +3300,8 @@ class SiteController extends Controller {
         $id = @$_GET['id'];
         require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
         try {
-            // You may need to change the region. It will say in the URL when the bucket is open
-            // and on creation.
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
             $s3 = S3Client::factory(
                             array(
                                 'credentials' => array(
@@ -1088,8 +3313,8 @@ class SiteController extends Controller {
                             )
             );
         } catch (Exception $e) {
-            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
-            // return a json object.
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
             die("Error: " . $e->getMessage());
         }
 
@@ -1106,32 +3331,42 @@ class SiteController extends Controller {
                 $model->work = $_POST['work'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
-                $model->published_date = $_POST['pdate'];
-                $model->document_date = $_POST['ddate'];
-                $model->bid_sub_date = $_POST['subdate'];
-                $model->bid_end_date = $_POST['enddate'];
+                $model->published_date = @$_POST['pdate'];
+                $model->document_date = @$_POST['ddate'];
+                $model->bid_sub_date = @$_POST['subdate'];
+                $model->bid_end_date = @$_POST['enddate'];
                 $model->cvalue = $_POST['costvalue'];
-                $model->bid_opening_date = $_POST['odate'];
+                $model->bid_opening_date = @$_POST['odate'];
 
                 if ($_FILES['tfile']['name']) {
                     $file_name = time() . $_FILES['tfile']['name'];
                     $file_tmp = $_FILES['tfile']['tmp_name'];
                     move_uploaded_file($file_tmp, "assets/files/" . $file_name);
 
-                    $keyName = 'files/' . $_FILES["tfile"]['name'];
+                    $keyName = 'files/' . $file_name;
                     $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
 
                     $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
-                    $fileupload = $s3->putObject(
-                            array(
-                                'Bucket' => Yii::$app->params['bucketName'],
-                                'Key' => $keyName,
-                                'SourceFile' => $file,
-                                'ACL' => 'public-read-write'
-                            )
-                    );
+                    /* $fileupload = $s3->putObject(
+                      array(
+                      'Bucket' => Yii::$app->params['bucketName'],
+                      'Key' => $keyName,
+                      'SourceFile' => $file,
+                      'ACL' => 'public-read-write'
+                      )
+                      ); */
+
+                    $uploader = new MultipartUploader($s3, $file, [
+                        'bucket' => Yii::$app->params['bucketName'],
+                        'key' => $keyName,
+                        'ACL' => 'public-read-write'
+                    ]);
+
+                    $fileupload = $uploader->upload();
+
                     if ($fileupload) {
                         $model->tfile = $pathInS3;
+                        unlink('assets/files/' . $file_name);
                     }
                 }
 
@@ -1149,12 +3384,12 @@ class SiteController extends Controller {
                 $model->work = $_POST['work'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
-                $model->published_date = $_POST['pdate'];
-                $model->document_date = $_POST['ddate'];
-                $model->bid_sub_date = $_POST['subdate'];
-                $model->bid_end_date = $_POST['enddate'];
+                $model->published_date = @$_POST['pdate'];
+                $model->document_date = @$_POST['ddate'];
+                $model->bid_sub_date = @$_POST['subdate'];
+                $model->bid_end_date = @$_POST['enddate'];
                 $model->cvalue = $_POST['costvalue'];
-                $model->bid_opening_date = $_POST['odate'];
+                $model->bid_opening_date = @$_POST['odate'];
                 $model->user_id = $user->UserId;
                 $model->createdon = date('Y-m-d h:i:s');
                 if ($user->group_id == 3) {
@@ -1168,21 +3403,29 @@ class SiteController extends Controller {
                     $file_tmp = $_FILES['tfile']['tmp_name'];
                     move_uploaded_file($file_tmp, "assets/files/" . $file_name);
 
-                    $keyName = 'files/' . $_FILES["tfile"]['name'];
+                    $keyName = 'files/' . $file_name;
                     $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
 
                     $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
-                    $fileupload = $s3->putObject(
-                            array(
-                                'Bucket' => Yii::$app->params['bucketName'],
-                                'Key' => $keyName,
-                                'SourceFile' => $file,
-                                'ACL' => 'public-read-write'
-                            )
-                    );
+                    /* $fileupload = $s3->putObject(
+                      array(
+                      'Bucket' => Yii::$app->params['bucketName'],
+                      'Key' => $keyName,
+                      'SourceFile' => $file,
+                      'ACL' => 'public-read-write'
+                      )
+                      ); */
 
-                    $model->tfile = $pathInS3;
+                    $uploader = new MultipartUploader($s3, $file, [
+                        'bucket' => Yii::$app->params['bucketName'],
+                        'key' => $keyName,
+                        'ACL' => 'public-read-write'
+                    ]);
+
+                    $fileupload = $uploader->upload();
+
                     if ($fileupload) {
+                        $model->tfile = $pathInS3;
                         unlink('assets/files/' . $file_name);
                     }
                 }
@@ -1267,6 +3510,8 @@ class SiteController extends Controller {
                     $detail->core = @$_POST['core'][$k];
                     $detail->typefitting = @$_POST['type'][$k];
                     $detail->capacityfitting = @$_POST['text'][$k];
+                    $detail->accessoryone = @$_POST['accessoryone'][$k];
+                    $detail->accessorytwo = @$_POST['accessorytwo'][$k];
                     //$detail->make = @$newarr[$k];
                     $detail->make = implode(',', $_POST['makes']);
                     $detail->makeid = @$_POST['makeid'][$k];
@@ -1296,6 +3541,8 @@ class SiteController extends Controller {
                             $mdetail->core = @$_POST['core'][$k];
                             $mdetail->typefitting = @$_POST['type'][$k];
                             $mdetail->capacityfitting = @$_POST['text'][$k];
+                            $mdetail->accessoryone = @$_POST['accessoryone'][$k];
+                            $mdetail->accessorytwo = @$_POST['accessorytwo'][$k];
                             //$mdetail->make = $makes_ids;
                             $mdetail->make = implode(',', $_POST['makes']);
                             $mdetail->makeid = @$_POST['makeid'][$k];
@@ -1330,7 +3577,7 @@ class SiteController extends Controller {
 
             Yii::$app->session->setFlash('success', "Item successfully added");
 
-            return $this->redirect(array('site/create-item?id=' . $_POST['tender_id'] . ''));
+            return $this->redirect(array('site/create-item/' . $_POST['tender_id'] . ''));
 
             die();
         } else {
@@ -1340,7 +3587,7 @@ class SiteController extends Controller {
             $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_DESC])->all();
             if (@$idetails) {
                 foreach ($idetails as $idetail) {
-                    $descfull = 'E/M,';
+                    $descfull = '';
                     $items = [];
                     $items = \common\models\Item::find()->where(['id' => $idetail->item_id])->one();
                     $makeids = explode(',', $idetail->make);
@@ -1349,11 +3596,15 @@ class SiteController extends Controller {
                         foreach ($makeids as $mid) {
                             $makename = \common\models\Make::find()->where(['id' => $mid])->one();
                             if (@$makename) {
-                                $makenameall .= $makename->make . ',';
+                                $makenameall .= '<span class="viewmake">' . $makename->make . '</span>';
                             }
                         }
                     }
                     $idetail->make = rtrim($makenameall, ',');
+                    if ($items->tenderone != '' && $items->tenderone != 0) {
+                        $one = $this->actionTenderone($items->tenderone);
+                        $descfull .= $one . ',';
+                    }
                     if ($items->tendertwo != '' && $items->tendertwo != 0) {
                         $two = $this->actionTendertwo($items->tendertwo);
                         $descfull .= $two . ',';
@@ -1379,10 +3630,17 @@ class SiteController extends Controller {
                     $core = $this->actionGetcore($idetail->core);
                     $type = $this->actionGetfit($idetail->typefitting);
                     $capacity = $this->actionGetfit($idetail->capacityfitting);
+                    $accone = $this->actionGetaccessory($idetail->accessoryone);
                     if ($items->tenderfour == 1) {
                         $idetail->description = @$size->size . ' ' . $core . ' (' . $descfull . ')';
-                    } else {
+                    } elseif ($items->tenderfour == 2) {
                         $idetail->description = @$type . ' ' . @$capacity . ' (' . $descfull . ')';
+                    } elseif ($items->tenderfour == 4) {
+                        $idetail->description = @$accone . ' ' . @$idetail->accessorytwo . ' (' . $descfull . ')';
+                    } elseif ($items->tenderfour == 5) {
+                        $idetail->description = @$size->size . ' (' . $descfull . ')';
+                    } else {
+                        $idetail->description = '(' . $descfull . ')';
                     }
                 }
             }
@@ -1415,6 +3673,27 @@ class SiteController extends Controller {
         }
     }
 
+    public function actionMovearchive() {
+        $id = @$_REQUEST['value'];
+        $tender = \common\models\Tender::find()->where(['id' => $id])->one();
+        if ($tender->is_archived == 1) {
+            $archived = '';
+        } else {
+            $archived = 1;
+        }
+        $data = ['is_archived' => $archived];
+        $querydata = \Yii::$app
+                ->db
+                ->createCommand()
+                ->update('tenders', $data, 'id = ' . $tender->id . '')
+                ->execute();
+        if ($querydata) {
+            echo json_encode(['status' => 1, 'arc' => $archived]);
+        } else {
+            echo json_encode(['status' => 0, 'arc' => $archived]);
+        }
+    }
+
     public function actionDeleteTenders() {
         if (count(@$_POST["selected_id"]) > 0) {
             $all = implode(",", $_POST["selected_id"]);
@@ -1433,8 +3712,26 @@ class SiteController extends Controller {
                 return $this->redirect(array('site/tenders'));
             }
         } else {
-            Yii::$app->session->setFlash('error', "Select checkbox to delete tender");
+            Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
             return $this->redirect(array('site/tenders'));
+        }
+    }
+
+    public function actionMovearchivetenders() {
+        if (count(@$_POST["selected_id"]) > 0) {
+            $all = implode(",", $_POST["selected_id"]);
+            $tenders = \common\models\Tender::find()->where(['id' => $_POST["selected_id"]])->all();
+            if ($tenders) {
+                foreach ($tenders as $_tender) {
+                    $_tender->is_archived = '1';
+                    $_tender->save();
+                }
+                Yii::$app->session->setFlash('success', "Tenders successfully archived");
+                return $this->redirect(array('site/movetoarchive'));
+            }
+        } else {
+            Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
+            return $this->redirect(array('site/movetoarchive'));
         }
     }
 
@@ -1512,8 +3809,11 @@ class SiteController extends Controller {
         } elseif ($value == 1) {
             $data .= '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
             $data .= '<option value="37">GE (CG) KOCHI - MES</option>';
+            $data .= '<option value="57">GE (CG) PORBANDAR - MES</option>';
             $data .= '<option value="38">GE DAMAN - MES</option>';
         } elseif ($value == 3) {
+            $data .= '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+            $data .= '<option value="59">GE (I)(FY) AVADI - MES</option>';
             $data .= '<option value="39">AGE (I) FY EDDUMAILARAM - MES</option>';
             $data .= '<option value="40">GE (I) (FY) ISHAPORE - MES</option>';
             $data .= '<option value="41">GE (I) (P) (FY) ITARSI - MES</option>';
@@ -1521,7 +3821,10 @@ class SiteController extends Controller {
             $data .= '<option value="43">GE (I) (P) FY KIRKEE - MES</option>';
         } elseif ($value == 4) {
             $data .= '<option value="44">AGE(I) R and D Haldwani - MES</option>';
+            $data .= '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
             $data .= '<option value="45">AGE(I) R and D Manali - MES</option>';
+            $data .= '<option value="61">AGE(I) R and D Delhi - MES</option>';
+            $data .= '<option value="62">GE(I) R and D Chandigarh - MES</option>';
             $data .= '<option value="46">GE(I) R and D Chandipur - MES</option>';
             $data .= '<option value="47">GE(I) R and D Dehradun - MES</option>';
             $data .= '<option value="48">GE(I) R and D Kanpur - MES</option>';
@@ -1531,9 +3834,12 @@ class SiteController extends Controller {
             $data .= '<option value="51">AGE (I) RND VISHAKHAPATNAM - MES</option>';
             $data .= '<option value="52">GE (I) RND (E) BANGALORE - MES</option>';
             $data .= '<option value="53">GE (I) RND KANCHANBAGH - MES</option>';
+            $data .= '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
             $data .= '<option value="54">GE (I) RND PASHAN - MES</option>';
             $data .= '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
             $data .= '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
+        } elseif ($value == 13) {
+            $data .= '<option value="64">GE (I)(CG) Chennai - MES</option>';
         }
         echo json_encode(['data' => $data]);
         die;
@@ -1566,6 +3872,7 @@ class SiteController extends Controller {
             $data .= '<option value="18">CWE LUCKNOW - MES</option>';
             $data .= '<option value="19">CWE MATHURA</option>';
         } elseif ($value == 9) {
+            $data .= '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data .= '<option value="20">CWE (AF) BORJAR - MES</option>';
             $data .= '<option value="21">CWE (AF) JORHAT - MES</option>';
             $data .= '<option value="22">CWE (AF) KALAIKUNDA - MES</option>';
@@ -1589,6 +3896,8 @@ class SiteController extends Controller {
         } elseif ($value == 13) {
             $data .= '<option value="37">CWE BENGDUBI - MES</option>';
             $data .= '<option value="38">CWE BINNAGURI - MES</option>';
+            $data .= '<option value="135">CWE TENGA - MES</option>';
+            $data .= '<option value="136">GE(I)(P) SILIGURI - MES</option>';
             $data .= '<option value="39">GE(I)(P) GANGTOK - MES</option>';
             $data .= '<option value="40">HQ 136 WORKS ENGINEERS - MES</option>';
         } elseif ($value == 15) {
@@ -1600,6 +3909,7 @@ class SiteController extends Controller {
             $data .= '<option value="45">CWE (AF) SRINAGAR - MES</option>';
         } elseif ($value == 17) {
             $data .= '<option value="46">CWE KUMBATHANG - MES</option>';
+            $data .= '<option value="137">GE(I) Project No. 1 Leh - MES</option>';
             $data .= '<option value="47">HQ 138 WORKS ENGR - MES</option>';
         } elseif ($value == 18) {
             $data .= '<option value="48">135 WORKS ENGINEER - MES</option>';
@@ -1645,6 +3955,7 @@ class SiteController extends Controller {
             $data .= '<option value="81">CWE EZHIMALA - MES</option>';
             $data .= '<option value="82">CWE (NB) KOCHI - MES</option>';
             $data .= '<option value="83">CWE NW KOCHI - MES</option>';
+            $data .= '<option value="138">GE (I) Navy JAMNAGAR - MES</option>';
             $data .= '<option value="84">GE (I) Navy LAKSHADWEEP - MES</option>';
             $data .= '<option value="85">GE (I) NAVY LONAWALA - MES</option>';
         } elseif ($value == 26) {
@@ -1672,6 +3983,7 @@ class SiteController extends Controller {
             $data .= '<option value="104">CWE BATHINDA - MES</option>';
             $data .= '<option value="105">CWE BIKANER - MES</option>';
             $data .= '<option value="106">CWE GANGANAGAR - MES</option>';
+            $data .= '<option value="139">GE (I) (P) NO 2 BATHINDA - MES</option>';
         } elseif ($value == 30) {
             $data .= '<option value="107">CWE HISAR - MES</option>';
             $data .= '<option value="108">CWE JAIPUR - MES</option>';
@@ -1685,6 +3997,7 @@ class SiteController extends Controller {
             $data .= '<option value="115">CWE (AF) Chandigarh-MES</option>';
             $data .= '<option value="116">CWE (AF) GURGAON - MES</option>';
             $data .= '<option value="117">CWE (AF) Palam-MES</option>';
+            $data .= '<option value="140">GE (I)(AF) Gurgaon-MES</option>';
         } elseif ($value == 32) {
             $data .= '<option value="118">CWE AMBALA - MES</option>';
             $data .= '<option value="119">CWE CHANDIMANDIR - MES</option>';
@@ -1720,8 +4033,11 @@ class SiteController extends Controller {
             $data .= '<option value="4">GE (AF) GORAKHPUR</option>';
         } elseif ($value == 2) {
             $data .= '<option value="5">GE(AF)IZATNAGAR - MES</option>';
+            $data .= '<option value="317">GE(P)(AF)BKT - MES</option>';
         } elseif ($value == 3) {
             $data .= '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
+            $data .= '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
+            $data .= '<option value="319">AGE (AF) (I) SONEGAON - MES</option>';
         } elseif ($value == 4) {
             $data .= '<option value="7">GE (AF) (ADM AREA) MAHARAJPUR - MES</option>';
             $data .= '<option value="8">GE (AF) (TECH AREA) MAHARAJPUR - MES</option>';
@@ -1732,6 +4048,7 @@ class SiteController extends Controller {
             $data .= '<option value="12">GE(WEST) BAREILLY - MES</option>';
         } elseif ($value == 6) {
             $data .= '<option value="13">GE DEHRADUN - MES</option>';
+            $data .= '<option value="320">GE (P)DEHRADUN - MES</option>';
             $data .= '<option value="14">GE PREMNAGAR - MES</option>';
         } elseif ($value == 7) {
             $data .= '<option value="15">AGE(I) Raiwala - MES</option>';
@@ -1739,9 +4056,11 @@ class SiteController extends Controller {
             $data .= '<option value="17">GE (MES) Clement Town - MES</option>';
         } elseif ($value == 8) {
             $data .= '<option value="18">GE Pithoragarh - MES</option>';
+            $data .= '<option value="321">GE 871EWS - MES</option>';
             $data .= '<option value="19">GE RANIKHET - MES</option>';
         } elseif ($value == 9) {
             $data .= '<option value="20">GE (N) MEERUT - MES</option>';
+            $data .= '<option value="322">GE (S) MEERUT - MES</option>';
             $data .= '<option value="21">GE (U) EM Meerut - MES</option>';
         } elseif ($value == 10) {
             $data .= '<option value="22">GE ROORKEE - MES</option>';
@@ -1753,7 +4072,9 @@ class SiteController extends Controller {
             $data .= '<option value="27">GE (W) JABALPUR - MES</option>';
         } elseif ($value == 12) {
             $data .= '<option value="28">GE AWC - MES</option>';
-            $data .= '<option value="29>GE (Maint) Inf School - MES</option>';
+            $data .= '<option value="29">GE (Maint) Inf School - MES</option>';
+            $data .= '<option value="323">GE (P) Inf School - MES</option>';
+            $data .= '<option value="324">GE MCTE - MES</option>';
         } elseif ($value == 13) {
             $data .= '<option value="30">GE DANAPUR - MES</option>';
             $data .= '<option value="31">GE DIPATOLI - MES</option>';
@@ -1772,6 +4093,7 @@ class SiteController extends Controller {
             $data .= '<option value="41">GE (W) ALLAHABAD - MES</option>';
         } elseif ($value == 17) {
             $data .= '<option value="42">GE FATEHGARH - MES</option>';
+            $data .= '<option value="325">GE MES KANPUR - MES</option>';
         } elseif ($value == 18) {
             $data .= '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data .= '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -1788,6 +4110,7 @@ class SiteController extends Controller {
         } elseif ($value == 21) {
             $data .= '<option value="53">GE (AF) CHABUA - MES</option>';
             $data .= '<option value="54">GE (AF) JORHAT - MES</option>';
+            $data .= '<option value="326">GE (AF) MOHANBARI - MES</option>';
             $data .= '<option value="55">GE (AF) TEZPUR - MES</option>';
         } elseif ($value == 22) {
             $data .= '<option value="56">GE (AF) BARRACKPORE - MES</option>';
@@ -1795,6 +4118,7 @@ class SiteController extends Controller {
         } elseif ($value == 23) {
             $data .= '<option value="58">AGE (I) (AF) SINGHARSI-MES</option>';
             $data .= '<option value="59">GE (AF) PURNEA-MES</option>';
+            $data .= '<option value="327">GE (AF) PANAGARH-MES</option>';
         } elseif ($value == 26) {
             $data .= '<option value="60">GE ALIPORE - MES</option>';
             $data .= '<option value="61">GE(CENTRAL) KOLKATA - MES</option>';
@@ -1850,6 +4174,8 @@ class SiteController extends Controller {
             $data .= '<option value="107">GE (N) BINNAGURI - MES</option>';
             $data .= '<option value="108">GE (S) BINNAGURI - MES</option>';
             $data .= '<option value="109">GE SEVOKE ROAD - MES</option>';
+        } elseif ($value == 135) {
+            $data .= '<option value="328">GE MISSAMARI - MES</option>';
         } elseif ($value == 40) {
             $data .= '<option value="110">AGE (I) DARJEELING - MES</option>';
             $data .= '<option value="111">GE 867 EWS - MES</option>';
@@ -1870,13 +4196,19 @@ class SiteController extends Controller {
         } elseif ($value == 45) {
             $data .= '<option value="123">GE (AF) ARANTIPAR - MES</option>';
             $data .= '<option value="124">GE (AF) LEH - MES</option>';
+            $data .= '<option value="329">GE (AF) THOISE - MES</option>';
             $data .= '<option value="125">GE(AF)SRINAGAR - MES</option>';
+        } elseif ($value == 46) {
+            $data .= '<option value="330">GE KARGIL - MES</option>';
+            $data .= '<option value="331">GE KHUMBATHANG - MES</option>';
         } elseif ($value == 47) {
             $data .= '<option value="126">GE 865 EWS - MES</option>';
+            $data .= '<option value="332">GE 860 EWS - MES</option>';
             $data .= '<option value="127">GE PARTAPUR - MES</option>';
             $data .= '<option value="128">GE (P) NO 2LEH - MES</option>';
         } elseif ($value == 48) {
             $data .= '<option value="129">GE NAGROTA - MES</option>';
+            $data .= '<option value="333">AGE(I)CIF(U) - MES</option>';
             $data .= '<option value="130">GE (N) AKHNOOR - MES</option>';
             $data .= '<option value="131">GE (S) AKHNOOR - MES</option>';
         } elseif ($value == 50) {
@@ -1887,6 +4219,7 @@ class SiteController extends Controller {
             $data .= '<option value="135">GE (U) UDHAMPUR - MES</option>';
         } elseif ($value == 54) {
             $data .= '<option value="136">GE BRICHGUNJ - MES</option>';
+            $data .= '<option value="334">GE (P) CENTRAL - MES</option>';
             $data .= '<option value="137">GE (SOUTH) DIGLIPUR - MES</option>';
         } elseif ($value == 55) {
             $data .= '<option value="138">GE HADDO - MES</option>';
@@ -1895,6 +4228,9 @@ class SiteController extends Controller {
             $data .= '<option value="138">GE (I) 866 EWS - MES</option>';
         } elseif ($value == 60) {
             $data .= '<option value="139">GE(AF) BANGALORE - MES</option>';
+            $data .= '<option value="335">GE (AF) MARATHALLI - MES</option>';
+            $data .= '<option value="336">GE (AF)(P) BANGALORE - MES</option>';
+            $data .= '<option value="337">GE(AF) SDI and ASTE BANGALORE - MES</option>';
             $data .= '<option value="140">GE (AF) TAMBARAM - MES</option>';
         } elseif ($value == 61) {
             $data .= '<option value="141">GE AFA HYDERABAD - MES</option>';
@@ -1916,12 +4252,15 @@ class SiteController extends Controller {
             $data .= '<option value="154">GE E/M AF CHAKERI - MES</option>';
         } elseif ($value == 66) {
             $data .= '<option value="155">GE (AF) AMLA - MES</option>';
+            $data .= '<option value="338">GE (AF) OJHAR - MES</option>';
         } elseif ($value == 67) {
+            $data .= '<option value="339">AGE(I) MANAURI - MES</option>';
             $data .= '<option value="156">GE (AF) MC Chandigarh - MES</option>';
             $data .= '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
         } elseif ($value == 68) {
             $data .= '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
         } elseif ($value == 70) {
+            $data .= '<option value="340">AGE(I) DHANA - MES</option>';
             $data .= '<option value="159">GE BHOPAL - MES</option>';
             $data .= '<option value="160">GE DRONACHAL - MES</option>';
             $data .= '<option value="161">GE NASIRABAD - MES</option>';
@@ -1942,7 +4281,7 @@ class SiteController extends Controller {
         } elseif ($value == 74) {
             $data .= '<option value="173">GE AVADI- MES</option>';
             $data .= '<option value="174">GE CHENNAI - MES</option>';
-            $data .= '<option value="175">GE CHENNAI - MES</option>';
+            $data .= '<option value="175">GE ST THOMAS MOUNT - MES</option>';
         } elseif ($value == 75) {
             $data .= '<option value="179">GE GOLCONDA HYDERABAD - MES</option>';
             $data .= '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
@@ -1960,6 +4299,8 @@ class SiteController extends Controller {
             $data .= '<option value="189">GE (ARMY ) BARODA - MES</option>';
             $data .= '<option value="190">GE (ARMY)BHUJ - MES</option>';
             $data .= '<option value="191">GE (ARMY) JAMNAGAR - MES</option>';
+            $data .= '<option value="341">GE AHMEDABAD - MES</option>';
+            $data .= '<option value="342">GE GANDHINAGAR - MES</option>';
         } elseif ($value == 79) {
             $data .= '<option value="192">AGE (I) NAGTALAO - MES</option>';
             $data .= '<option value="193">AGE(I) UDAIPUR - MES</option>';
@@ -1968,6 +4309,7 @@ class SiteController extends Controller {
             $data .= '<option value="196">GE BANAR - MES</option>';
             $data .= '<option value="197">GE SHIKARGARH - MES</option>';
         } elseif ($value == 80) {
+            $data .= '<option value="343">GE (ARMY) BARMER - MES</option>';
             $data .= '<option value="198">GE (ARMY) JAISALMER - MES</option>';
         } elseif ($value == 81) {
             $data .= '<option value="199">GE MAINT EZHIMALA - MES</option>';
@@ -1999,6 +4341,7 @@ class SiteController extends Controller {
         } elseif ($value == 93) {
             $data .= '<option value="219">GE (NORTH) SANTA CRUZ - MES</option>';
             $data .= '<option value="220">GE PANAJI - MES</option>';
+            $data .= '<option value="344">GE DEHU ROAD - MES</option>';
             $data .= '<option value="221">GE (WEST) COLABA - MES</option>';
         } elseif ($value == 94) {
             $data .= '<option value="222">GE DEOLALI - MES</option>';
@@ -2007,6 +4350,7 @@ class SiteController extends Controller {
             $data .= '<option value="225">GE (S) AHMEDNAGAR - MES</option>';
         } elseif ($value == 95) {
             $data .= '<option value="226">GE (CENTRAL) KIRKEE - MES</option>';
+            $data .= '<option value="345">GE (CME) KIRKEE - MES</option>';
             $data .= '<option value="227">GE MH AND RANGE HILLS - MES</option>';
         } elseif ($value == 96) {
             $data .= '<option value="228">GE (C) PUNE - MES</option>';
@@ -2016,8 +4360,10 @@ class SiteController extends Controller {
         } elseif ($value == 97) {
             $data .= '<option value="232">GE(AF) BHUJ - MES</option>';
             $data .= '<option value="233">GE (AF) JAMNAGAR - MES</option>';
+            $data .= '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
         } elseif ($value == 98) {
             $data .= '<option value="232">GE (AF) CHILODA - MES</option>';
+            $data .= '<option value="347">GE (AF) BARODA - MES</option>';
         } elseif ($value == 99) {
             $data .= '<option value="233">GE (AF) Phalodi - MES</option>';
         } elseif ($value == 100) {
@@ -2075,21 +4421,26 @@ class SiteController extends Controller {
         } elseif ($value == 117) {
             $data .= '<option value="271">GE (AF) North Palam-MES</option>';
             $data .= '<option value="272">GE(AF) South Palam-MES</option>';
+            $data .= '<option value="348">GE (P)(AF) South Palam-MES</option>';
             $data .= '<option value="273">GE (AF) Subroto Park-MES</option>';
         } elseif ($value == 118) {
             $data .= '<option value="274">GE (N) AMBALA - MES</option>';
             $data .= '<option value="275">GE (P) Ambala - MES</option>';
             $data .= '<option value="276">GE (U) AMBALA - MES</option>';
+            $data .= '<option value="349">GE (S) AMBALA - MES</option>';
         } elseif ($value == 119) {
             $data .= '<option value="277">GE CHANDIGARH - MES</option>';
             $data .= '<option value="278">GE CHANDIMANDIR - MES</option>';
             $data .= '<option value="279">GE (P) CHANDIMANDIR - MES</option>';
+            $data .= '<option value="350">GE (U) CHANDIMANDIR - MES</option>';
         } elseif ($value == 120) {
             $data .= '<option value="280">GE (P) DAPPAR - MES</option>';
             $data .= '<option value="281">GE (S) PATIALA - MES</option>';
+            $data .= '<option value="351">GE (N) PATIALA - MES</option>';
         } elseif ($value == 121) {
             $data .= '<option value="282">GE 863 EWS - MES</option>';
             $data .= '<option value="283">GE JUTOGH - MES</option>';
+            $data .= '<option value="352">GE KASAULI - MES</option>';
         } elseif ($value == 122) {
             $data .= '<option value="284">GE (CENTRAL) DELHI CANTT-MES</option>';
             $data .= '<option value="285">GE (EAST) DELHI CANTT-MES</option>';
@@ -2100,8 +4451,11 @@ class SiteController extends Controller {
             $data .= '<option value="289">GE E/M (RR) HOSPITAL DELHI CNATT-MES</option>';
             $data .= '<option value="290">GE NEW DELHI-MES</option>';
             $data .= '<option value="291">GE (S) NEW DELHI-MES</option>';
+            $data .= '<option value="353">GE (P) WEST DELHI-MES</option>';
         } elseif ($value == 124) {
+            $data .= '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
             $data .= '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
+            $data .= '<option value="355">GE(U) P and M DELHI CNATT-MES</option>';
             $data .= '<option value="293">GE(U)WATER SUPPLY DELHI CANTT-MES</option>';
         } elseif ($value == 127) {
             $data .= '<option value="294">GE AMRITSAR - MES</option>';
@@ -2149,6 +4503,11 @@ class SiteController extends Controller {
             $data .= '<option value="5">Lifts</option>';
             $data .= '<option value="6">Cranes</option>';
             $data .= '<option value="7">DG Set</option>';
+        } elseif ($value == 2) {
+            $data .= '<option value="14">Cement</option>';
+            $data .= '<option value="15">Reinforcement Steel</option>';
+            $data .= '<option value="16">Structural Steel</option>';
+            $data .= '<option value="17">Non Structural Steel</option>';
         } else {
             $data .= '<option value="8">Building</option>';
             $data .= '<option value="9">Road</option>';
@@ -2183,7 +4542,24 @@ class SiteController extends Controller {
         } else {
             $item = 1;
         }
-        echo json_encode(['data' => $data, 'item' => $item]);
+
+        $makes = [];
+        $allmakes = [];
+        if ($value) {
+            $makes = \common\models\Make::find()->where(['mtype' => $value, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+        } else {
+            $makes = \common\models\Make::find()->where(['status' => 1])->orderBy(['make' => SORT_ASC])->all();
+        }
+
+        if ($makes) {
+            foreach ($makes as $_make) {
+                $allmakes[$_make->id] = $_make->make;
+            }
+        } else {
+            $allmakes['0'] = 'No Makes';
+        }
+
+        echo json_encode(['data' => $data, 'item' => $item, 'value' => $value, 'select' => $allmakes]);
         die;
     }
 
@@ -2227,10 +4603,6 @@ class SiteController extends Controller {
         if (($value == 1) || ($value == 12)) {
             $data .= '<option value="1">Copper</option>';
             $data .= '<option value="2">Aluminium</option>';
-        } elseif ($value == 2) {
-            $data .= '<option value="3">Domestic</option>';
-            $data .= '<option value="4">Industrial</option>';
-            $data .= '<option value="5">Street/Road</option>';
         } elseif ($value == 3) {
             $data .= '<option value="6">Ceiling fans</option>';
             $data .= '<option value="7">Wall fans</option>';
@@ -2279,7 +4651,7 @@ class SiteController extends Controller {
         } else {
             $sizes = [];
             $sizes = \common\models\Size::find()->where(['mtypeone' => $value, 'status' => 1])->orderBy(['size' => SORT_ASC])->all();
-            //$sizes = \common\models\Size::find()->where(['status' => 1])->orderBy(['size' => SORT_ASC])->all();
+//$sizes = \common\models\Size::find()->where(['status' => 1])->orderBy(['size' => SORT_ASC])->all();
 
             if ($sizes) {
                 foreach ($sizes as $_size) {
@@ -2292,9 +4664,11 @@ class SiteController extends Controller {
 
         $typefit = \common\models\Fitting::find()->where(['status' => 1, 'type' => 1])->orderBy(['text' => SORT_ASC])->all();
         $capacityfit = \common\models\Fitting::find()->where(['status' => 1, 'type' => 2])->orderBy(['text' => SORT_ASC])->all();
+        $accessories = \common\models\Accessories::find()->where(['status' => 1])->orderBy(['text' => SORT_ASC])->all();
 
         $alltypes = [];
         $allcapacities = [];
+        $allaccessories = [];
         if ($typefit) {
             foreach ($typefit as $_tfit) {
                 $alltypes[$_tfit->id] = $_tfit->text;
@@ -2311,7 +4685,15 @@ class SiteController extends Controller {
             $allcapacities['0'] = 'No Capacities';
         }
 
-        echo json_encode(['data' => $data, 'item' => $item, 'select' => $allmakes, 'sizes' => $allsizes, 'types' => $alltypes, 'capacities' => $allcapacities]);
+        if ($accessories) {
+            foreach ($accessories as $_acc) {
+                $allaccessories[$_acc->id] = $_acc->text;
+            }
+        } else {
+            $allaccessories['0'] = 'No Accessories';
+        }
+
+        echo json_encode(['data' => $data, 'item' => $item, 'select' => $allmakes, 'sizes' => $allsizes, 'types' => $alltypes, 'capacities' => $allcapacities, 'accessories' => $allaccessories]);
         die;
     }
 
@@ -2366,7 +4748,7 @@ class SiteController extends Controller {
 
         if (@$idetails) {
             foreach ($idetails as $idetail) {
-                $descfull = 'E/M,';
+                $descfull = '';
                 $items = [];
                 $items = \common\models\Item::find()->where(['id' => $idetail->item_id])->one();
                 $makeids = explode(',', $idetail->make);
@@ -2375,11 +4757,15 @@ class SiteController extends Controller {
                     foreach ($makeids as $mid) {
                         $makename = \common\models\Make::find()->where(['id' => $mid])->one();
                         if (@$makename) {
-                            $makenameall .= $makename->make . ',';
+                            $makenameall .= '<span class="viewmake">' . $makename->make . '</span>';
                         }
                     }
                 }
                 $idetail->make = rtrim($makenameall, ',');
+                if ($items->tenderone != '' && $items->tenderone != 0) {
+                    $one = $this->actionTenderone($items->tenderone);
+                    $descfull .= $one . ',';
+                }
                 if ($items->tendertwo != '' && $items->tendertwo != 0) {
                     $two = $this->actionTendertwo($items->tendertwo);
                     $descfull .= $two . ',';
@@ -2405,10 +4791,17 @@ class SiteController extends Controller {
                 $core = $this->actionGetcore($idetail->core);
                 $type = $this->actionGetfit($idetail->typefitting);
                 $capacity = $this->actionGetfit($idetail->capacityfitting);
+                $accone = $this->actionGetaccessory($idetail->accessoryone);
                 if ($items->tenderfour == 1) {
                     $idetail->description = @$size->size . ' ' . $core . ' (' . $descfull . ')';
-                } else {
+                } elseif ($items->tenderfour == 2) {
                     $idetail->description = @$type . ' ' . @$capacity . ' (' . $descfull . ')';
+                } elseif ($items->tenderfour == 4) {
+                    $idetail->description = @$accone . ' ' . @$idetail->accessorytwo . ' (' . $descfull . ')';
+                } elseif ($items->tenderfour == 5) {
+                    $idetail->description = @$size->size . ' (' . $descfull . ')';
+                } else {
+                    $idetail->description = '(' . $descfull . ')';
                 }
             }
         }
@@ -2420,14 +4813,26 @@ class SiteController extends Controller {
         ]);
     }
 
-    public function actionMakes() {
+    public function actionEM() {
         $user = Yii::$app->user->identity;
         if (isset($_POST['mtypesort']) && $_POST['mtypesort'] != '') {
-            $makes = \common\models\Make::find()->where(['mtype' => $_POST['mtypesort']])->orderBy(['make' => SORT_ASC])->all();
+            $makes = \common\models\Make::find()->where(['mtype' => $_POST['mtypesort'], 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
         } else {
             $makes = [];
         }
-        return $this->render('makes', [
+        return $this->render('makesem', [
+                    'makes' => $makes
+        ]);
+    }
+
+    public function actionCivil() {
+        $user = Yii::$app->user->identity;
+        if (isset($_POST['mtypesort']) && $_POST['mtypesort'] != '') {
+            $makes = \common\models\Make::find()->where(['mtype' => $_POST['mtypesort'], 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+        } else {
+            $makes = [];
+        }
+        return $this->render('makescivil', [
                     'makes' => $makes
         ]);
     }
@@ -2454,7 +4859,7 @@ class SiteController extends Controller {
         $user = Yii::$app->user->identity;
 
         if (isset($_POST)) {
-            $fittings = \common\models\Fitting::find()->where(['type' => @$_POST['mtypesortone']])->orderBy(['text' => SORT_ASC])->all();
+            $fittings = \common\models\Fitting::find()->where(['type' => @$_POST['mtypesortone'], 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
         } else {
             $fittings = [];
         }
@@ -2471,10 +4876,10 @@ class SiteController extends Controller {
         } else {
             $tenders = \common\models\Tender::find()->orderBy(['id' => SORT_DESC])->all();
         }
-        return $this->redirect(array('site/approvetenders?c=' . $_POST['c'] . ''));
+        return $this->redirect(array('site/approvetenders/' . $_POST['c'] . ''));
     }
 
-    public function actionCreateMake() {
+    public function actionCreateMakeEm() {
         $user = Yii::$app->user->identity;
         $id = @$_GET['id'];
 
@@ -2494,7 +4899,7 @@ class SiteController extends Controller {
                         Yii::$app->session->setFlash('success', "Make successfully updated");
                     }
                 }
-                return $this->redirect(array('site/makes'));
+                return $this->redirect(array('site/e-m'));
             } else {
                 $model = new \common\models\Make();
                 $model->mtype = $_POST['mtype'];
@@ -2518,7 +4923,7 @@ class SiteController extends Controller {
                         Yii::$app->session->setFlash('success', "Make successfully added");
                     }
                 }
-                return $this->redirect(array('site/create-make'));
+                return $this->redirect(array('site/create-make-em'));
             }
 
 
@@ -2531,7 +4936,70 @@ class SiteController extends Controller {
                 $make = [];
             }
 
-            return $this->render('createmake', [
+            return $this->render('createmakeem', [
+                        'make' => $make
+            ]);
+        }
+    }
+
+    public function actionCreateMakeCivil() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Make::find()->where(['id' => $_POST['id']])->one();
+                $model->mtype = $_POST['mtype'];
+                $model->make = $_POST['make'];
+                $model->email = @$_POST['email'];
+
+                $make = \common\models\Make::find()->where(['make' => $_POST['make'], 'email' => $_POST['email'], 'mtype' => $_POST['mtype']])->andWhere(['!=', 'id', $_POST['id']])->one();
+                if ($make) {
+                    Yii::$app->session->setFlash('error', "Make already existed");
+                } else {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', "Make successfully updated");
+                    }
+                }
+                return $this->redirect(array('site/civil'));
+            } else {
+                $model = new \common\models\Make();
+                $model->mtype = $_POST['mtype'];
+                $model->make = $_POST['make'];
+                $model->email = @$_POST['email'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                $make = \common\models\Make::find()->where(['make' => $_POST['make'], 'email' => $_POST['email'], 'mtype' => $_POST['mtype']])->one();
+                if ($make) {
+                    Yii::$app->session->setFlash('error', "Make already existed");
+                } else {
+                    $tender = \Yii::$app
+                            ->db
+                            ->createCommand()
+                            ->insert('makes', $model)
+                            ->execute();
+
+
+                    if ($tender) {
+                        Yii::$app->session->setFlash('success', "Make successfully added");
+                    }
+                }
+                return $this->redirect(array('site/create-make-civil'));
+            }
+
+
+
+            die();
+        } else {
+            if ($id) {
+                $make = \common\models\Make::find()->where(['id' => $id])->one();
+            } else {
+                $make = [];
+            }
+
+            return $this->render('createmakecivil', [
                         'make' => $make
             ]);
         }
@@ -2539,10 +5007,15 @@ class SiteController extends Controller {
 
     public function actionDeleteMake() {
         $id = $_GET['id'];
+        $make = \common\models\Make::find()->where(['id' => $id])->one();
         $delete = \common\models\Make::deleteAll(['id' => $id]);
         if ($delete) {
             Yii::$app->session->setFlash('success', "Make successfully deleted");
-            return $this->redirect(array('site/makes'));
+            if ($make->mtype < 14) {
+                return $this->redirect(array('site/e-m'));
+            } else {
+                return $this->redirect(array('site/civil'));
+            }
         }
     }
 
@@ -2742,7 +5215,7 @@ class SiteController extends Controller {
             }
 
             Yii::$app->session->setFlash('success', "Item successfully deleted");
-            return $this->redirect(array('site/view-items?id=' . $tid . ''));
+            return $this->redirect(array('site/view-items/' . $tid . ''));
         }
     }
 
@@ -2757,33 +5230,62 @@ class SiteController extends Controller {
                     $iids[] = $_item->item_id;
                 }
             }
-            $delete = \common\models\ItemDetails::deleteAll(['id' => $_POST["selected_id"]]);
-            $deleteitems = \common\models\Item::deleteAll(['id' => $iids]);
-            if ($delete) {
-                $mdelete = \common\models\MakeDetails::deleteAll(['item_detail_id' => $_POST["selected_id"]]);
-                $checktender = \common\models\Item::find()->where(['tender_id' => $tid])->all();
-                if ($checktender) {
-                    $checkstatus = \common\models\Item::find()->where(['tender_id' => $tid, 'status' => 0])->all();
-                    if (!$checkstatus) {
+
+            if (isset($_POST['btn_delete'])) {
+                $delete = \common\models\ItemDetails::deleteAll(['id' => $_POST["selected_id"]]);
+                $deleteitems = \common\models\Item::deleteAll(['id' => $iids]);
+                if ($delete) {
+                    $mdelete = \common\models\MakeDetails::deleteAll(['item_detail_id' => $_POST["selected_id"]]);
+                    $checktender = \common\models\Item::find()->where(['tender_id' => $tid])->all();
+                    if ($checktender) {
+                        $checkstatus = \common\models\Item::find()->where(['tender_id' => $tid, 'status' => 0])->all();
+                        if (!$checkstatus) {
+                            $tmodel = \common\models\Tender::find()->where(['id' => $tid])->one();
+                            $tmodel->status = 1;
+                            $tmodel->save();
+                        }
+                    } else {
                         $tmodel = \common\models\Tender::find()->where(['id' => $tid])->one();
-                        $tmodel->status = 1;
+                        $tmodel->status = 0;
+                        $tmodel->technical_status = 0;
+                        $tmodel->financial_status = 0;
+                        $tmodel->aoc_status = 0;
+                        $tmodel->aoc_date = '';
                         $tmodel->save();
                     }
-                } else {
+                    Yii::$app->session->setFlash('success', "Items successfully deleted");
+                    return $this->redirect(array('site/view-items/' . $tid . ''));
+                }
+            } else {
+                $ids = $_POST["selected_id"];
+                if (isset($ids) && count($ids)) {
+                    foreach ($ids as $_id) {
+                        $itemdetail = \common\models\ItemDetails::find()->where(['id' => $_id])->one();
+                        $makedetail = \common\models\MakeDetails::find()->where(['item_detail_id' => $_id])->one();
+                        $itemz = \common\models\Item::find()->where(['id' => $itemdetail->item_id])->one();
+                        $itemz->status = 1;
+                        $makedetail->status = 1;
+                        $itemdetail->status = 1;
+                        $itemdetail->save();
+                        $makedetail->save();
+                        $itemz->save();
+                    }
+                }
+
+                $checkstatus = \common\models\Item::find()->where(['tender_id' => $tid, 'status' => 0])->all();
+
+                if (!$checkstatus) {
                     $tmodel = \common\models\Tender::find()->where(['id' => $tid])->one();
-                    $tmodel->status = 0;
-                    $tmodel->technical_status = 0;
-                    $tmodel->financial_status = 0;
-                    $tmodel->aoc_status = 0;
-                    $tmodel->aoc_date = '';
+                    $tmodel->status = 1;
                     $tmodel->save();
                 }
-                Yii::$app->session->setFlash('success', "Items successfully deleted");
-                return $this->redirect(array('site/view-items?id=' . $tid . ''));
+
+                Yii::$app->session->setFlash('success', "Items successfully approved");
+                return $this->redirect(array('site/view-items/' . $tid . ''));
             }
         } else {
-            Yii::$app->session->setFlash('error', "Select checkbox to delete item");
-            return $this->redirect(array('site/view-items?id=' . $tid . ''));
+            Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
+            return $this->redirect(array('site/view-items/' . $tid . ''));
         }
     }
 
@@ -2794,15 +5296,17 @@ class SiteController extends Controller {
             if ($_POST['id']) {
                 $item = \common\models\Item::find()->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['itemdetails.id' => $id])->one();
                 $model = \common\models\ItemDetails::find()->where(['id' => $_POST['id']])->one();
-                $model->itemtender = $_POST['itemtender'];
+                $model->itemtender = @$_POST['itemtender'];
                 $model->description = @$_POST['description'];
-                $model->units = $_POST['units'];
-                $model->quantity = $_POST['quantity'];
+                $model->units = @$_POST['units'];
+                $model->quantity = @$_POST['quantity'];
                 $model->core = @$_POST['core'];
                 $model->typefitting = @$_POST['typefitting'];
                 $model->capacityfitting = @$_POST['capacityfitting'];
+                $model->accessoryone = @$_POST['accessoryone'];
+                $model->accessorytwo = @$_POST['accessorytwo'];
                 $model->make = implode(',', $_POST['makes']);
-                $model->makeid = $_POST['makeid'];
+                $model->makeid = @$_POST['makeid'];
 
                 $parentitem = \common\models\Item::find()->where(['id' => $_POST['item_id']])->one();
                 $parentitem->tenderone = @$_POST['tenderone'];
@@ -2818,18 +5322,20 @@ class SiteController extends Controller {
                 if (@$_POST['makes']) {
                     foreach ($_POST['makes'] as $make_ids) {
                         $mdetail = new \common\models\MakeDetails();
-                        $mdetail->itemtender = $_POST['itemtender'];
+                        $mdetail->itemtender = @$_POST['itemtender'];
                         $mdetail->description = @$_POST['description'];
-                        $mdetail->units = $_POST['units'];
-                        $mdetail->quantity = $_POST['quantity'];
+                        $mdetail->units = @$_POST['units'];
+                        $mdetail->quantity = @$_POST['quantity'];
                         $mdetail->core = @$_POST['core'];
                         $mdetail->typefitting = @$_POST['typefitting'];
                         $mdetail->capacityfitting = @$_POST['capacityfitting'];
+                        $mdetail->accessoryone = @$_POST['accessoryone'];
+                        $mdetail->accessorytwo = @$_POST['accessorytwo'];
                         $mdetail->make = $make_ids;
-                        $mdetail->makeid = $_POST['makeid'];
+                        $mdetail->makeid = @$_POST['makeid'];
                         $mdetail->user_id = $user->id;
-                        $mdetail->item_id = $_POST['item_id'];
-                        $mdetail->item_detail_id = $_POST['id'];
+                        $mdetail->item_id = @$_POST['item_id'];
+                        $mdetail->item_detail_id = @$_POST['id'];
                         $mdetail->createdon = date('Y-m-d h:i:s');
                         if ($user->group_id == 3) {
                             $mdetail->status = 0;
@@ -2845,28 +5351,34 @@ class SiteController extends Controller {
                     Yii::$app->session->setFlash('success', "Item successfully updated");
                 }
             }
-            return $this->redirect(array('site/view-items?id=' . $item->tender_id . ''));
+            return $this->redirect(array('site/view-items/' . $item->tender_id . ''));
         } else {
             $user = Yii::$app->user->identity;
             $types = [];
             $capacities = [];
             $item = \common\models\Item::find()->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['itemdetails.id' => $id])->one();
-            $makes = \common\models\Make::find()->where(['mtype' => $item->tenderfour])->orderBy(['make' => SORT_ASC])->all();
+            if ($item->tenderone == 1) {
+                $makes = \common\models\Make::find()->where(['mtype' => $item->tenderfour, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+            } else {
+                $makes = \common\models\Make::find()->where(['mtype' => $item->tendertwo, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+            }
             $idetails = \common\models\ItemDetails::find()->where(['id' => $id])->one();
             if ($item->tenderfour == 1) {
-                $sizes = \common\models\Size::find()->where(['mtypeone' => $item->tenderfour, 'mtypetwo' => $item->tenderfive, 'mtypethree' => $item->tendersix, 'status' => 1])->all();
+                $sizes = \common\models\Size::find()->where(['mtypeone' => $item->tenderfour, 'mtypetwo' => $item->tenderfive, 'mtypethree' => $item->tendersix, 'status' => 1])->orderBy(['LENGTH(size)' => SORT_ASC, 'size' => SORT_ASC])->all();
             } else {
-                $sizes = \common\models\Size::find()->where(['mtypeone' => $item->tenderfour, 'status' => 1])->all();
+                $sizes = \common\models\Size::find()->where(['mtypeone' => $item->tenderfour, 'status' => 1])->orderBy(['LENGTH(size)' => SORT_ASC, 'size' => SORT_ASC])->all();
             }
-            $types = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->all();
-            $capacities = \common\models\Fitting::find()->where(['type' => 2, 'status' => 1])->all();
+            $types = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
+            $capacities = \common\models\Fitting::find()->where(['type' => 2, 'status' => 1])->orderBy(['LENGTH(text)' => SORT_ASC, 'text' => SORT_ASC])->all();
+            $accessories = \common\models\Accessories::find()->where(['status' => 1])->orderBy(['LENGTH(text)' => SORT_ASC, 'text' => SORT_ASC])->all();
             return $this->render('edititem', [
                         'item' => $idetails,
                         'makes' => $makes,
                         'parentitems' => $item,
                         'sizes' => $sizes,
                         'types' => $types,
-                        'capacities' => $capacities
+                        'capacities' => $capacities,
+                        'accessories' => $accessories
             ]);
         }
     }
@@ -2977,6 +5489,51 @@ class SiteController extends Controller {
             case "5":
                 return "4 Core";
                 break;
+            case "6":
+                return "5 Core";
+                break;
+            case "7":
+                return "6 Core";
+                break;
+            case "8":
+                return "7 Core";
+                break;
+            case "9":
+                return "8 Core";
+                break;
+            case "10":
+                return "10 Core";
+                break;
+            case "11":
+                return "12 Core";
+                break;
+            case "12":
+                return "14 Core";
+                break;
+            case "13":
+                return "16 Core";
+                break;
+            case "14":
+                return "19 Core";
+                break;
+            case "15":
+                return "24 Core";
+                break;
+            case "16":
+                return "27 Core";
+                break;
+            case "17":
+                return "30 Core";
+                break;
+            case "18":
+                return "37 Core";
+                break;
+            case "19":
+                return "44 Core";
+                break;
+            case "20":
+                return "61 Core";
+                break;
             default:
                 return "";
         }
@@ -2984,7 +5541,16 @@ class SiteController extends Controller {
 
     public function actionGetfit($value) {
         if ($value) {
-            $type = \common\models\Fitting::find()->where(['id' => $value, 'status' => 1])->one();
+            $type = \common\models\Fitting::find()->where(['id' => $value])->one();
+        } else {
+            $type = [];
+        }
+        return @$type->text;
+    }
+
+    public function actionGetaccessory($value) {
+        if ($value) {
+            $type = \common\models\Accessories::find()->where(['id' => $value, 'status' => 1])->one();
         } else {
             $type = [];
         }
@@ -3008,6 +5574,9 @@ class SiteController extends Controller {
             case "5":
                 return "ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES";
                 break;
+            case "13":
+                return "ADG (Projects) AND CE (CG) Visakhapatnam - MES";
+                break;
             case "6":
                 return "CENTRAL COMMAND";
                 break;
@@ -3028,6 +5597,52 @@ class SiteController extends Controller {
                 break;
             case "12":
                 return "DGNP MUMBAI - MES";
+                break;
+            default:
+                return "";
+        }
+    }
+
+    public function actionGetcommandgraph($id) {
+        switch ($id) {
+            case "1":
+                return "ADG CHENNAI";
+                break;
+            case "2":
+                return "ADG DESIGN PUNE";
+                break;
+            case "3":
+                return "CE (FY) HYDERABAD";
+                break;
+            case "4":
+                return "CE (R and D) DELHI";
+                break;
+            case "5":
+                return "CE (R and D) SECUNDERABAD";
+                break;
+            case "13":
+                return "CE (CG) Visakhapatnam";
+                break;
+            case "6":
+                return "CENTRAL";
+                break;
+            case "7":
+                return "EASTERN";
+                break;
+            case "8":
+                return "NORTHERN";
+                break;
+            case "9":
+                return "SOUTHERN";
+                break;
+            case "10":
+                return "SOUTH WESTERN";
+                break;
+            case "11":
+                return "WESTERN";
+                break;
+            case "12":
+                return "DGNP MUMBAI";
                 break;
             default:
                 return "";
@@ -3094,6 +5709,13 @@ class SiteController extends Controller {
         $data[] = '<option value="54">GE (I) RND PASHAN - MES</option>';
         $data[] = '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
         $data[] = '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
+        $data[] = '<option value="57">GE (CG) PORBANDAR - MES</option>';
+        $data[] = '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+        $data[] = '<option value="59">GE (I)(FY) AVADI - MES</option>';
+        $data[] = '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
+        $data[] = '<option value="61">AGE(I) R and D Delhi - MES</option>';
+        $data[] = '<option value="62">GE(I) R and D Chandigarh - MES</option>';
+        $data[] = '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
 
 
         $i = 0;
@@ -3246,6 +5868,11 @@ class SiteController extends Controller {
         $data[] = '<option value="131">CWE MAMUN - MES</option>';
         $data[] = '<option value="132">CWE PATHANKOT - MES</option>';
         $data[] = '<option value="133">CWE YOL - MES</option>';
+        $data[] = '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
+        $data[] = '<option value="135">CWE TENGA - MES</option>';
+        $data[] = '<option value="136">GE(I)(P) SILIGURI - MES</option>';
+        $data[] = '<option value="137">GE(I) Project No. 1 Leh - MES</option>';
+        $data[] = '<option value="138">GE (I) Navy JAMNAGAR - MES</option>';
 
 
 
@@ -3309,8 +5936,11 @@ class SiteController extends Controller {
         } elseif ($value == 1) {
             $data[] = '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
             $data[] = '<option value="37">GE (CG) KOCHI - MES</option>';
+            $data[] = '<option value="57">GE (CG) PORBANDAR - MES</option>';
             $data[] = '<option value="38">GE DAMAN - MES</option>';
         } elseif ($value == 3) {
+            $data[] = '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+            $data[] = '<option value="59">GE (I)(FY) AVADI - MES</option>';
             $data[] = '<option value="39">AGE (I) FY EDDUMAILARAM - MES</option>';
             $data[] = '<option value="40">GE (I) (FY) ISHAPORE - MES</option>';
             $data[] = '<option value="41">GE (I) (P) (FY) ITARSI - MES</option>';
@@ -3318,7 +5948,10 @@ class SiteController extends Controller {
             $data[] = '<option value="43">GE (I) (P) FY KIRKEE - MES</option>';
         } elseif ($value == 4) {
             $data[] = '<option value="44">AGE(I) R and D Haldwani - MES</option>';
+            $data[] = '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
             $data[] = '<option value="45">AGE(I) R and D Manali - MES</option>';
+            $data[] = '<option value="61">AGE(I) R and D Delhi - MES</option>';
+            $data[] = '<option value="62">GE(I) R and D Chandigarh - MES</option>';
             $data[] = '<option value="46">GE(I) R and D Chandipur - MES</option>';
             $data[] = '<option value="47">GE(I) R and D Dehradun - MES</option>';
             $data[] = '<option value="48">GE(I) R and D Kanpur - MES</option>';
@@ -3328,9 +5961,12 @@ class SiteController extends Controller {
             $data[] = '<option value="51">AGE (I) RND VISHAKHAPATNAM - MES</option>';
             $data[] = '<option value="52">GE (I) RND (E) BANGALORE - MES</option>';
             $data[] = '<option value="53">GE (I) RND KANCHANBAGH - MES</option>';
+            $data[] = '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
             $data[] = '<option value="54">GE (I) RND PASHAN - MES</option>';
             $data[] = '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
             $data[] = '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
+        } elseif ($value == 13) {
+            $data[] = '<option value="64">GE (I)(CG) Chennai - MES</option>';
         }
 
         $i = 0;
@@ -3405,8 +6041,11 @@ class SiteController extends Controller {
         } elseif ($value == 1) {
             $data[] = '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
             $data[] = '<option value="37">GE (CG) KOCHI - MES</option>';
+            $data[] = '<option value="57">GE (CG) PORBANDAR - MES</option>';
             $data[] = '<option value="38">GE DAMAN - MES</option>';
         } elseif ($value == 3) {
+            $data[] = '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+            $data[] = '<option value="59">GE (I)(FY) AVADI - MES</option>';
             $data[] = '<option value="39">AGE (I) FY EDDUMAILARAM - MES</option>';
             $data[] = '<option value="40">GE (I) (FY) ISHAPORE - MES</option>';
             $data[] = '<option value="41">GE (I) (P) (FY) ITARSI - MES</option>';
@@ -3414,7 +6053,10 @@ class SiteController extends Controller {
             $data[] = '<option value="43">GE (I) (P) FY KIRKEE - MES</option>';
         } elseif ($value == 4) {
             $data[] = '<option value="44">AGE(I) R and D Haldwani - MES</option>';
+            $data[] = '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
             $data[] = '<option value="45">AGE(I) R and D Manali - MES</option>';
+            $data[] = '<option value="61">AGE(I) R and D Delhi - MES</option>';
+            $data[] = '<option value="62">GE(I) R and D Chandigarh - MES</option>';
             $data[] = '<option value="46">GE(I) R and D Chandipur - MES</option>';
             $data[] = '<option value="47">GE(I) R and D Dehradun - MES</option>';
             $data[] = '<option value="48">GE(I) R and D Kanpur - MES</option>';
@@ -3424,6 +6066,7 @@ class SiteController extends Controller {
             $data[] = '<option value="51">AGE (I) RND VISHAKHAPATNAM - MES</option>';
             $data[] = '<option value="52">GE (I) RND (E) BANGALORE - MES</option>';
             $data[] = '<option value="53">GE (I) RND KANCHANBAGH - MES</option>';
+            $data[] = '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
             $data[] = '<option value="54">GE (I) RND PASHAN - MES</option>';
             $data[] = '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
             $data[] = '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
@@ -3435,7 +6078,7 @@ class SiteController extends Controller {
                 $i++;
                 preg_match_all('/"(.*?)"/s', $_data, $matches);
                 preg_match_all('/>(.*?)</s', $_data, $mvalue);
-                $data = ['command' => $value, 'text' => $mvalue['1']['0'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $data = ['cid' => $matches['1']['0'], 'command' => $value, 'text' => $mvalue['1']['0'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
                 $querydata = \Yii::$app
                         ->db
                         ->createCommand()
@@ -3474,6 +6117,7 @@ class SiteController extends Controller {
             $data[] = '<option value="18">CWE LUCKNOW - MES</option>';
             $data[] = '<option value="19">CWE MATHURA</option>';
         } elseif ($value == 9) {
+            $data[] = '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data[] = '<option value="20">CWE (AF) BORJAR - MES</option>';
             $data[] = '<option value="21">CWE (AF) JORHAT - MES</option>';
             $data[] = '<option value="22">CWE (AF) KALAIKUNDA - MES</option>';
@@ -3497,6 +6141,8 @@ class SiteController extends Controller {
         } elseif ($value == 13) {
             $data[] = '<option value="37">CWE BENGDUBI - MES</option>';
             $data[] = '<option value="38">CWE BINNAGURI - MES</option>';
+            $data[] = '<option value="135">CWE TENGA - MES</option>';
+            $data[] = '<option value="136">GE(I)(P) SILIGURI - MES</option>';
             $data[] = '<option value="39">GE(I)(P) GANGTOK - MES</option>';
             $data[] = '<option value="40">HQ 136 WORKS ENGINEERS - MES</option>';
         } elseif ($value == 15) {
@@ -3508,6 +6154,7 @@ class SiteController extends Controller {
             $data[] = '<option value="45">CWE (AF) SRINAGAR - MES</option>';
         } elseif ($value == 17) {
             $data[] = '<option value="46">CWE KUMBATHANG - MES</option>';
+            $data[] = '<option value="137">GE(I) Project No. 1 Leh - MES</option>';
             $data[] = '<option value="47">HQ 138 WORKS ENGR - MES</option>';
         } elseif ($value == 18) {
             $data[] = '<option value="48">135 WORKS ENGINEER - MES</option>';
@@ -3553,6 +6200,7 @@ class SiteController extends Controller {
             $data[] = '<option value="81">CWE EZHIMALA - MES</option>';
             $data[] = '<option value="82">CWE (NB) KOCHI - MES</option>';
             $data[] = '<option value="83">CWE NW KOCHI - MES</option>';
+            $data[] = '<option value="138">GE (I) Navy JAMNAGAR - MES</option>';
             $data[] = '<option value="84">GE (I) Navy LAKSHADWEEP - MES</option>';
             $data[] = '<option value="85">GE (I) NAVY LONAWALA - MES</option>';
         } elseif ($value == 26) {
@@ -3580,6 +6228,7 @@ class SiteController extends Controller {
             $data[] = '<option value="104">CWE BATHINDA - MES</option>';
             $data[] = '<option value="105">CWE BIKANER - MES</option>';
             $data[] = '<option value="106">CWE GANGANAGAR - MES</option>';
+            $data[] = '<option value="139">GE (I) (P) NO 2 BATHINDA - MES</option>';
         } elseif ($value == 30) {
             $data[] = '<option value="107">CWE HISAR - MES</option>';
             $data[] = '<option value="108">CWE JAIPUR - MES</option>';
@@ -3593,6 +6242,7 @@ class SiteController extends Controller {
             $data[] = '<option value="115">CWE (AF) Chandigarh-MES</option>';
             $data[] = '<option value="116">CWE (AF) GURGAON - MES</option>';
             $data[] = '<option value="117">CWE (AF) Palam-MES</option>';
+            $data[] = '<option value="140">GE (I)(AF) Gurgaon-MES</option>';
         } elseif ($value == 32) {
             $data[] = '<option value="118">CWE AMBALA - MES</option>';
             $data[] = '<option value="119">CWE CHANDIMANDIR - MES</option>';
@@ -3666,6 +6316,7 @@ class SiteController extends Controller {
             $data[] = '<option value="18">CWE LUCKNOW - MES</option>';
             $data[] = '<option value="19">CWE MATHURA</option>';
         } elseif ($value == 9) {
+            $data[] = '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data[] = '<option value="20">CWE (AF) BORJAR - MES</option>';
             $data[] = '<option value="21">CWE (AF) JORHAT - MES</option>';
             $data[] = '<option value="22">CWE (AF) KALAIKUNDA - MES</option>';
@@ -3689,6 +6340,8 @@ class SiteController extends Controller {
         } elseif ($value == 13) {
             $data[] = '<option value="37">CWE BENGDUBI - MES</option>';
             $data[] = '<option value="38">CWE BINNAGURI - MES</option>';
+            $data[] = '<option value="135">CWE TENGA - MES</option>';
+            $data[] = '<option value="136">GE(I)(P) SILIGURI - MES</option>';
             $data[] = '<option value="39">GE(I)(P) GANGTOK - MES</option>';
             $data[] = '<option value="40">HQ 136 WORKS ENGINEERS - MES</option>';
         } elseif ($value == 15) {
@@ -3700,6 +6353,7 @@ class SiteController extends Controller {
             $data[] = '<option value="45">CWE (AF) SRINAGAR - MES</option>';
         } elseif ($value == 17) {
             $data[] = '<option value="46">CWE KUMBATHANG - MES</option>';
+            $data[] = '<option value="137">GE(I) Project No. 1 Leh - MES</option>';
             $data[] = '<option value="47">HQ 138 WORKS ENGR - MES</option>';
         } elseif ($value == 18) {
             $data[] = '<option value="48">135 WORKS ENGINEER - MES</option>';
@@ -3745,6 +6399,7 @@ class SiteController extends Controller {
             $data[] = '<option value="81">CWE EZHIMALA - MES</option>';
             $data[] = '<option value="82">CWE (NB) KOCHI - MES</option>';
             $data[] = '<option value="83">CWE NW KOCHI - MES</option>';
+            $data[] = '<option value="138">GE (I) Navy JAMNAGAR - MES</option>';
             $data[] = '<option value="84">GE (I) Navy LAKSHADWEEP - MES</option>';
             $data[] = '<option value="85">GE (I) NAVY LONAWALA - MES</option>';
         } elseif ($value == 26) {
@@ -3772,6 +6427,7 @@ class SiteController extends Controller {
             $data[] = '<option value="104">CWE BATHINDA - MES</option>';
             $data[] = '<option value="105">CWE BIKANER - MES</option>';
             $data[] = '<option value="106">CWE GANGANAGAR - MES</option>';
+            $data[] = '<option value="139">GE (I) (P) NO 2 BATHINDA - MES</option>';
         } elseif ($value == 30) {
             $data[] = '<option value="107">CWE HISAR - MES</option>';
             $data[] = '<option value="108">CWE JAIPUR - MES</option>';
@@ -3785,6 +6441,7 @@ class SiteController extends Controller {
             $data[] = '<option value="115">CWE (AF) Chandigarh-MES</option>';
             $data[] = '<option value="116">CWE (AF) GURGAON - MES</option>';
             $data[] = '<option value="117">CWE (AF) Palam-MES</option>';
+            $data[] = '<option value="140">GE (I)(AF) Gurgaon-MES</option>';
         } elseif ($value == 32) {
             $data[] = '<option value="118">CWE AMBALA - MES</option>';
             $data[] = '<option value="119">CWE CHANDIMANDIR - MES</option>';
@@ -3812,7 +6469,7 @@ class SiteController extends Controller {
                 $i++;
                 preg_match_all('/"(.*?)"/s', $_data, $matches);
                 preg_match_all('/>(.*?)</s', $_data, $mvalue);
-                $data = ['cengineer' => $value, 'text' => $mvalue['1']['0'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $data = ['cid' => $matches['1']['0'], 'cengineer' => $value, 'text' => $mvalue['1']['0'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
                 $querydata = \Yii::$app
                         ->db
                         ->createCommand()
@@ -3835,8 +6492,11 @@ class SiteController extends Controller {
             $data[] = '<option value="4">GE (AF) GORAKHPUR</option>';
         } elseif ($value == 2) {
             $data[] = '<option value="5">GE(AF)IZATNAGAR - MES</option>';
+            $data[] = '<option value="317">GE(P)(AF)BKT - MES</option>';
         } elseif ($value == 3) {
             $data[] = '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
+            $data[] = '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
+            $data[] = '<option value="319">AGE (AF) (I) SONEGAON - MES</option>';
         } elseif ($value == 4) {
             $data[] = '<option value="7">GE (AF) (ADM AREA) MAHARAJPUR - MES</option>';
             $data[] = '<option value="8">GE (AF) (TECH AREA) MAHARAJPUR - MES</option>';
@@ -3847,6 +6507,7 @@ class SiteController extends Controller {
             $data[] = '<option value="12">GE(WEST) BAREILLY - MES</option>';
         } elseif ($value == 6) {
             $data[] = '<option value="13">GE DEHRADUN - MES</option>';
+            $data[] = '<option value="320">GE (P)DEHRADUN - MES</option>';
             $data[] = '<option value="14">GE PREMNAGAR - MES</option>';
         } elseif ($value == 7) {
             $data[] = '<option value="15">AGE(I) Raiwala - MES</option>';
@@ -3854,9 +6515,11 @@ class SiteController extends Controller {
             $data[] = '<option value="17">GE (MES) Clement Town - MES</option>';
         } elseif ($value == 8) {
             $data[] = '<option value="18">GE Pithoragarh - MES</option>';
+            $data[] = '<option value="321">GE 871EWS - MES</option>';
             $data[] = '<option value="19">GE RANIKHET - MES</option>';
         } elseif ($value == 9) {
             $data[] = '<option value="20">GE (N) MEERUT - MES</option>';
+            $data[] = '<option value="322">GE (S) MEERUT - MES</option>';
             $data[] = '<option value="21">GE (U) EM Meerut - MES</option>';
         } elseif ($value == 10) {
             $data[] = '<option value="22">GE ROORKEE - MES</option>';
@@ -3869,6 +6532,8 @@ class SiteController extends Controller {
         } elseif ($value == 12) {
             $data[] = '<option value="28">GE AWC - MES</option>';
             $data[] = '<option value="29>GE (Maint) Inf School - MES</option>';
+            $data[] = '<option value="323>GE (P) Inf School - MES</option>';
+            $data[] = '<option value="324>GE MCTE - MES</option>';
         } elseif ($value == 13) {
             $data[] = '<option value="30">GE DANAPUR - MES</option>';
             $data[] = '<option value="31">GE DIPATOLI - MES</option>';
@@ -3887,6 +6552,7 @@ class SiteController extends Controller {
             $data[] = '<option value="41">GE (W) ALLAHABAD - MES</option>';
         } elseif ($value == 17) {
             $data[] = '<option value="42">GE FATEHGARH - MES</option>';
+            $data[] = '<option value="325">GE MES KANPUR - MES</option>';
         } elseif ($value == 18) {
             $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -3903,6 +6569,7 @@ class SiteController extends Controller {
         } elseif ($value == 21) {
             $data[] = '<option value="53">GE (AF) CHABUA - MES</option>';
             $data[] = '<option value="54">GE (AF) JORHAT - MES</option>';
+            $data[] = '<option value="326">GE (AF) MOHANBARI - MES</option>';
             $data[] = '<option value="55">GE (AF) TEZPUR - MES</option>';
         } elseif ($value == 22) {
             $data[] = '<option value="56">GE (AF) BARRACKPORE - MES</option>';
@@ -3910,6 +6577,7 @@ class SiteController extends Controller {
         } elseif ($value == 23) {
             $data[] = '<option value="58">AGE (I) (AF) SINGHARSI-MES</option>';
             $data[] = '<option value="59">GE (AF) PURNEA-MES</option>';
+            $data[] = '<option value="327">GE (AF) PANAGARH-MES</option>';
         } elseif ($value == 26) {
             $data[] = '<option value="60">GE ALIPORE - MES</option>';
             $data[] = '<option value="61">GE(CENTRAL) KOLKATA - MES</option>';
@@ -3965,6 +6633,8 @@ class SiteController extends Controller {
             $data[] = '<option value="107">GE (N) BINNAGURI - MES</option>';
             $data[] = '<option value="108">GE (S) BINNAGURI - MES</option>';
             $data[] = '<option value="109">GE SEVOKE ROAD - MES</option>';
+        } elseif ($value == 135) {
+            $data[] = '<option value="328">GE MISSAMARI - MES</option>';
         } elseif ($value == 40) {
             $data[] = '<option value="110">AGE (I) DARJEELING - MES</option>';
             $data[] = '<option value="111">GE 867 EWS - MES</option>';
@@ -3985,13 +6655,19 @@ class SiteController extends Controller {
         } elseif ($value == 45) {
             $data[] = '<option value="123">GE (AF) ARANTIPAR - MES</option>';
             $data[] = '<option value="124">GE (AF) LEH - MES</option>';
+            $data[] = '<option value="329">GE (AF) THOISE - MES</option>';
             $data[] = '<option value="125">GE(AF)SRINAGAR - MES</option>';
+        } elseif ($value == 46) {
+            $data[] = '<option value="330">GE KARGIL - MES</option>';
+            $data[] = '<option value="331">GE KHUMBATHANG - MES</option>';
         } elseif ($value == 47) {
             $data[] = '<option value="126">GE 865 EWS - MES</option>';
+            $data[] = '<option value="332">GE 860 EWS - MES</option>';
             $data[] = '<option value="127">GE PARTAPUR - MES</option>';
             $data[] = '<option value="128">GE (P) NO 2LEH - MES</option>';
         } elseif ($value == 48) {
             $data[] = '<option value="129">GE NAGROTA - MES</option>';
+            $data[] = '<option value="333">AGE(I)CIF(U) - MES</option>';
             $data[] = '<option value="130">GE (N) AKHNOOR - MES</option>';
             $data[] = '<option value="131">GE (S) AKHNOOR - MES</option>';
         } elseif ($value == 50) {
@@ -4002,6 +6678,7 @@ class SiteController extends Controller {
             $data[] = '<option value="135">GE (U) UDHAMPUR - MES</option>';
         } elseif ($value == 54) {
             $data[] = '<option value="136">GE BRICHGUNJ - MES</option>';
+            $data[] = '<option value="334">GE (P) CENTRAL - MES</option>';
             $data[] = '<option value="137">GE (SOUTH) DIGLIPUR - MES</option>';
         } elseif ($value == 55) {
             $data[] = '<option value="138">GE HADDO - MES</option>';
@@ -4010,6 +6687,9 @@ class SiteController extends Controller {
             $data[] = '<option value="138">GE (I) 866 EWS - MES</option>';
         } elseif ($value == 60) {
             $data[] = '<option value="139">GE(AF) BANGALORE - MES</option>';
+            $data[] = '<option value="335">GE (AF) MARATHALLI - MES</option>';
+            $data[] = '<option value="336">GE (AF)(P) BANGALORE - MES</option>';
+            $data[] = '<option value="337">GE(AF) SDI and ASTE BANGALORE - MES</option>';
             $data[] = '<option value="140">GE (AF) TAMBARAM - MES</option>';
         } elseif ($value == 61) {
             $data[] = '<option value="141">GE AFA HYDERABAD - MES</option>';
@@ -4031,12 +6711,15 @@ class SiteController extends Controller {
             $data[] = '<option value="154">GE E/M AF CHAKERI - MES</option>';
         } elseif ($value == 66) {
             $data[] = '<option value="155">GE (AF) AMLA - MES</option>';
+            $data[] = '<option value="338">GE (AF) OJHAR - MES</option>';
         } elseif ($value == 67) {
+            $data[] = '<option value="339">AGE(I) MANAURI - MES</option>';
             $data[] = '<option value="156">GE (AF) MC Chandigarh - MES</option>';
             $data[] = '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
         } elseif ($value == 68) {
             $data[] = '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
         } elseif ($value == 70) {
+            $data[] = '<option value="340">AGE(I) DHANA - MES</option>';
             $data[] = '<option value="159">GE BHOPAL - MES</option>';
             $data[] = '<option value="160">GE DRONACHAL - MES</option>';
             $data[] = '<option value="161">GE NASIRABAD - MES</option>';
@@ -4057,7 +6740,7 @@ class SiteController extends Controller {
         } elseif ($value == 74) {
             $data[] = '<option value="173">GE AVADI- MES</option>';
             $data[] = '<option value="174">GE CHENNAI - MES</option>';
-            $data[] = '<option value="175">GE CHENNAI - MES</option>';
+            $data[] = '<option value="175">GE ST THOMAS MOUNT - MES</option>';
         } elseif ($value == 75) {
             $data[] = '<option value="179">GE GOLCONDA HYDERABAD - MES</option>';
             $data[] = '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
@@ -4075,6 +6758,8 @@ class SiteController extends Controller {
             $data[] = '<option value="189">GE (ARMY ) BARODA - MES</option>';
             $data[] = '<option value="190">GE (ARMY)BHUJ - MES</option>';
             $data[] = '<option value="191">GE (ARMY) JAMNAGAR - MES</option>';
+            $data[] = '<option value="341">GE AHMEDABAD - MES</option>';
+            $data[] = '<option value="342">GE GANDHINAGAR - MES</option>';
         } elseif ($value == 79) {
             $data[] = '<option value="192">AGE (I) NAGTALAO - MES</option>';
             $data[] = '<option value="193">AGE(I) UDAIPUR - MES</option>';
@@ -4083,6 +6768,7 @@ class SiteController extends Controller {
             $data[] = '<option value="196">GE BANAR - MES</option>';
             $data[] = '<option value="197">GE SHIKARGARH - MES</option>';
         } elseif ($value == 80) {
+            $data[] = '<option value="343">GE (ARMY) BARMER - MES</option>';
             $data[] = '<option value="198">GE (ARMY) JAISALMER - MES</option>';
         } elseif ($value == 81) {
             $data[] = '<option value="199">GE MAINT EZHIMALA - MES</option>';
@@ -4114,6 +6800,7 @@ class SiteController extends Controller {
         } elseif ($value == 93) {
             $data[] = '<option value="219">GE (NORTH) SANTA CRUZ - MES</option>';
             $data[] = '<option value="220">GE PANAJI - MES</option>';
+            $data[] = '<option value="344">GE DEHU ROAD - MES</option>';
             $data[] = '<option value="221">GE (WEST) COLABA - MES</option>';
         } elseif ($value == 94) {
             $data[] = '<option value="222">GE DEOLALI - MES</option>';
@@ -4122,6 +6809,7 @@ class SiteController extends Controller {
             $data[] = '<option value="225">GE (S) AHMEDNAGAR - MES</option>';
         } elseif ($value == 95) {
             $data[] = '<option value="226">GE (CENTRAL) KIRKEE - MES</option>';
+            $data[] = '<option value="345">GE (CME) KIRKEE - MES</option>';
             $data[] = '<option value="227">GE MH AND RANGE HILLS - MES</option>';
         } elseif ($value == 96) {
             $data[] = '<option value="228">GE (C) PUNE - MES</option>';
@@ -4131,8 +6819,10 @@ class SiteController extends Controller {
         } elseif ($value == 97) {
             $data[] = '<option value="232">GE(AF) BHUJ - MES</option>';
             $data[] = '<option value="233">GE (AF) JAMNAGAR - MES</option>';
+            $data[] = '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
         } elseif ($value == 98) {
             $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
+            $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
         } elseif ($value == 99) {
             $data[] = '<option value="233">GE (AF) Phalodi - MES</option>';
         } elseif ($value == 100) {
@@ -4190,21 +6880,26 @@ class SiteController extends Controller {
         } elseif ($value == 117) {
             $data[] = '<option value="271">GE (AF) North Palam-MES</option>';
             $data[] = '<option value="272">GE(AF) South Palam-MES</option>';
+            $data[] = '<option value="348">GE (P)(AF) South Palam-MES</option>';
             $data[] = '<option value="273">GE (AF) Subroto Park-MES</option>';
         } elseif ($value == 118) {
             $data[] = '<option value="274">GE (N) AMBALA - MES</option>';
             $data[] = '<option value="275">GE (P) Ambala - MES</option>';
             $data[] = '<option value="276">GE (U) AMBALA - MES</option>';
+            $data[] = '<option value="349">GE (S) AMBALA - MES</option>';
         } elseif ($value == 119) {
             $data[] = '<option value="277">GE CHANDIGARH - MES</option>';
             $data[] = '<option value="278">GE CHANDIMANDIR - MES</option>';
             $data[] = '<option value="279">GE (P) CHANDIMANDIR - MES</option>';
+            $data[] = '<option value="350">GE (U) CHANDIMANDIR - MES</option>';
         } elseif ($value == 120) {
             $data[] = '<option value="280">GE (P) DAPPAR - MES</option>';
             $data[] = '<option value="281">GE (S) PATIALA - MES</option>';
+            $data[] = '<option value="351">GE (N) PATIALA - MES</option>';
         } elseif ($value == 121) {
             $data[] = '<option value="282">GE 863 EWS - MES</option>';
             $data[] = '<option value="283">GE JUTOGH - MES</option>';
+            $data[] = '<option value="352">GE KASAULI - MES</option>';
         } elseif ($value == 122) {
             $data[] = '<option value="284">GE (CENTRAL) DELHI CANTT-MES</option>';
             $data[] = '<option value="285">GE (EAST) DELHI CANTT-MES</option>';
@@ -4215,8 +6910,11 @@ class SiteController extends Controller {
             $data[] = '<option value="289">GE E/M (RR) HOSPITAL DELHI CNATT-MES</option>';
             $data[] = '<option value="290">GE NEW DELHI-MES</option>';
             $data[] = '<option value="291">GE (S) NEW DELHI-MES</option>';
+            $data[] = '<option value="353">GE (P) WEST DELHI-MES</option>';
         } elseif ($value == 124) {
+            $data[] = '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
             $data[] = '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
+            $data[] = '<option value="355">GE(U) P and M DELHI CNATT-MES</option>';
             $data[] = '<option value="293">GE(U)WATER SUPPLY DELHI CANTT-MES</option>';
         } elseif ($value == 127) {
             $data[] = '<option value="294">GE AMRITSAR - MES</option>';
@@ -4276,7 +6974,7 @@ class SiteController extends Controller {
         $data = [];
         $finaldata = '';
         $valuefinal = '';
-        for ($value = 1; $value <= 133; $value++) {
+        for ($value = 1; $value <= 135; $value++) {
             $data = [];
             if ($value == 1) {
                 $data[] = '<option value="1">GE (AF) BAMRAULI - MES</option>';
@@ -4285,8 +6983,11 @@ class SiteController extends Controller {
                 $data[] = '<option value="4">GE (AF) GORAKHPUR</option>';
             } elseif ($value == 2) {
                 $data[] = '<option value="5">GE(AF)IZATNAGAR - MES</option>';
+                $data[] = '<option value="317">GE(P)(AF)BKT - MES</option>';
             } elseif ($value == 3) {
                 $data[] = '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
+                $data[] = '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
+                $data[] = '<option value="319">AGE (AF) (I) SONEGAON - MES</option>';
             } elseif ($value == 4) {
                 $data[] = '<option value="7">GE (AF) (ADM AREA) MAHARAJPUR - MES</option>';
                 $data[] = '<option value="8">GE (AF) (TECH AREA) MAHARAJPUR - MES</option>';
@@ -4297,6 +6998,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="12">GE(WEST) BAREILLY - MES</option>';
             } elseif ($value == 6) {
                 $data[] = '<option value="13">GE DEHRADUN - MES</option>';
+                $data[] = '<option value="320">GE (P)DEHRADUN - MES</option>';
                 $data[] = '<option value="14">GE PREMNAGAR - MES</option>';
             } elseif ($value == 7) {
                 $data[] = '<option value="15">AGE(I) Raiwala - MES</option>';
@@ -4304,9 +7006,11 @@ class SiteController extends Controller {
                 $data[] = '<option value="17">GE (MES) Clement Town - MES</option>';
             } elseif ($value == 8) {
                 $data[] = '<option value="18">GE Pithoragarh - MES</option>';
+                $data[] = '<option value="321">GE 871EWS - MES</option>';
                 $data[] = '<option value="19">GE RANIKHET - MES</option>';
             } elseif ($value == 9) {
                 $data[] = '<option value="20">GE (N) MEERUT - MES</option>';
+                $data[] = '<option value="322">GE (S) MEERUT - MES</option>';
                 $data[] = '<option value="21">GE (U) EM Meerut - MES</option>';
             } elseif ($value == 10) {
                 $data[] = '<option value="22">GE ROORKEE - MES</option>';
@@ -4319,6 +7023,8 @@ class SiteController extends Controller {
             } elseif ($value == 12) {
                 $data[] = '<option value="28">GE AWC - MES</option>';
                 $data[] = '<option value="29">GE (Maint) Inf School - MES</option>';
+                $data[] = '<option value="323">GE (P) Inf School - MES</option>';
+                $data[] = '<option value="324">GE MCTE - MES</option>';
             } elseif ($value == 13) {
                 $data[] = '<option value="30">GE DANAPUR - MES</option>';
                 $data[] = '<option value="31">GE DIPATOLI - MES</option>';
@@ -4337,6 +7043,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="41">GE (W) ALLAHABAD - MES</option>';
             } elseif ($value == 17) {
                 $data[] = '<option value="42">GE FATEHGARH - MES</option>';
+                $data[] = '<option value="325">GE MES KANPUR - MES</option>';
             } elseif ($value == 18) {
                 $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
                 $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -4353,6 +7060,7 @@ class SiteController extends Controller {
             } elseif ($value == 21) {
                 $data[] = '<option value="53">GE (AF) CHABUA - MES</option>';
                 $data[] = '<option value="54">GE (AF) JORHAT - MES</option>';
+                $data[] = '<option value="326">GE (AF) MOHANBARI - MES</option>';
                 $data[] = '<option value="55">GE (AF) TEZPUR - MES</option>';
             } elseif ($value == 22) {
                 $data[] = '<option value="56">GE (AF) BARRACKPORE - MES</option>';
@@ -4360,6 +7068,7 @@ class SiteController extends Controller {
             } elseif ($value == 23) {
                 $data[] = '<option value="58">AGE (I) (AF) SINGHARSI-MES</option>';
                 $data[] = '<option value="59">GE (AF) PURNEA-MES</option>';
+                $data[] = '<option value="327">GE (AF) PANAGARH-MES</option>';
             } elseif ($value == 26) {
                 $data[] = '<option value="60">GE ALIPORE - MES</option>';
                 $data[] = '<option value="61">GE(CENTRAL) KOLKATA - MES</option>';
@@ -4415,6 +7124,8 @@ class SiteController extends Controller {
                 $data[] = '<option value="107">GE (N) BINNAGURI - MES</option>';
                 $data[] = '<option value="108">GE (S) BINNAGURI - MES</option>';
                 $data[] = '<option value="109">GE SEVOKE ROAD - MES</option>';
+            } elseif ($value == 135) {
+                $data[] = '<option value="328">GE MISSAMARI - MES</option>';
             } elseif ($value == 40) {
                 $data[] = '<option value="110">AGE (I) DARJEELING - MES</option>';
                 $data[] = '<option value="111">GE 867 EWS - MES</option>';
@@ -4435,13 +7146,19 @@ class SiteController extends Controller {
             } elseif ($value == 45) {
                 $data[] = '<option value="123">GE (AF) ARANTIPAR - MES</option>';
                 $data[] = '<option value="124">GE (AF) LEH - MES</option>';
+                $data[] = '<option value="329">GE (AF) THOISE - MES</option>';
                 $data[] = '<option value="125">GE(AF)SRINAGAR - MES</option>';
+            } elseif ($value == 46) {
+                $data[] = '<option value="330">GE KARGIL - MES</option>';
+                $data[] = '<option value="331">GE KHUMBATHANG - MES</option>';
             } elseif ($value == 47) {
                 $data[] = '<option value="126">GE 865 EWS - MES</option>';
+                $data[] = '<option value="332">GE 860 EWS - MES</option>';
                 $data[] = '<option value="127">GE PARTAPUR - MES</option>';
                 $data[] = '<option value="128">GE (P) NO 2LEH - MES</option>';
             } elseif ($value == 48) {
                 $data[] = '<option value="129">GE NAGROTA - MES</option>';
+                $data[] = '<option value="333">AGE(I)CIF(U) - MES</option>';
                 $data[] = '<option value="130">GE (N) AKHNOOR - MES</option>';
                 $data[] = '<option value="131">GE (S) AKHNOOR - MES</option>';
             } elseif ($value == 50) {
@@ -4452,6 +7169,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="135">GE (U) UDHAMPUR - MES</option>';
             } elseif ($value == 54) {
                 $data[] = '<option value="136">GE BRICHGUNJ - MES</option>';
+                $data[] = '<option value="334">GE (P) CENTRAL - MES</option>';
                 $data[] = '<option value="137">GE (SOUTH) DIGLIPUR - MES</option>';
             } elseif ($value == 55) {
                 $data[] = '<option value="138">GE HADDO - MES</option>';
@@ -4460,6 +7178,9 @@ class SiteController extends Controller {
                 $data[] = '<option value="138">GE (I) 866 EWS - MES</option>';
             } elseif ($value == 60) {
                 $data[] = '<option value="139">GE(AF) BANGALORE - MES</option>';
+                $data[] = '<option value="335">GE (AF) MARATHALLI - MES</option>';
+                $data[] = '<option value="336">GE (AF)(P) BANGALORE - MES</option>';
+                $data[] = '<option value="337">GE(AF) SDI and ASTE BANGALORE - MES</option>';
                 $data[] = '<option value="140">GE (AF) TAMBARAM - MES</option>';
             } elseif ($value == 61) {
                 $data[] = '<option value="141">GE AFA HYDERABAD - MES</option>';
@@ -4481,12 +7202,15 @@ class SiteController extends Controller {
                 $data[] = '<option value="154">GE E/M AF CHAKERI - MES</option>';
             } elseif ($value == 66) {
                 $data[] = '<option value="155">GE (AF) AMLA - MES</option>';
+                $data[] = '<option value="338">GE (AF) OJHAR - MES</option>';
             } elseif ($value == 67) {
+                $data[] = '<option value="339">AGE(I) MANAURI - MES</option>';
                 $data[] = '<option value="156">GE (AF) MC Chandigarh - MES</option>';
                 $data[] = '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
             } elseif ($value == 68) {
                 $data[] = '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
             } elseif ($value == 70) {
+                $data[] = '<option value="340">AGE(I) DHANA - MES</option>';
                 $data[] = '<option value="159">GE BHOPAL - MES</option>';
                 $data[] = '<option value="160">GE DRONACHAL - MES</option>';
                 $data[] = '<option value="161">GE NASIRABAD - MES</option>';
@@ -4507,7 +7231,7 @@ class SiteController extends Controller {
             } elseif ($value == 74) {
                 $data[] = '<option value="173">GE AVADI- MES</option>';
                 $data[] = '<option value="174">GE CHENNAI - MES</option>';
-                $data[] = '<option value="175">GE CHENNAI - MES</option>';
+                $data[] = '<option value="175">GE ST THOMAS MOUNT - MES</option>';
             } elseif ($value == 75) {
                 $data[] = '<option value="179">GE GOLCONDA HYDERABAD - MES</option>';
                 $data[] = '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
@@ -4525,6 +7249,8 @@ class SiteController extends Controller {
                 $data[] = '<option value="189">GE (ARMY ) BARODA - MES</option>';
                 $data[] = '<option value="190">GE (ARMY)BHUJ - MES</option>';
                 $data[] = '<option value="191">GE (ARMY) JAMNAGAR - MES</option>';
+                $data[] = '<option value="341">GE AHMEDABAD - MES</option>';
+                $data[] = '<option value="342">GE GANDHINAGAR - MES</option>';
             } elseif ($value == 79) {
                 $data[] = '<option value="192">AGE (I) NAGTALAO - MES</option>';
                 $data[] = '<option value="193">AGE(I) UDAIPUR - MES</option>';
@@ -4533,6 +7259,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="196">GE BANAR - MES</option>';
                 $data[] = '<option value="197">GE SHIKARGARH - MES</option>';
             } elseif ($value == 80) {
+                $data[] = '<option value="343">GE (ARMY) BARMER - MES</option>';
                 $data[] = '<option value="198">GE (ARMY) JAISALMER - MES</option>';
             } elseif ($value == 81) {
                 $data[] = '<option value="199">GE MAINT EZHIMALA - MES</option>';
@@ -4564,6 +7291,7 @@ class SiteController extends Controller {
             } elseif ($value == 93) {
                 $data[] = '<option value="219">GE (NORTH) SANTA CRUZ - MES</option>';
                 $data[] = '<option value="220">GE PANAJI - MES</option>';
+                $data[] = '<option value="344">GE DEHU ROAD - MES</option>';
                 $data[] = '<option value="221">GE (WEST) COLABA - MES</option>';
             } elseif ($value == 94) {
                 $data[] = '<option value="222">GE DEOLALI - MES</option>';
@@ -4572,6 +7300,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="225">GE (S) AHMEDNAGAR - MES</option>';
             } elseif ($value == 95) {
                 $data[] = '<option value="226">GE (CENTRAL) KIRKEE - MES</option>';
+                $data[] = '<option value="345">GE (CME) KIRKEE - MES</option>';
                 $data[] = '<option value="227">GE MH AND RANGE HILLS - MES</option>';
             } elseif ($value == 96) {
                 $data[] = '<option value="228">GE (C) PUNE - MES</option>';
@@ -4581,8 +7310,10 @@ class SiteController extends Controller {
             } elseif ($value == 97) {
                 $data[] = '<option value="232">GE(AF) BHUJ - MES</option>';
                 $data[] = '<option value="233">GE (AF) JAMNAGAR - MES</option>';
+                $data[] = '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
             } elseif ($value == 98) {
                 $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
+                $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
             } elseif ($value == 99) {
                 $data[] = '<option value="233">GE (AF) Phalodi - MES</option>';
             } elseif ($value == 100) {
@@ -4640,21 +7371,26 @@ class SiteController extends Controller {
             } elseif ($value == 117) {
                 $data[] = '<option value="271">GE (AF) North Palam-MES</option>';
                 $data[] = '<option value="272">GE(AF) South Palam-MES</option>';
+                $data[] = '<option value="348">GE (P)(AF) South Palam-MES</option>';
                 $data[] = '<option value="273">GE (AF) Subroto Park-MES</option>';
             } elseif ($value == 118) {
                 $data[] = '<option value="274">GE (N) AMBALA - MES</option>';
                 $data[] = '<option value="275">GE (P) Ambala - MES</option>';
                 $data[] = '<option value="276">GE (U) AMBALA - MES</option>';
+                $data[] = '<option value="349">GE (S) AMBALA - MES</option>';
             } elseif ($value == 119) {
                 $data[] = '<option value="277">GE CHANDIGARH - MES</option>';
                 $data[] = '<option value="278">GE CHANDIMANDIR - MES</option>';
                 $data[] = '<option value="279">GE (P) CHANDIMANDIR - MES</option>';
+                $data[] = '<option value="350">GE (U) CHANDIMANDIR - MES</option>';
             } elseif ($value == 120) {
                 $data[] = '<option value="280">GE (P) DAPPAR - MES</option>';
                 $data[] = '<option value="281">GE (S) PATIALA - MES</option>';
+                $data[] = '<option value="351">GE (N) PATIALA - MES</option>';
             } elseif ($value == 121) {
                 $data[] = '<option value="282">GE 863 EWS - MES</option>';
                 $data[] = '<option value="283">GE JUTOGH - MES</option>';
+                $data[] = '<option value="352">GE KASAULI - MES</option>';
             } elseif ($value == 122) {
                 $data[] = '<option value="284">GE (CENTRAL) DELHI CANTT-MES</option>';
                 $data[] = '<option value="285">GE (EAST) DELHI CANTT-MES</option>';
@@ -4665,8 +7401,11 @@ class SiteController extends Controller {
                 $data[] = '<option value="289">GE E/M (RR) HOSPITAL DELHI CNATT-MES</option>';
                 $data[] = '<option value="290">GE NEW DELHI-MES</option>';
                 $data[] = '<option value="291">GE (S) NEW DELHI-MES</option>';
+                $data[] = '<option value="353">GE (P) WEST DELHI-MES</option>';
             } elseif ($value == 124) {
+                $data[] = '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
                 $data[] = '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
+                $data[] = '<option value="355">GE(U) P and M DELHI CNATT-MES</option>';
                 $data[] = '<option value="293">GE(U)WATER SUPPLY DELHI CANTT-MES</option>';
             } elseif ($value == 127) {
                 $data[] = '<option value="294">GE AMRITSAR - MES</option>';
@@ -4743,6 +7482,11 @@ class SiteController extends Controller {
             $data[] = '<option value="5">Lifts</option>';
             $data[] = '<option value="6">Cranes</option>';
             $data[] = '<option value="7">DG Set</option>';
+        } elseif ($value == 2) {
+            $data[] = '<option value="14">Cement</option>';
+            $data[] = '<option value="15">Reinforcement Steel</option>';
+            $data[] = '<option value="16">Structural Steel</option>';
+            $data[] = '<option value="17">Non Structural Steel</option>';
         } else {
             $data[] = '<option value="8">Building</option>';
             $data[] = '<option value="9">Road</option>';
@@ -4939,6 +7683,19 @@ class SiteController extends Controller {
         echo $finaldata;
     }
 
+    public function actionTenderone($value) {
+        switch ($value) {
+            case "1":
+                return "E/M";
+                break;
+            case "2":
+                return "Civil";
+                break;
+            default:
+                return "";
+        }
+    }
+
     public function actionTendertwo($value) {
         switch ($value) {
             case "1":
@@ -4976,6 +7733,18 @@ class SiteController extends Controller {
                 break;
             case "12":
                 return "Plumbing";
+                break;
+            case "14":
+                return "Cement";
+                break;
+            case "15":
+                return "Reinforcement Steel";
+                break;
+            case "16":
+                return "Structural Steel";
+                break;
+            case "17":
+                return "Non Structural Steel";
                 break;
             default:
                 return "";
@@ -5126,6 +7895,9 @@ class SiteController extends Controller {
             case "3":
                 return "User";
                 break;
+            case "4":
+                return "Sales";
+                break;
             default:
                 return "";
         }
@@ -5135,8 +7907,8 @@ class SiteController extends Controller {
         $user = Yii::$app->user->identity;
         require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
         try {
-            // You may need to change the region. It will say in the URL when the bucket is open
-            // and on creation.
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
             $s3 = S3Client::factory(
                             array(
                                 'credentials' => array(
@@ -5148,8 +7920,8 @@ class SiteController extends Controller {
                             )
             );
         } catch (Exception $e) {
-            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
-            // return a json object.
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
             die("Error: " . $e->getMessage());
         }
 
@@ -5161,7 +7933,7 @@ class SiteController extends Controller {
         $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
 
         try {
-            // Uploaded:
+// Uploaded:
             $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
             $fileupload = $s3->putObject(
                     array(
@@ -5202,8 +7974,8 @@ class SiteController extends Controller {
         $user = Yii::$app->user->identity;
         require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
         try {
-            // You may need to change the region. It will say in the URL when the bucket is open
-            // and on creation.
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
             $s3 = S3Client::factory(
                             array(
                                 'credentials' => array(
@@ -5215,8 +7987,8 @@ class SiteController extends Controller {
                             )
             );
         } catch (Exception $e) {
-            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
-            // return a json object.
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
             die("Error: " . $e->getMessage());
         }
 
@@ -5234,7 +8006,7 @@ class SiteController extends Controller {
         $pathInS3two = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNametwo;
 
         try {
-            // Uploaded:
+// Uploaded:
             $fileone = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_one;
             $filetwo = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_two;
             $fileuploadone = $s3->putObject(
@@ -5279,7 +8051,7 @@ class SiteController extends Controller {
                 } else {
                     Yii::$app->session->setFlash('error', "Financial Bid Not Opened");
                 }
-                return $this->redirect(array('site/tenders'));
+                return $this->redirect(array('site/' . $this->action->id . ''));
             }
         } catch (S3Exception $e) {
             die('Error:' . $e->getMessage());
@@ -5315,8 +8087,8 @@ class SiteController extends Controller {
 
         require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
         try {
-            // You may need to change the region. It will say in the URL when the bucket is open
-            // and on creation.
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
             $s3 = S3Client::factory(
                             array(
                                 'credentials' => array(
@@ -5328,40 +8100,88 @@ class SiteController extends Controller {
                             )
             );
         } catch (Exception $e) {
-            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
-            // return a json object.
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
             die("Error: " . $e->getMessage());
         }
 
-        $file_name = time() . $_FILES['fileone']['name'];
-        $file_tmp = $_FILES['fileone']['tmp_name'];
-        move_uploaded_file($file_tmp, "assets/files/" . $file_name);
+        $file_name_one = time() . $_FILES['fileone']['name'];
+        $file_name_two = time() . $_FILES['filetwo']['name'];
+        $file_name_three = time() . $_FILES['filethree']['name'];
+        $file_tmp_one = $_FILES['fileone']['tmp_name'];
+        $file_tmp_two = $_FILES['filetwo']['tmp_name'];
+        $file_tmp_three = $_FILES['filethree']['tmp_name'];
+        move_uploaded_file($file_tmp_one, "assets/files/" . $file_name_one);
+        move_uploaded_file($file_tmp_two, "assets/files/" . $file_name_two);
+        move_uploaded_file($file_tmp_three, "assets/files/" . $file_name_three);
 
-        $keyName = 'files/' . $file_name;
-        $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
+        $keyNameone = 'files/' . $file_name_one;
+        $keyNametwo = 'files/' . $file_name_two;
+        $keyNamethree = 'files/' . $file_name_three;
+
+        $pathInS3one = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNameone;
+        $pathInS3two = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNametwo;
+        $pathInS3three = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNamethree;
 
         try {
-            // Uploaded:
-            $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
-            $fileupload = $s3->putObject(
+// Uploaded:
+            $fileone = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_one;
+            $filetwo = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_two;
+            $filethree = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_three;
+            $fileuploadone = $s3->putObject(
                     array(
                         'Bucket' => Yii::$app->params['bucketName'],
-                        'Key' => $keyName,
-                        'SourceFile' => $file,
+                        'Key' => $keyNameone,
+                        'SourceFile' => $fileone,
                         'ACL' => 'public-read-write'
                     )
             );
-            if ($fileupload) {
-                unlink('assets/files/' . $file_name);
-                $data = ['tender_id' => $_POST['tid'], 'type' => 3, 'file' => $pathInS3, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+            $fileuploadtwo = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyNametwo,
+                        'SourceFile' => $filetwo,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            $fileuploadthree = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyNamethree,
+                        'SourceFile' => $filethree,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            if ($fileuploadone) {
+                unlink('assets/files/' . $file_name_one);
+                $dataone = ['tender_id' => $_POST['tid'], 'type' => 3, 'file' => $pathInS3one, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
                 $querydata = \Yii::$app
                         ->db
                         ->createCommand()
-                        ->insert('tenderfiles', $data)
+                        ->insert('tenderfiles', $dataone)
+                        ->execute();
+            }
+            if ($fileuploadtwo) {
+                unlink('assets/files/' . $file_name_two);
+                $datatwo = ['tender_id' => $_POST['tid'], 'type' => 2, 'file' => $pathInS3two, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenderfiles', $datatwo)
+                        ->execute();
+            }
+            if ($fileuploadthree) {
+                unlink('assets/files/' . $file_name_three);
+                $datathree = ['tender_id' => $_POST['tid'], 'type' => 3, 'file' => $pathInS3three, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenderfiles', $datathree)
                         ->execute();
                 if ($querydata) {
                     $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
                     $tender->aoc_status = 1;
+                    $tender->qvalue = @$_POST['qvalue'];
                     $tender->aoc_date = @$_POST['aoc_date'];
                     $tender->contractor = $lid;
                     $tender->save();

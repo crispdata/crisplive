@@ -28,7 +28,7 @@ class AppAsset extends AssetBundle {
         'frontend/web/assets/js/plagin-js/plagin.js',
         'frontend/web/assets/plugins/sweetalert/sweetalert.min.js',
         'frontend/web/assets/plugins/select2/js/select2.min.js',
-        'frontend/web/assets/js/custom-scripts.js?v=87',
+        'frontend/web/assets/js/custom-scripts.js?v=90',
         
     ];
     public $depends = [

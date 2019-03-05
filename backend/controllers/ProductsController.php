@@ -39,7 +39,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'getaccessories', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'getaccessories','updatedetails','updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -499,6 +499,38 @@ class ProductsController extends Controller {
 
         echo json_encode(['alltypes' => $alltypes]);
         die;
+    }
+    
+    public function actionUpdatedetails() {
+        $tenders = \common\models\ItemDetails::find()->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => 504])->all();
+        echo "<pre/>";
+        print_r($tenders);
+        die();
+        if($tenders){
+            foreach($tenders as $_ten){
+                $arr = explode(',',$_ten->make);
+                $a = array_search("26",$arr);
+                $arr[$a] = '21';    
+                $narr = array_unique($arr);
+                $_ten->make = implode(',',$narr);
+                $_ten->save();
+            }
+        }
+       
+    }
+    
+    public function actionUpdatedetailsitems() {
+        $tenders = \common\models\ItemDetails::find()->where(['typefitting'=>1])->all();
+        echo "<pre/>";
+        print_r($tenders);
+        die();
+        if($tenders){
+            foreach($tenders as $_ten){
+                $_ten->typefitting = 6;
+                $_ten->save();
+            }
+        }
+       
     }
 
 }

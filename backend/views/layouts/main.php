@@ -22,7 +22,7 @@ $image_url = Yii::$app->params['IMAGE_URL'];
     <meta charset="<?= Yii::$app->charset ?>">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-     <link rel="shortcut icon" href="<?= $image_url ?>/images/favicon.ico" /> 
+     <link rel="shortcut icon" href="<?= $image_url ?>images/favicon.ico" /> 
     <?= Html::csrfMetaTags() ?>
     <title><?= Html::encode($this->title) ?></title>
     <?php $this->head() ?>
@@ -35,7 +35,7 @@ $image_url = Yii::$app->params['IMAGE_URL'];
 		<?php //include('sidebar.php'); ?>
 		<?php include('header.php'); ?>
 		<?= $content; ?>
-		<?php include ('footer.php'); ?>
+		<?php //include ('footer.php'); ?>
 	<?php } ?>
 
 <?php $this->endBody() ?>

@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Manage Sizes';
-
+use yii\helpers\Url;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
@@ -152,7 +152,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $size->size ?></td>
                                             <td>
 
-                                                <a href="<?= $baseURL ?>site/create-size?id=<?= $size->id; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                                <a href="<?= Url::to(['site/create-size', 'id' => $size->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
 
                                                 <a href="#modal<?= $size->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
@@ -168,7 +168,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="modal-footer">
                                             <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= $baseURL ?>site/delete-size?id=<?= $size->id; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                            <a href="<?= Url::to(['site/delete-size', 'id' => $size->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
 

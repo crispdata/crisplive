@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Manage Fittings';
-
+use yii\helpers\Url;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
@@ -84,7 +84,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $fit->text ?></td>
                                             <td>
 
-                                                <a href="<?= $baseURL ?>site/create-fitting?id=<?= $fit->id; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                                <a href="<?= Url::to(['site/create-fitting', 'id' => $fit->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
 
                                                 <a href="#modal<?= $fit->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
@@ -100,7 +100,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="modal-footer">
                                             <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= $baseURL ?>site/delete-fitting?id=<?= $fit->id; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                            <a href="<?= Url::to(['site/delete-fitting', 'id' => $fit->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
 

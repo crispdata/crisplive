@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 use backend\controllers\SiteController;
-
+use yii\helpers\Url;
 $this->title = 'All Dealers';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -76,7 +76,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $status = 'Inactive';
                                         $class = 'red';
                                     }
-                                   
+
                                     $city = Sitecontroller::actionAddress($user->city, 1);
                                     $state = Sitecontroller::actionAddress($user->state, 2);
                                     ?>
@@ -88,9 +88,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <td class = ""><?= $user->cperson ?></td>
                                         <td class = ""><?= $user->cnumber ?></td>
                                         <td class = ""><?= $user->cemail ?></td>
-                                        <td ><a href="<?= $baseURL ?>site/change-status-client?id=<?= $user->id; ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
+                                        <td ><a href="<?= Url::to(['site/change-status-client', 'id' => $user->id]) ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
                                         <td>
-                                            <a href="<?= $baseURL ?>site/edit-client?id=<?= $user->id; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                            <a href="<?= Url::to(['site/edit-client', 'id' => $user->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                             <a href="#modal<?= $user->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                             <?php if ($user->type == 3) { ?>
                                                 <a href="#modalfiles<?= $user->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Products</a>
@@ -105,18 +105,39 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                     <div class="modal-footer">
                                         <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                        <a href="<?= $baseURL ?>site/delete-client?id=<?= $user->id; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                        <a href="<?= Url::to(['site/delete-client', 'id' => $user->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                     </div>
                                 </div>
                                 <div id="modalfiles<?= $user->id; ?>" class="modal">
                                     <div class="modal-content">
                                         <h4>Products</h4>
-                                        <b>Cables</b>
-                                        <p><?= Sitecontroller::actionProducts($user->cables,1) ?></p>
-                                        <b>Lighting</b>
-                                        <p><?= Sitecontroller::actionProducts($user->lighting,2) ?></p>
+                                        <?php if ($user->cables) { ?>
+                                            <b>Cables</b>
+                                            <p><?= Sitecontroller::actionProducts($user->cables, 1) ?></p>
+                                        <?php } ?>
+                                        <?php if ($user->lighting) { ?>
+                                            <b>Lighting</b>
+                                            <p><?= Sitecontroller::actionProducts($user->lighting, 2) ?></p>
+                                        <?php } ?>
+                                        <?php if ($user->cements) { ?>
+                                            <b>Cement</b>
+                                            <p><?= Sitecontroller::actionProducts($user->cements, 14) ?></p>
+                                        <?php } ?>
+                                        <?php if ($user->rsteel) { ?>
+                                            <b>Reinforcement Steel</b>
+                                            <p><?= Sitecontroller::actionProducts($user->rsteel, 15) ?></p>
+                                        <?php } ?>
+                                        <?php if ($user->ssteel) { ?>
+                                            <b>Structural Steel</b>
+                                            <p><?= Sitecontroller::actionProducts($user->ssteel, 16) ?></p>
+                                        <?php } ?>
+                                        <?php if ($user->nsteel) { ?>
+                                            <b>Non Structural Steel</b>
+                                            <p><?= Sitecontroller::actionProducts($user->nsteel, 17) ?></p>
+                                        <?php } ?>
+
                                     </div>
-                                   
+
                                 </div>
 
                                 <?php

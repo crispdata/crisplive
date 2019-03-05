@@ -140,6 +140,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <option value=''>Select Product</option>
                                         <option value='1'>Cables</option>
                                         <option value='2'>Lighting</option>
+                                        <option value='3'>Cement</option>
+                                        <option value='4'>Reinforcement Steel</option>
+                                        <option value='5'>Structural Steel</option>
+                                        <option value='6'>Non Structural Steel</option>
                                     </select>
                                 </div>
                                 <div class="input-field col s12" id="cablesdiv" style="display: none;">
@@ -172,6 +176,78 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     echo "selected";
                                                 }
                                                 ?>><?= $light_->make ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                    </select>
+                                </div>
+                                <div class="col-xs-12" id="cementdiv" style="display: none;">
+                                    <select name='cement[]' class="cementmakes browser-default" id="cement" multiple>
+                                        <?php
+                                        $selectedcements = explode(',', $client->cements);
+                                        if (@$cements) {
+                                            foreach ($cements as $cement_) {
+                                                ?>
+                                                <option value="<?= $cement_->id ?>" <?php
+                                                if (in_array($cement_->id, $selectedcements)) {
+                                                    echo "selected";
+                                                }
+                                                ?>><?= $cement_->make ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                    </select>
+                                </div>
+                                <div class="col-xs-12" id="rsteeldiv" style="display: none;">
+                                    <select name='rsteel[]' class="rmakes browser-default" id="rsteel" multiple>
+                                        <?php
+                                        $selectedrsteel = explode(',', $client->rsteel);
+                                        if (@$rsteel) {
+                                            foreach ($rsteel as $rsteel_) {
+                                                ?>
+                                                <option value="<?= $rsteel_->id ?>" <?php
+                                                if (in_array($rsteel_->id, $selectedrsteel)) {
+                                                    echo "selected";
+                                                }
+                                                ?>><?= $rsteel_->make ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                    </select>
+                                </div>
+                                <div class="col-xs-12" id="ssteeldiv" style="display: none;">
+                                    <select name='ssteel[]' class="smakes browser-default" id="ssteel" multiple>
+                                        <?php
+                                        $selectedssteel = explode(',', $client->ssteel);
+                                        if (@$ssteel) {
+                                            foreach ($ssteel as $ssteel_) {
+                                                ?>
+                                                <option value="<?= $ssteel_->id ?>" <?php
+                                                if (in_array($ssteel_->id, $selectedssteel)) {
+                                                    echo "selected";
+                                                }
+                                                ?>><?= $ssteel_->make ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                    </select>
+                                </div>
+                                <div class="col-xs-12" id="nsteeldiv" style="display: none;">
+                                    <select name='nsteel[]' class="nmakes browser-default" id="nsteel" multiple>
+                                        <?php
+                                        $selectednsteel = explode(',', $client->nsteel);
+                                        if (@$nsteel) {
+                                            foreach ($nsteel as $nsteel_) {
+                                                ?>
+                                                <option value="<?= $nsteel_->id ?>" <?php
+                                                if (in_array($nsteel_->id, $selectednsteel)) {
+                                                    echo "selected";
+                                                }
+                                                ?>><?= $nsteel_->make ?></option>
                                                         <?php
                                                     }
                                                 }

@@ -378,7 +378,7 @@ $(document).ready(function () {
     });
 
 
-    $('.ddatepicker').pickadate({
+    /*$('.ddatepicker').pickadate({
         format: 'dd-mm-yyyy',
         selectMonths: true, // Creates a dropdown to control month
         selectYears: 15, // Creates a dropdown of 15 years to control year
@@ -395,9 +395,9 @@ $(document).ready(function () {
             $('.ddatepicker').pickadate('picker').set('min', chosen_date);
             //return false;
         }
-    });
+    });*/
 
-    $('.bsdatepicker').pickadate({
+    /*$('.bsdatepicker').pickadate({
         format: 'dd-mm-yyyy',
         selectMonths: true, // Creates a dropdown to control month
         selectYears: 15, // Creates a dropdown of 15 years to control year
@@ -414,27 +414,26 @@ $(document).ready(function () {
             $('.bsdatepicker').pickadate('picker').set('min', chosen_date);
             //return false;
         }
-    });
+    });*/
+    
+    $('.datepicker').datepicker();
+    
     $('.bedatepicker').pickadate({
-        format: 'dd-mm-yyyy',
+        format: 'yyyy-mm-dd',
         selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
+        selectYears: 315, // Creates a dropdown of 15 years to control year
         onSet: function (ele) {
             if (ele.select) {
                 var chosen_date = $('.bedatepicker').val();
                 $('.bodatepicker').pickadate('picker').set('min', chosen_date);
-                $('.bsdatepicker').pickadate('picker').set('max', chosen_date);
+                //$('.bsdatepicker').pickadate('picker').set('max', chosen_date);
                 this.close();
             }
-        },
-        onStart: function () {
-            var chosen_date = $('.bsdatepicker').val();
-            $('.bedatepicker').pickadate('picker').set('min', chosen_date);
-            //return false;
         }
     });
+    
     $('.bodatepicker').pickadate({
-        format: 'dd-mm-yyyy',
+        format: 'yyyy-mm-dd',
         selectMonths: true, // Creates a dropdown to control month
         selectYears: 15, // Creates a dropdown of 15 years to control year
         onSet: function (ele) {

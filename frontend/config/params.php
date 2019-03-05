@@ -6,6 +6,8 @@ return [
     'ROOT_URL' => 'https://crispdata.co.in/frontend/',
     'IMAGE_URL' => 'https://crispdata.co.in/frontend/web/',
     'AJAX_URL' => 'https://crispdata.co.in/index.php/',
+    'IAM_KEY' => '',
+    'IAM_SECRET' => '',
     'googleAnalytics' => [
         'developerKey' => 'AIzaSyAZo9TShqXlMfP25AkFCIGlGE-RPjcYRig', // Public key
         'clientId' => '663066723913-90ai1qfjt029a8g3mu9d82v2tim9nk0s.apps.googleusercontent.com', // Client ID
