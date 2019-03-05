@@ -1,0 +1,390 @@
+<?php
+/* @var $this yii\web\View */
+
+$this->title = 'Dashboard';
+$user = Yii::$app->user->identity;
+$baseURL = Yii::$app->params['BASE_URL'];
+$imageURL = Yii::$app->params['IMAGE_URL'];
+?>
+<style>
+    .add-contact{    float: right;
+                     margin-right: 15px;}    
+    .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled{border-color: unset;}
+    .select-wrapper.validate.required.materialSelect.dashmake.initialized {
+        float: left;
+    }
+    .select-wrapper.validate.required.materialSelecttype.lights.initialized {
+        float: left;
+    }
+    .select-wrapper.validate.required.materialSelecttypecapacity.lights.initialized {
+        float: left;
+    }
+    .card {
+        float: left;
+        width: 100%;
+    }
+    th {
+        font-size: 20px;
+    }
+    td.leftside {
+        font-size: 18px;
+        padding-left: 45px;
+    }
+    .cables{float:left; width:60%;}
+    .boxzz{font-size:18px;}
+    .belowgraphs{float: left;width:100%}
+    svg > g > g:last-child { pointer-events: none }
+    #total img,#quantity img,.boxzz img,.upper img{width:20px;}
+</style>
+<script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+<script type="text/javascript">
+    google.charts.load('visualization', {'packages': ['corechart']});
+    //google.charts.setOnLoadCallback(drawChart);
+
+    function drawPieChart(labels, values, id) {
+
+        var years = labels;
+        var sales = values;
+
+        var data = new google.visualization.DataTable();
+        data.addColumn('string', 'years');
+        data.addColumn('number', 'sales');
+
+        for (i = 0; i < years.length; i++)
+            data.addRow([years[i], sales[i]]);
+
+
+        var options = {
+            legend: 'none',
+            displayExactValues: true,
+            'showRowNumber': false,
+            'allowHtml': true,
+            is3D: true,
+            chartArea: {
+                left: "3%",
+                top: "3%",
+                height: "94%",
+                width: "94%"
+            },
+            slices: {1: {offset: 0.2},
+                     0: {offset: 0},
+            },
+        };
+
+// Create and draw the visualization.
+        new google.visualization.PieChart(document.getElementById(id)).
+                draw(data, options);
+
+    }
+
+
+</script>
+<main class="mn-inner">
+    <div class="row">
+        <div class="col s6">
+            <div class="page-title">Dashboard</div>
+        </div>
+
+
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
+            <script>
+                swal({
+                    title: "<?= Yii::$app->session->getFlash('success'); ?>",
+                    timer: 2000,
+                    type: "success",
+                    showConfirmButton: false
+                });
+                //sweetAlert('Success', '<?= Yii::$app->session->getFlash('success'); ?>', 'success');
+            </script>
+        <?php endif; ?>
+
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
+            <div class="alert alert-danger">
+                <?= Yii::$app->session->getFlash('error'); ?>
+            </div>
+        <?php endif; ?>
+
+
+        <div class="col s12 m12 l12">
+            <div class="card">
+                <div class="card-content">
+
+                    <?php if ($user->group_id == 4) { ?>
+
+                        <form id="product-types" method = "post" action = "<?= $baseURL ?>">
+                            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                            <label>Select Product</label>
+                            <select class="validate required materialSelect" id="product" name='type'>
+                                <option value="" disabled selected>Select Product</option>
+                                <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
+                                <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
+                            </select>
+                        </form>
+
+                        <?php if (isset($details) && count($details)) { ?>
+
+                            <select class="validate required materialSelect" name="command" id="command" required="">
+                                <option value="">Select Command</option>
+                                <option value="13" selected <?php
+                                if (@$_POST['command'] == 13) {
+                                    echo "selected";
+                                }
+                                ?>>ALL COMMANDS</option>
+                                <option value="1" <?php
+                                if (@$_POST['command'] == 1) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
+                                <option value="2" <?php
+                                if (@$_POST['command'] == 2) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
+                                <option value="3" <?php
+                                if (@$_POST['command'] == 3) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
+                                <option value="4" <?php
+                                if (@$_POST['command'] == 4) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
+                                <option value="5" <?php
+                                if (@$_POST['command'] == 5) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
+                                <option value="6" <?php
+                                if (@$_POST['command'] == 6) {
+                                    echo "selected";
+                                }
+                                ?>>CENTRAL COMMAND</option>
+                                <option value="7" <?php
+                                if (@$_POST['command'] == 7) {
+                                    echo "selected";
+                                }
+                                ?>>EASTERN COMMAND</option>
+                                <option value="8" <?php
+                                if (@$_POST['command'] == 8) {
+                                    echo "selected";
+                                }
+                                ?>>NORTHERN COMMAND</option>
+                                <option value="9" <?php
+                                if (@$_POST['command'] == 9) {
+                                    echo "selected";
+                                }
+                                ?>>SOUTHERN COMMAND</option>
+                                <option value="10" <?php
+                                if (@$_POST['command'] == 10) {
+                                    echo "selected";
+                                }
+                                ?>>SOUTH WESTERN COMMAND</option>
+                                <option value="11" <?php
+                                if (@$_POST['command'] == 11) {
+                                    echo "selected";
+                                }
+                                ?>>WESTERN COMMAND</option>
+                                <option value="12" <?php
+                                if (@$_POST['command'] == 12) {
+                                    echo "selected";
+                                }
+                                ?>>DGNP MUMBAI - MES</option>
+
+                                <!--option value="2">B/R</option-->
+                            </select>
+
+                            <table id = "current-projects" class="responsive-table">
+                                <thead>
+                                    <tr>
+                                        <th data-field="name"></th>
+                                        <th data-field="name">Total Tenders</th>
+                                        <th data-field="name"><?= $head ?></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contacts_list">
+                                    <?php
+                                    if (@$details) {
+                                        $i = 0;
+                                        foreach ($details as $key => $_log) {
+                                            ?>
+                                            <tr>
+                                                <td class = "leftside"><?= $_log['title']; ?></td>
+                                                <td class = "upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></td>
+                                                <td class = "upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></td>
+
+                                            </tr>
+
+
+                                            <?php
+                                            $i++;
+                                        }
+                                    }
+                                    if (@$_POST['type'] == 1) {
+                                        $unit = 'RM';
+                                    } else {
+                                        $unit = 'NOS';
+                                    }
+                                    ?>
+                                    <tr>
+                                        <td class = "leftside"> <select class="validate required materialSelect dashmake" id="dashmake" name='make'>
+                                                <option value="" disabled selected>Select Make</option>
+                                                <?php
+                                                if (isset($makes) && count($makes)) {
+                                                    foreach ($makes as $_make) {
+                                                        ?>
+                                                        <option value="<?= $_make->id ?>"><?= $_make->make ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                            </select></td>
+                                        <td class = "leftside" id="total">0</td>
+                                        <td class = "leftside" id="quantity">0 <?= $unit ?></td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div id="piechart" style="width: 100%; height: 300px;margin-top:-30px;display:none;"></div>
+                            <table id = "cable-size" class="responsive-table" style="display: none;">
+                                <thead>
+                                    <tr>
+                                        <th data-field="0" width="200px">Type of Cables</th>
+                                        <th data-field="1"><select class="validate required materialSelect cables" data-field="1" id="typeone" name='typeone'>
+                                                <option value="" disabled>Select LT/HT</option>
+                                                <option value="1" >LT</option>
+                                                <option value="2" >HT</option>
+                                            </select></th>
+                                        <th data-field="2"><select class="validate required materialSelect cables" data-field="2" id="typetwo" name='typetwo'>
+                                                <option value="" disabled>Select Type</option>
+                                                <option value="1" >Copper</option>
+                                                <option value="2" >Aluminium</option>
+                                            </select></th>
+                                        <th data-field="3"><select class="validate required materialSelect cables" data-field="3" id="typethree" name='typethree'>
+                                                <option value="" disabled>Select Type</option>
+                                                <option value="1" >Armoured</option>
+                                                <option value="2" >Unarmoured</option>
+                                            </select></th>
+                                        <th data-field="4"><select class="validate required materialSelectsize cables" data-field="4" id="typefour" name='typefour'>
+                                                <?php
+                                                if (isset($sizes) && count($sizes)) {
+                                                    foreach ($sizes as $_size) {
+                                                        ?>
+                                                        <option value="<?= $_size->id ?>"><?= $_size->size ?></option>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                            </select></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="sizes-list">
+
+                                    <tr>
+                                        <td class = "boxzz" id="a1"></td>
+                                        <td class = "boxzz" id="a2"></td>
+                                        <td class = "boxzz" id="a3"></td>
+                                        <td class = "boxzz" id="a4"></td>
+                                        <td class = "boxzz" id="a5"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class = "boxzz" id="b1"></td>
+                                        <td class = "boxzz" id="b2"></td>
+                                        <td class = "boxzz" id="b3"></td>
+                                        <td class = "boxzz" id="b4"></td>
+                                        <td class = "boxzz" id="b5"></td>
+
+                                    </tr>
+                                    <tr>
+                                        <td class = "boxzz" id="c1"></td>
+                                        <td class = "boxzz" id="c2"></td>
+                                        <td class = "boxzz" id="c3"></td>
+                                        <td class = "boxzz" id="c4"></td>
+                                        <td class = "boxzz" id="c5"></td>
+
+                                    </tr>
+
+
+                                </tbody>
+                            </table>
+                            <div class="belowgraphs">
+                                <div class="upper" id="p2" style="width: 22%; height: 200px;float:left;margin-left:110px;display:none;"></div>
+                                <div class="upper" id="p3" style="width: 22%; height: 200px;float:left;display:none;"></div>
+                                <div class="upper" id="p4" style="width: 22%; height: 200px;float:left;display:none;"></div>
+                                <div class="upper" id="p5" style="width: 22%; height: 200px;float:left;display:none;"></div>
+                            </div>
+                            <table id = "light-type" class="responsive-table" style="display:none;">
+                                <thead>
+                                    <tr>
+                                        <th data-field="0">Type of Fittings</th>
+                                        <th data-field="1">Archived</th>
+                                        <th data-field="2" id="lighthead"></th>
+                                        <th data-field="3" id="lightheadtwo"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="types-list">
+
+                                    <tr>
+                                        <td class = "" id="d1"><select class="validate required materialSelecttype lights" data-field="5" id="typelights" name='typelights'>
+
+                                            </select></td>
+                                        <td class = "boxzz" id="d2"></td>
+                                        <td class = "boxzz" id="d3"></td>
+                                        <td class = "boxzz" id="d4"></td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+                            <div class="belowgraphs">
+                                <div class="upper" id="l2" style="width: 22%; height: 200px;float:left;margin-left:450px;display:none;"></div>
+                            </div>
+                            <table id = "light-capacity" class="responsive-table" style="display:none;">
+                                <thead>
+                                    <tr>
+                                        <th data-field="0">Capacity of Fittings</th>
+                                        <th data-field="1">Total</th>
+                                        <th data-field="2" id="capacityhead"></th>
+                                    </tr>
+                                </thead>
+                                <tbody id="types-list">
+
+                                    <tr>
+                                        <td class = "" id="e1"><select class="validate required materialSelecttypecapacity lights" data-field="6" id="capacitylights" name='capacitylights'>
+
+                                            </select></td>
+                                        <td class = "boxzz" id="e2"></td>
+                                        <td class = "boxzz" id="e3"></td>
+
+                                    </tr>
+
+                                </tbody>
+                            </table>
+
+                            <?php
+                        }
+                    } else {
+                        ?>
+                        <div class="row">
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=1">ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=2">ADG (DESIGN and CONSULTANCY) PUNE - MES</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=3">ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=4">ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=5">ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=6">CENTRAL COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=7">EASTERN COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=8">NORTHERN COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=9">SOUTHERN COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=10">SOUTH WESTERN COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=11">WESTERN COMMAND</a>
+                            <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= $baseURL ?>site/approvetenders?c=12">DGNP MUMBAI - MES</a>
+
+                        </div>
+                    <?php } ?>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
