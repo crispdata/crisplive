@@ -2,9 +2,11 @@
 
 return [
     'adminEmail' => 'admin@example.com',
-    'BASE_URL' => 'https://crispdata.co.in/admin/index.php/',
-    'ROOT_URL' => 'https://crispdata.co.in/admin/index.php/',
-    'IMAGE_URL' => 'https://crispdata.co.in/admin/',
+    'BASE_URL' => 'https://admin.crispdata.co.in/',
+    'ROOT_URL' => 'https://admin.crispdata.co.in/',
+    'IMAGE_URL' => 'https://admin.crispdata.co.in/',
+    'FILE_URL' => 'https://crispdata.co.in/backend/',
+    'URL' => 'https://crispdata.co.in/',
     'bucketName' => 'aadhdata',
     'IAM_KEY' => '',
-    'IAM_SECRET' => '',];
+    'IAM_SECRET' => ''];
