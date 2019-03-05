@@ -22,6 +22,8 @@ class Tender extends ActiveRecord
     /**
      * {@inheritdoc}
      */
+    
+    
     public static function tableName()
     {
         return '{{%tenders}}';

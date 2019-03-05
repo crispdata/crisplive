@@ -4,11 +4,14 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=crispdata',
+            'dsn' => 'mysql:host=localhost;dbname=',
             'username' => 'root',
-            'password' => 'onlyican21<>',
+            'password' => '',
             'charset' => 'utf8',
-            'enableSchemaCache' => true,
+            'enableSchemaCache' => false,
+        ],
+        'assetManager' => [
+            'appendTimestamp' => true,
         ],
         'mail' => [
             'class' => 'yashop\ses\Mailer',
@@ -16,9 +19,6 @@ return [
             'access_key' => 'AKIAJOYFSXBHL7QCKZ4Q',
             'secret_key' => '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',
             'host' => 'email.us-east-1.amazonaws.com' // not required
-        ],
-        'cache' => [
-            'class' => 'yii\caching\FileCache',
         ],
         'awssdk' => [
             'class' => 'fedemotta\awssdk\AwsSdk',

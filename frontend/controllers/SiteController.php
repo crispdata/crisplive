@@ -73,13 +73,17 @@ class SiteController extends Controller {
      * @return mixed
      */
     public function actionIndex() {
-        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        //require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
         $addr = $_SERVER['REMOTE_ADDR'];
         $baseURL = Yii::$app->params['BASE_URL'];
 
         $states = \common\models\States::find()->where(['!=', 'name', ''])->andWhere(['country_id' => '101'])->all();
-        $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->all();
-        $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->all();
+        $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+        $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+        $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+        $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+        $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+        $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
         $online = $this->actionTotalOnline();
         $visitors = \common\models\Visitors::find()->where(['status' => 1])->count();
 
@@ -110,6 +114,10 @@ class SiteController extends Controller {
                     'states' => $states,
                     'cables' => $cables,
                     'lights' => $lights,
+                    'cements' => $cements,
+                    'rsteel' => $rsteel,
+                    'ssteel' => $ssteel,
+                    'nsteel' => $nsteel,
                     'visitor' => $visitors,
                     'online' => $online
         ]);
@@ -210,7 +218,7 @@ class SiteController extends Controller {
     public function actionRegister() {
         $data = $_REQUEST;
         if ($data['htype'] == 1 || $data['htype'] == 3) {
-            if ((isset($data['cables']) && count($data['cables']) != 0) || (isset($data['lighting']) && count($data['lighting']) != 0)) {
+            if ((isset($data['cables']) && count($data['cables']) != 0) || (isset($data['lighting']) && count($data['lighting']) != 0 ) || (isset($data['cement']) && count($data['cement']) != 0 ) || (isset($data['rsteel']) && count($data['rsteel']) != 0 ) || (isset($data['ssteel']) && count($data['ssteel']) != 0 ) || (isset($data['nsteel']) && count($data['nsteel']) != 0 )) {
                 if (@$data['terms'] == 1) {
                     $client = new \common\models\Clients();
                     $client->type = $data['htype'];
@@ -226,12 +234,25 @@ class SiteController extends Controller {
                     $client->cperson = $data['ctype'] . ' ' . $data['cperson'];
                     $client->cnumber = $data['cnumber'];
                     $client->phone = $data['phone'];
-                    $client->cemail = $data['cemail'];
+                    //$client->mails = $data['mails'];
+                    $client->cemail = $data['cemail'] . ',' . $data['mails'];
                     if (isset($data['cables']) && count($data['cables'])) {
                         $client->cables = implode(',', @$data['cables']);
                     }
                     if (isset($data['lighting']) && count($data['lighting'])) {
                         $client->lighting = implode(',', @$data['lighting']);
+                    }
+                    if (isset($data['cement']) && count($data['cement'])) {
+                        $client->cements = implode(',', @$data['cement']);
+                    }
+                    if (isset($data['rsteel']) && count($data['rsteel'])) {
+                        $client->rsteel = implode(',', @$data['rsteel']);
+                    }
+                    if (isset($data['ssteel']) && count($data['ssteel'])) {
+                        $client->ssteel = implode(',', @$data['ssteel']);
+                    }
+                    if (isset($data['nsteel']) && count($data['nsteel'])) {
+                        $client->nsteel = implode(',', @$data['nsteel']);
                     }
                     $client->createdon = date('Y-m-d h:i:s');
                     $client->status = 1;
@@ -242,6 +263,10 @@ class SiteController extends Controller {
                             $type = 'Manufacturer';
                             $selectedcables = 'No Cables Selected';
                             $selectedlights = 'No Lighting Selected';
+                            $selectedcements = 'No Cement Selected';
+                            $selectedrsteel = 'No Reinforcement Steel Selected';
+                            $selectedssteel = 'No Structural Steel Selected';
+                            $selectednsteel = 'No Non Structural Steel Selected';
                             if (isset($data['cables']) && count($data['cables'])) {
                                 $allcables = implode(',', @$data['cables']);
                                 $selectedcables = $this->actionProducts($allcables, 1);
@@ -250,10 +275,34 @@ class SiteController extends Controller {
                                 $alllights = implode(',', @$data['lighting']);
                                 $selectedlights = $this->actionProducts($alllights, 2);
                             }
+                            if (isset($data['cement']) && count($data['cement'])) {
+                                $allcement = implode(',', @$data['cement']);
+                                $selectedcements = $this->actionProducts($allcement, 14);
+                            }
+                            if (isset($data['rsteel']) && count($data['rsteel'])) {
+                                $allrsteel = implode(',', @$data['rsteel']);
+                                $selectedrsteel = $this->actionProducts($allrsteel, 15);
+                            }
+                            if (isset($data['ssteel']) && count($data['ssteel'])) {
+                                $allssteel = implode(',', @$data['ssteel']);
+                                $selectedssteel = $this->actionProducts($allssteel, 16);
+                            }
+                            if (isset($data['nsteel']) && count($data['nsteel'])) {
+                                $allnsteel = implode(',', @$data['nsteel']);
+                                $selectednsteel = $this->actionProducts($allnsteel, 17);
+                            }
                             $product = '<h4></h4><b>Cables</b>
                                         <p>' . $selectedcables . '</p>
                                         <b>Lighting</b>
-                                        <p>' . $selectedlights . '</p>';
+                                        <p>' . $selectedlights . '</p>
+                                        <b>Cement</b>
+                                        <p>' . $selectedcements . '</p>
+                                        <b>Reinforcement Steel</b>
+                                        <p>' . $selectedrsteel . '</p>
+                                        <b>Structural Steel</b>
+                                        <p>' . $selectedssteel . '</p>
+                                        <b>Non Structural Steel</b>
+                                        <p>' . $selectednsteel . '</p>';
                         } elseif ($client->type == 2) {
                             $type = 'Contractor';
                             if ($client->contracttype == 1) {
@@ -271,6 +320,10 @@ class SiteController extends Controller {
                             $type = 'Dealer';
                             $selectedcables = 'No Cables Selected';
                             $selectedlights = 'No Lighting Selected';
+                            $selectedcements = 'No Cement Selected';
+                            $selectedrsteel = 'No Reinforcement Steel Selected';
+                            $selectedssteel = 'No Structural Steel Selected';
+                            $selectednsteel = 'No Non Structural Steel Selected';
                             if (isset($data['cables']) && count($data['cables'])) {
                                 $allcables = implode(',', @$data['cables']);
                                 $selectedcables = $this->actionProducts($allcables, 1);
@@ -279,18 +332,42 @@ class SiteController extends Controller {
                                 $alllights = implode(',', @$data['lighting']);
                                 $selectedlights = $this->actionProducts($alllights, 2);
                             }
+                            if (isset($data['cement']) && count($data['cement'])) {
+                                $allcement = implode(',', @$data['cement']);
+                                $selectedcements = $this->actionProducts($allcement, 14);
+                            }
+                            if (isset($data['rsteel']) && count($data['rsteel'])) {
+                                $allrsteel = implode(',', @$data['rsteel']);
+                                $selectedrsteel = $this->actionProducts($allrsteel, 15);
+                            }
+                            if (isset($data['ssteel']) && count($data['ssteel'])) {
+                                $allssteel = implode(',', @$data['ssteel']);
+                                $selectedssteel = $this->actionProducts($allssteel, 16);
+                            }
+                            if (isset($data['nsteel']) && count($data['nsteel'])) {
+                                $allnsteel = implode(',', @$data['nsteel']);
+                                $selectednsteel = $this->actionProducts($allnsteel, 17);
+                            }
                             $product = '<h4></h4><b>Cables</b>
                                         <p>' . $selectedcables . '</p>
                                         <b>Lighting</b>
-                                        <p>' . $selectedlights . '</p>';
+                                        <p>' . $selectedlights . '</p>
+                                        <b>Cement</b>
+                                        <p>' . $selectedcements . '</p>
+                                        <b>Reinforcement Steel</b>
+                                        <p>' . $selectedrsteel . '</p>
+                                        <b>Structural Steel</b>
+                                        <p>' . $selectedssteel . '</p>
+                                        <b>Non Structural Steel</b>
+                                        <p>' . $selectednsteel . '</p>';
                         } else {
                             $type = 'Supplier';
                         }
                         $city = $this->actionAddress($client->city, 1);
                         $state = $this->actionAddress($client->state, 2);
                         // Email will be send
-                        $to = "info@crispdata.co.in"; // Change with your email address
-                        //$to = "sajstyles21@gmail.com"; // Change with your email address
+                        //$to = "info@crispdata.co.in"; // Change with your email address
+                        $to = "sajstyles21@gmail.com"; // Change with your email address
                         $sub = "New Registration on Crispdata"; // You can define email subject
                         // HTML Elements for Email Body
                         $body = <<<EOD
@@ -350,12 +427,25 @@ EOD;
                 $client->cperson = $data['ctype'] . ' ' . $data['cperson'];
                 $client->cnumber = $data['cnumber'];
                 $client->phone = $data['phone'];
-                $client->cemail = $data['cemail'];
+                //$client->mails = $data['mails'];
+                $client->cemail = $data['cemail'] . ',' . $data['mails'];
                 if (isset($data['cables']) && count($data['cables'])) {
                     $client->cables = implode(',', @$data['cables']);
                 }
                 if (isset($data['lighting']) && count($data['lighting'])) {
                     $client->lighting = implode(',', @$data['lighting']);
+                }
+                if (isset($data['cement']) && count($data['cement'])) {
+                    $client->cements = implode(',', @$data['cement']);
+                }
+                if (isset($data['rsteel']) && count($data['rsteel'])) {
+                    $client->rsteel = implode(',', @$data['rsteel']);
+                }
+                if (isset($data['ssteel']) && count($data['ssteel'])) {
+                    $client->ssteel = implode(',', @$data['ssteel']);
+                }
+                if (isset($data['nsteel']) && count($data['nsteel'])) {
+                    $client->nsteel = implode(',', @$data['nsteel']);
                 }
                 $client->createdon = date('Y-m-d h:i:s');
                 $client->status = 1;
@@ -363,21 +453,7 @@ EOD;
                     $name = 'Crispdata';
                     $email = 'suraj@crispdata.co.in';
                     if ($client->type == 1) {
-                        $type = 'Manufacturer';
-                        $selectedcables = 'No Cables Selected';
-                        $selectedlights = 'No Lighting Selected';
-                        if (isset($data['cables']) && count($data['cables'])) {
-                            $allcables = implode(',', @$data['cables']);
-                            $selectedcables = $this->actionProducts($allcables, 1);
-                        }
-                        if (isset($data['lighting']) && count($data['lighting'])) {
-                            $alllights = implode(',', @$data['lighting']);
-                            $selectedlights = $this->actionProducts($alllights, 2);
-                        }
-                        $product = '<h4></h4><b>Cables</b>
-                                        <p>' . $selectedcables . '</p>
-                                        <b>Lighting</b>
-                                        <p>' . $selectedlights . '</p>';
+                        
                     } elseif ($client->type == 2) {
                         $type = 'Contractor';
                         if ($client->contracttype == 1) {
@@ -392,29 +468,15 @@ EOD;
                             $ctype = 'Ltd. Company';
                         }
                     } elseif ($client->type == 3) {
-                        $type = 'Dealer';
-                        $selectedcables = 'No Cables Selected';
-                        $selectedlights = 'No Lighting Selected';
-                        if (isset($data['cables']) && count($data['cables'])) {
-                            $allcables = implode(',', @$data['cables']);
-                            $selectedcables = $this->actionProducts($allcables, 1);
-                        }
-                        if (isset($data['lighting']) && count($data['lighting'])) {
-                            $alllights = implode(',', @$data['lighting']);
-                            $selectedlights = $this->actionProducts($alllights, 2);
-                        }
-                        $product = '<h4></h4><b>Cables</b>
-                                        <p>' . $selectedcables . '</p>
-                                        <b>Lighting</b>
-                                        <p>' . $selectedlights . '</p>';
+                        
                     } else {
                         $type = 'Supplier';
                     }
                     $city = $this->actionAddress($client->city, 1);
                     $state = $this->actionAddress($client->state, 2);
                     // Email will be send
-                    $to = "info@crispdata.co.in"; // Change with your email address
-                    //$to = "sajstyles21@gmail.com"; // Change with your email address
+                    //$to = "info@crispdata.co.in"; // Change with your email address
+                    $to = "sajstyles21@gmail.com"; // Change with your email address
                     $sub = "New Registration on Crispdata"; // You can define email subject
                     // HTML Elements for Email Body
                     $body = <<<EOD
@@ -435,11 +497,7 @@ EOD;
 	<strong>Mobile Number:</strong> $client->cnumber <br>
 	<strong>Email:</strong> <a href="mailto:$client->cemail?subject=feedback" "email me">$client->cemail</a> <br> <br>
 EOD;
-                    if ($client->type == 3) {
-                        $body .= <<<EOD
-                         <b>Products:</b> $product <br> 
-EOD;
-                    }
+
 //Must end on first column
 
                     $headers = "From: $name <$client->cemail>\r\n";
@@ -497,7 +555,7 @@ EOD;
             } else {
                 $fresult = 'No Cables Selected';
             }
-        } else {
+        } elseif ($type == 2) {
             if (@$data) {
                 $i = 1;
                 foreach ($data as $_data) {
@@ -512,6 +570,70 @@ EOD;
                 }
             } else {
                 $fresult = 'No Lighting Selected';
+            }
+        } elseif ($type == 14) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Cement Selected';
+            }
+        } elseif ($type == 15) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Reinforement Steel Selected';
+            }
+        } elseif ($type == 16) {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Structural Steel Selected';
+            }
+        } else {
+            if (@$data) {
+                $i = 1;
+                foreach ($data as $_data) {
+                    $result = \common\models\Make::find()->where(['id' => $_data, 'mtype' => $type])->one();
+                    if ($datacount != $i) {
+                        $fresult .= $result->make . ' , ';
+                    } else {
+                        $fresult .= $result->make;
+                    }
+
+                    $i++;
+                }
+            } else {
+                $fresult = 'No Non Structural Steel Selected';
             }
         }
         $nresult = rtrim($fresult, ",");

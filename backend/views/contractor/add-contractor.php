@@ -108,7 +108,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <input id="email" type="email" name = "email" class="validate required" value="<?= @$contractor->email; ?>">
+                                    <input id="email" type="text" name = "email" class="validate required" value="<?= @$contractor->email; ?>">
                                     <label for="email">Email-Id</label>
                                 </div>
                                

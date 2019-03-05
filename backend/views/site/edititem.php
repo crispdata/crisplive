@@ -87,7 +87,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .checkboxes label:hover {
         background-color: #1e90ff;
     }
-
+    .makesrow {
+    margin-top: 25px;
+}
 </style>
 
 <main class="mn-inner">
@@ -135,6 +137,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             echo "selected";
                                         }
                                         ?>>E/M</option>
+                                        <option value="2" <?php
+                                        if ($parentitems->tenderone == 2) {
+                                            echo "selected";
+                                        }
+                                        ?>>Civil</option>
                                         <!--option value="2">B/R</option-->
                                     </select>
                                 </div>
@@ -145,6 +152,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <select class="validate required materialSelect" required="" name="tenderone" id="tenderone" onchange="getdata(this.value)">
                                         <option value="" disabled selected>Select</option>
                                         <option value="1">E/M</option>
+                                        <option value="2">Civil</option>
                                         <!--option value="2">B/R</option-->
                                     </select>
                                 </div>
@@ -250,146 +258,205 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
 
                             <?php } ?>
-                            <div class='row'>
-                                <div class="input-field col s6">
-                                    <input id="username" type="text" name = "itemtender" class="validate required" value="<?= $item->itemtender; ?>">
-                                    <label for="username">Item Sr. No. Tender</label>
+                            <?php if ($parentitems->tenderone == 1) { ?>
+                                <div class='row'>
+                                    <div class="input-field col s6">
+                                        <input id="username" type="text" name = "itemtender" class="validate required" value="<?= $item->itemtender; ?>">
+                                        <label for="username">Item Sr. No. Tender</label>
+                                    </div>
+                                    <div class="input-field col s6">
+                                        <input id="password" type="text" name = "units" class="validate" value="<?= $item->units; ?>">
+                                        <label for="password">Units</label>
+                                    </div>
                                 </div>
-                                <div class="input-field col s6">
-                                    <input id="password" type="text" name = "units" class="validate" value="<?= $item->units; ?>">
-                                    <label for="password">Units</label>
-                                </div>
-                            </div>
-
-                            <div class="row">
-
-                                <div class="input-field col s6">
-                                    <input id="FirstName" type="text" name = "quantity" class="validate required" value="<?= $item->quantity; ?>">
-                                    <label for="FirstName">Quantity</label>
-                                </div>
-
-                                <div class="input-field col s6">
-                                    <input id="Street" type="text" name = "makeid" class="validate" value="<?= $item->makeid; ?>">
-                                    <label for="Street">Cat Part Id</label>
-                                </div>
-
-
-                            </div>
-
-                            <?php if ($parentitems->tenderfour == 1) { ?>
 
                                 <div class="row">
 
-                                    <div class="input-fields col s6" id='sizesdiv'>
-                                        <label>Select Size</label>
-                                        <select class="validate required materialSelectsize" required="" name="description" id="sizes0">
-                                            <?php
-                                            if ($sizes) {
-                                                foreach ($sizes as $_size) {
-                                                    ?>
-                                                    <option value="<?= $_size->id ?>" <?php
-                                                    if ($_size->id == $item->description) {
-                                                        echo "selected";
-                                                    }
-                                                    ?>><?= $_size->size ?></option>
-                                                            <?php
-                                                        }
-                                                    } else {
-                                                        ?>
-                                                <option value="" disabled required>No Sizes</option>
-                                            <?php }
-                                            ?>
-                                        </select>
+                                    <div class="input-field col s6">
+                                        <input id="FirstName" type="text" name = "quantity" class="validate required" value="<?= $item->quantity; ?>">
+                                        <label for="FirstName">Quantity</label>
                                     </div>
 
-                                    <div class="input-fields col s6" id='corediv'>
-                                        <label>Select Core</label>
-                                        <select class="validate required materialSelectcore" required="" name="core" id="core0">
-                                            <option value="">Select Core</option>
-                                            <option value="1" <?php
-                                            if ($item->core == 1) {
-                                                echo "selected";
-                                            }
-                                            ?>>Core 1</option>
-                                            <option value="2" <?php
-                                            if ($item->core == 2) {
-                                                echo "selected";
-                                            }
-                                            ?>>Core 2</option>
-                                            <option value="3" <?php
-                                            if ($item->core == 3) {
-                                                echo "selected";
-                                            }
-                                            ?>>Core 3</option>
-                                            <option value="4" <?php
-                                            if ($item->core == 4) {
-                                                echo "selected";
-                                            }
-                                            ?>>Core 3.5</option>
-                                            <option value="5" <?php
-                                            if ($item->core == 5) {
-                                                echo "selected";
-                                            }
-                                            ?>>Core 4</option>
-
-                                        </select>
+                                    <div class="input-field col s6">
+                                        <input id="Street" type="text" name = "makeid" class="validate" value="<?= $item->makeid; ?>">
+                                        <label for="Street">Cat Part Id</label>
                                     </div>
+
 
                                 </div>
 
-                                <div class="row">
-                                    <div class="input-fields col s6" id='typefit' style='display: none;'>
-                                        <label>Select Type of fitting</label>
-                                        <select class="validate required materialSelecttypefit" required="" name="typefitting" id="type0">
-                                            <?php
-                                            if ($types) {
-                                                foreach ($types as $_type) {
-                                                    ?>
-                                                    <option value="<?= $_type->id ?>" <?php
-                                                    if ($_type->id == $item->typefitting) {
-                                                        echo "selected";
-                                                    }
-                                                    ?>><?= $_type->text ?></option>
-                                                            <?php
-                                                        }
-                                                    } else {
+                                <?php
+                            }
+                            if ($parentitems->tenderone == 1) {
+                                if ($parentitems->tenderfour == 1) {
+                                    ?>
+
+                                    <div class="row">
+
+                                        <div class="input-fields col s6" id='sizesdiv'>
+                                            <label>Select Size</label>
+                                            <select class="validate required materialSelectsize browser-default" required="" name="description" id="sizes0">
+                                                <?php
+                                                if ($sizes) {
+                                                    foreach ($sizes as $_size) {
                                                         ?>
-                                                <option value="" disabled required>No Types</option>
-                                            <?php }
-                                            ?>
-                                        </select>
+                                                        <option value="<?= $_size->id ?>" <?php
+                                                        if ($_size->id == $item->description) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_size->size ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Sizes</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-fields col s6" id='corediv' style="height: 0px;">
+                                            <label>Select Core</label>
+                                            <select class="validate required materialSelectcore" required="" name="core" id="core0">
+                                                <option value="">Select Core</option>
+                                                <option value="1" <?php
+                                                if ($item->core == 1) {
+                                                    echo "selected";
+                                                }
+                                                ?>>1 Core</option>
+                                                <option value="2" <?php
+                                                if ($item->core == 2) {
+                                                    echo "selected";
+                                                }
+                                                ?>>2 Core</option>
+                                                <option value="3" <?php
+                                                if ($item->core == 3) {
+                                                    echo "selected";
+                                                }
+                                                ?>>3 Core</option>
+                                                <option value="4" <?php
+                                                if ($item->core == 4) {
+                                                    echo "selected";
+                                                }
+                                                ?>>3.5 Core</option>
+                                                <option value="5" <?php
+                                                if ($item->core == 5) {
+                                                    echo "selected";
+                                                }
+                                                ?>>4 Core</option>
+                                                <option value="6" <?php
+                                                if ($item->core == 6) {
+                                                    echo "selected";
+                                                }
+                                                ?>>5 Core</option>
+                                                <option value="7" <?php
+                                                if ($item->core == 7) {
+                                                    echo "selected";
+                                                }
+                                                ?>>6 Core</option>
+                                                <option value="8" <?php
+                                                if ($item->core == 8) {
+                                                    echo "selected";
+                                                }
+                                                ?>>7 Core</option>
+                                                <option value="9" <?php
+                                                if ($item->core == 9) {
+                                                    echo "selected";
+                                                }
+                                                ?>>8 Core</option>
+                                                <option value="10" <?php
+                                                if ($item->core == 10) {
+                                                    echo "selected";
+                                                }
+                                                ?>>10 Core</option>
+
+                                            </select>
+                                        </div>
+
                                     </div>
 
-                                    <div class="input-fields col s6" id='capacityfit' style='display: none;'>
-                                        <label>Select Capacity of fitting</label>
-                                        <select class="validate required materialSelectcapacityfit" required="" name="capacityfitting" id="text0">
-                                            <?php
-                                            if ($capacities) {
-                                                foreach ($capacities as $_text) {
-                                                    ?>
-                                                    <option value="<?= $_text->id ?>" <?php
-                                                    if ($_text->id == $item->capacityfitting) {
-                                                        echo "selected";
-                                                    }
-                                                    ?>><?= $_text->text ?></option>
-                                                            <?php
-                                                        }
-                                                    } else {
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='typefit' style='display: none;'>
+                                            <label>Select Type of fitting</label>
+                                            <select class="validate required materialSelecttypefit browser-default" required="" name="typefitting" id="type0">
+                                                <?php
+                                                if ($types) {
+                                                    foreach ($types as $_type) {
                                                         ?>
-                                                <option value="" disabled required>No Types</option>
-                                            <?php }
-                                            ?>
-                                        </select>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->typefitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-fields col s6" id='capacityfit' style='display: none;'>
+                                            <label>Select Capacity of fitting</label>
+                                            <select class="validate required materialSelectcapacityfit browser-default" required="" name="capacityfitting" id="text0">
+                                                <?php
+                                                if ($capacities) {
+                                                    foreach ($capacities as $_text) {
+                                                        ?>
+                                                        <option value="<?= $_text->id ?>" <?php
+                                                        if ($_text->id == $item->capacityfitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_text->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
                                     </div>
 
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='accessoryone' style="display:none;">
+                                            <label>Select Accessory</label>
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                                <?php
+                                                if ($accessories) {
+                                                    foreach ($accessories as $_type) {
+                                                        ?>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->accessoryone) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Accessories</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
 
-                                <?php } else { ?>
+                                        <div class="input-field col s6" id='accessorytwo' style="display:none">
+                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
+                                            <label for="accessorytwo">Model</label>
+                                        </div>
+                                    </div>
+
+                                <?php } elseif ($parentitems->tenderfour == 2) { ?>
 
 
                                     <div class="row">
                                         <div class="input-fields col s6" id='typefit'>
                                             <label>Select Type of fitting</label>
-                                            <select class="validate required materialSelecttypefit" required="" name="typefitting" id="type0">
+                                            <select class="validate required materialSelecttypefit browser-default" required="" name="typefitting" id="type0">
                                                 <?php
                                                 if ($types) {
                                                     foreach ($types as $_type) {
@@ -411,7 +478,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                         <div class="input-fields col s6" id='capacityfit'>
                                             <label>Select Capacity of fitting</label>
-                                            <select class="validate required materialSelectcapacityfit" required="" name="capacityfitting" id="text0">
+                                            <select class="validate required materialSelectcapacityfit browser-default" required="" name="capacityfitting" id="text0">
                                                 <?php
                                                 if ($capacities) {
                                                     foreach ($capacities as $_text) {
@@ -431,11 +498,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-
-
+                                    </div>
+                                    <div class="row">
                                         <div class="input-fields col s6" id='sizesdiv' style='display:none;'>
                                             <label>Select Size</label>
-                                            <select class="validate required materialSelectsize" required="" name="description" id="sizes0">
+                                            <select class="validate required materialSelectsize browser-default" required="" name="description" id="sizes0">
                                                 <?php
                                                 if ($sizes) {
                                                     foreach ($sizes as $_size) {
@@ -455,7 +522,80 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-                                        <div class="input-field col s6" id="corediv" style="display:none;">
+                                        <div class="input-field col s6" id="corediv" style="display:none;height:0px;">
+                                            <select class="validate required materialSelectcore " required="" name="core" id="core0">
+                                                <option value="">Select Core</option>
+                                                <option value="1">Core 1</option>
+                                                <option value="2">Core 2</option>
+                                                <option value="3">Core 3</option>
+                                                <option value="4">Core 3.5</option>
+                                                <option value="5">Core 4</option>
+                                                <option value="6">Core 5</option>
+                                                <option value="7">Core 6</option>
+                                                <option value="8">Core 7</option>
+                                                <option value="9">Core 8</option>
+                                                <option value="10">Core 10</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                            
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='accessoryone' style="display:none;">
+                                            <label>Select Accessory</label>
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                                <?php
+                                                if ($accessories) {
+                                                    foreach ($accessories as $_type) {
+                                                        ?>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->accessoryone) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Accessories</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-field col s6" id='accessorytwo' style="display:none;">
+                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
+                                            <label for="accessorytwo">Model</label>
+                                        </div>
+                                    </div>
+
+
+                                <?php } elseif ($parentitems->tenderfour == 4) {
+                                    ?>
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='sizesdiv' style='display:none;'>
+                                            <label>Select Size</label>
+                                            <select class="validate required materialSelectsize browser-default" required="" name="description" id="sizes0">
+                                                <?php
+                                                if ($sizes) {
+                                                    foreach ($sizes as $_size) {
+                                                        ?>
+                                                        <option value="<?= $_size->id ?>" <?php
+                                                        if ($_size->id == $item->description) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_size->size ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Sizes</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-field col s6" id="corediv" style="display:none;height:0px;">
                                             <select class="validate required materialSelectcore" required="" name="core" id="core0">
                                                 <option value="">Select Core</option>
                                                 <option value="1">Core 1</option>
@@ -463,49 +603,242 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <option value="3">Core 3</option>
                                                 <option value="4">Core 3.5</option>
                                                 <option value="5">Core 4</option>
+                                                <option value="6">Core 5</option>
+                                                <option value="7">Core 6</option>
+                                                <option value="8">Core 7</option>
+                                                <option value="9">Core 8</option>
+                                                <option value="10">Core 10</option>
 
                                             </select>
                                         </div>
                                     </div>
-
-
-                                <?php } ?>
-                                <div class='row'>
-                                    <div class="input-fields col s6">
-                                        <label>Select Makes</label>
-                                        <select class="validate required materialSelectmake browser-default makeedit" required="" name="makes[]" multiple id="makes0">
-                                            <?php
-                                            if ($makes) {
-                                                $allmakes = explode(',', $item->make);
-                                                foreach ($makes as $_make) {
-                                                    ?>
-                                                    <option value="<?= $_make->id ?>" <?php
-                                                    if (in_array($_make->id, $allmakes)) {
-                                                        echo "selected";
-                                                    }
-                                                    ?>><?= $_make->make ?></option>
-                                                            <?php
-                                                        }
-                                                    } else {
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='typefit' style='display: none;'>
+                                            <label>Select Type of fitting</label>
+                                            <select class="validate required materialSelecttypefit browser-default" required="" name="typefitting" id="type0">
+                                                <?php
+                                                if ($types) {
+                                                    foreach ($types as $_type) {
                                                         ?>
-                                                <option value="" disabled required>No Makes</option>
-                                            <?php }
-                                            ?>
-                                        </select>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->typefitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-fields col s6" id='capacityfit' style='display: none;'>
+                                            <label>Select Capacity of fitting</label>
+                                            <select class="validate required materialSelectcapacityfit browser-default" required="" name="capacityfitting" id="text0">
+                                                <?php
+                                                if ($capacities) {
+                                                    foreach ($capacities as $_text) {
+                                                        ?>
+                                                        <option value="<?= $_text->id ?>" <?php
+                                                        if ($_text->id == $item->capacityfitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_text->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
                                     </div>
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='accessoryone'>
+                                            <label>Select Accessory</label>
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                                <?php
+                                                if ($accessories) {
+                                                    foreach ($accessories as $_type) {
+                                                        ?>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->accessoryone) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Accessories</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-field col s6" id='accessorytwo'>
+                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
+                                            <label for="accessorytwo">Model</label>
+                                        </div>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='sizesdiv'>
+                                            <label>Select Size</label>
+                                            <select class="validate required materialSelectsize browser-default" required="" name="description" id="sizes0">
+                                                <?php
+                                                if ($sizes) {
+                                                    foreach ($sizes as $_size) {
+                                                        ?>
+                                                        <option value="<?= $_size->id ?>" <?php
+                                                        if ($_size->id == $item->description) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_size->size ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Sizes</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-field col s6" id="corediv" style="display:none;height:0px;">
+                                            <select class="validate required materialSelectcore" required="" name="core" id="core0">
+                                                <option value="">Select Core</option>
+                                                <option value="1">Core 1</option>
+                                                <option value="2">Core 2</option>
+                                                <option value="3">Core 3</option>
+                                                <option value="4">Core 3.5</option>
+                                                <option value="5">Core 4</option>
+                                                <option value="6">Core 5</option>
+                                                <option value="7">Core 6</option>
+                                                <option value="8">Core 7</option>
+                                                <option value="9">Core 8</option>
+                                                <option value="10">Core 10</option>
+
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='typefit' style='display: none;'>
+                                            <label>Select Type of fitting</label>
+                                            <select class="validate required materialSelecttypefit browser-default" required="" name="typefitting" id="type0">
+                                                <?php
+                                                if ($types) {
+                                                    foreach ($types as $_type) {
+                                                        ?>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->typefitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-fields col s6" id='capacityfit' style='display: none;'>
+                                            <label>Select Capacity of fitting</label>
+                                            <select class="validate required materialSelectcapacityfit browser-default" required="" name="capacityfitting" id="text0">
+                                                <?php
+                                                if ($capacities) {
+                                                    foreach ($capacities as $_text) {
+                                                        ?>
+                                                        <option value="<?= $_text->id ?>" <?php
+                                                        if ($_text->id == $item->capacityfitting) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_text->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Types</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="row">
+                                        <div class="input-fields col s6" id='accessoryone' style="display:none">
+                                            <label>Select Accessory</label>
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                                <?php
+                                                if ($accessories) {
+                                                    foreach ($accessories as $_type) {
+                                                        ?>
+                                                        <option value="<?= $_type->id ?>" <?php
+                                                        if ($_type->id == $item->accessoryone) {
+                                                            echo "selected";
+                                                        }
+                                                        ?>><?= $_type->text ?></option>
+                                                                <?php
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                    <option value="" disabled required>No Accessories</option>
+                                                <?php }
+                                                ?>
+                                            </select>
+                                        </div>
+
+                                        <div class="input-field col s6" id='accessorytwo' style="display:none">
+                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
+                                            <label for="accessorytwo">Model</label>
+                                        </div>
+                                    </div>
+                                    <?php
+                                }
+                            }
+                            ?>
+                            <div class='row makesrow'>
+                                <div class="input-fields col <?= ($parentitems->tenderone == 1 && $parentitems->tenderfour == 1) ? 's6' : 's12' ?>">
+                                    <label>Select Makes</label>
+                                    <select class="validate required materialSelectmake browser-default makeedit" required="" name="makes[]" multiple id="makes0">
+                                        <?php
+                                        if ($makes) {
+                                            $allmakes = explode(',', $item->make);
+                                            foreach ($makes as $_make) {
+                                                ?>
+                                                <option value="<?= $_make->id ?>" <?php
+                                                if (in_array($_make->id, $allmakes)) {
+                                                    echo "selected";
+                                                }
+                                                ?>><?= $_make->make ?></option>
+                                                        <?php
+                                                    }
+                                                } else {
+                                                    ?>
+                                            <option value="" disabled required>No Makes</option>
+                                        <?php }
+                                        ?>
+                                    </select>
                                 </div>
-
-
-
-                                <input class="waves-effect waves-light btn blue m-b-xs row col s12" type="submit" name='submit' value="Submit">
-
-                                </form>
-
                             </div>
+
+
+
+                            <input class="waves-effect waves-light btn blue m-b-xs row col s12" type="submit" name='submit' value="Submit">
+
+                        </form>
+
                     </div>
                 </div>
             </div>
         </div>
+    </div>
 </main>
 <script>
 

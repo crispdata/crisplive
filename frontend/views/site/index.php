@@ -9,6 +9,19 @@ $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 $ajaxURL = Yii::$app->params['AJAX_URL'];
 ?>
+<style>
+    a.btn.blue {
+    font-size: 40px;
+    margin-top: 25px;
+    border: 1px solid;
+    font-weight: bold;
+    padding: 10px;
+    background-color: lightsteelblue;
+}
+a.btn.blue:hover,a.btn.blue:focus,a.btn.blue:active,a.btn.blue:visited{
+    color:#000;
+}
+</style>
 <input type = "hidden" value = "<?= $ajaxURL ?>" id = "base_url">
 <header id="header" class="okayNav-header navbar-fixed-top main-navbar-top">
     <div class="container">
@@ -30,7 +43,7 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                         <li><a class="btn-nav btn-scroll" href="#aboutus">About Us</a></li>
                         <li><a class="btn-nav btn-scroll" href="#contactus">Contact Us</a></li>
                         <!--li><a class="btn-nav" href="#" data-toggle="modal" data-target="#sign-in-form">Sign In</a></li-->
-                        <li><a class="btn-nav btn-border" href="" data-toggle="modal" data-target="#sign-up-form">Register</a></li>
+                        <!--li><a class="btn-nav btn-border" href="" data-toggle="modal" data-target="#sign-up-form">Register</a></li-->
                     </ul>
                 </nav>
 
@@ -179,7 +192,7 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                     </div>
                     <div class="col-xs-12">
                         <!-- Email -->
-                        <input name="phone" class="contact-phone form-control" type="text" placeholder="Enter multiple numbers by putting comma i.e (1234567,2345678)">
+                        <input name="phone" class="contact-phone form-control" type="text" placeholder="Enter multiple numbers by putting comma">
                     </div>
                     <div class="col-xs-12">
                         <!-- Subject -->
@@ -187,6 +200,10 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                         <a class="btn" id='mobileotp'>Click here to generate OTP</a>
                         <input style="display:none;" id="otpmobile" class="contact-email form-control" type="number" placeholder="Enter OTP" required="">
                         <a style="display:none;" class="btn" id='vmobileotp'>Validate OTP</a>
+                    </div>
+                    <div class="col-xs-12">
+                        <!-- Email -->
+                        <input name="mails" class="contact-mails form-control" type="text" placeholder="Enter multiple E-mail IDs by putting comma">
                     </div>
                     <div class="col-xs-12 emaildiv">
                         <!-- Subject -->
@@ -205,6 +222,10 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                             <option value=''>Select Product</option>
                             <option value='1'>Cables</option>
                             <option value='2'>Lighting</option>
+                            <option value='3'>Cement</option>
+                            <option value='4'>Reinforcement Steel</option>
+                            <option value='5'>Structural Steel</option>
+                            <option value='6'>Non Structural Steel</option>
                         </select>
                     </div>
                     <div class="col-xs-12" id="cablesdiv" style="display: none;">
@@ -233,6 +254,58 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                             ?>
                         </select>
                     </div>
+                    <div class="col-xs-12" id="cementdiv" style="display: none;">
+                        <select name='cement[]' class="cementmakes browser-default" id="cement" multiple>
+                            <?php
+                            if (@$cements) {
+                                foreach ($cements as $cement_) {
+                                    ?>
+                                    <option value="<?= $cement_->id ?>"><?= $cement_->make ?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-xs-12" id="rsteeldiv" style="display: none;">
+                        <select name='rsteel[]' class="rmakes browser-default" id="rsteel" multiple>
+                            <?php
+                            if (@$rsteel) {
+                                foreach ($rsteel as $rsteel_) {
+                                    ?>
+                                    <option value="<?= $rsteel_->id ?>"><?= $rsteel_->make ?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-xs-12" id="ssteeldiv" style="display: none;">
+                        <select name='ssteel[]' class="smakes browser-default" id="ssteel" multiple>
+                            <?php
+                            if (@$ssteel) {
+                                foreach ($ssteel as $ssteel_) {
+                                    ?>
+                                    <option value="<?= $ssteel_->id ?>"><?= $ssteel_->make ?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
+                    <div class="col-xs-12" id="nsteeldiv" style="display: none;">
+                        <select name='nsteel[]' class="nmakes browser-default" id="nsteel" multiple>
+                            <?php
+                            if (@$nsteel) {
+                                foreach ($nsteel as $nsteel_) {
+                                    ?>
+                                    <option value="<?= $nsteel_->id ?>"><?= $nsteel_->make ?></option>
+                                    <?php
+                                }
+                            }
+                            ?>
+                        </select>
+                    </div>
                 </div>
 
                 <div id="supplier" style="display: none;"><span>Coming Soon</span></div>
@@ -242,7 +315,7 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                 <div class="col-xs-12">
                     <div class="checkbox">
                         <input name="terms" type="checkbox" id="agreement" value="1">
-                        <label for="agreement">I agree to Your <a href="index.php/site/terms" target="_blank">Terms of Service</a> </label>
+                        <label for="agreement">I agree to Your <a href="site/terms" target="_blank">Terms of Service</a> </label>
                     </div>
                 </div>
 
@@ -279,7 +352,7 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
                         <div class="detail service">
                             <p>Services of <img src="<?= $imageURL ?>assets/images/crispdatalogo.png" alt="" class="logoservice"> are free upto 31st March 2019.</p>
                         </div>
-
+                        <a class="btn blue" href="" data-toggle="modal" data-target="#sign-up-form">Register Now</a>
 
                     </div>
                 </div> <!-- End: .part-1 -->
@@ -424,8 +497,8 @@ $ajaxURL = Yii::$app->params['AJAX_URL'];
 
                         <p class="title"><strong>Links</strong></p>
                         <ul class="nav link-list">
-                            <li><a href="index.php/site/terms" target="_blank">Terms & Conditions</a></li>
-                            <li><a href="index.php/site/privacy" target="_blank">Privacy Policy</a></li>
+                            <li><a href="site/terms" target="_blank">Terms & Conditions</a></li>
+                            <li><a href="site/privacy" target="_blank">Privacy Policy</a></li>
                         </ul>
 
                     </div> <!-- End: .each-section -->

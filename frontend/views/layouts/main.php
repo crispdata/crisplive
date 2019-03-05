@@ -14,7 +14,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
 <?php $this->beginPage() ?>
 <!DOCTYPE html>
-<html lang="<?= Yii::$app->language ?>">
+<html lang="<?= Yii::$app->language ?>" oncontextmenu="return false">
     <head>
         <!-- Global site tag (gtag.js) - Google Analytics -->
         <script async src="https://www.googletagmanager.com/gtag/js?id=UA-133548958-1"></script>
@@ -26,20 +26,31 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             gtag('js', new Date());
 
             gtag('config', 'UA-133548958-1');
+
+            $(document).keydown(function (e) {
+                if (e.which === 123) {
+
+                    return false;
+
+                }
+
+            });
         </script>
 
         <meta charset="<?= Yii::$app->charset ?>">
         <meta http-equiv="X-UA-Compatible" content="IE=edge">
-        <meta name="title" content ="Crispdata - CONTRACTORS/MANUFACTURERS/DEALERS/SUPPLIERS">
+        <meta name="title" content ="Crispdata - Data Management Company, Mohali, India">
         <meta name="viewport" content="width=device-width, initial-scale=1">
+        <meta name="author" content="AADH Datamatics Pvt. Ltd. (Crispdata)">
         <meta name="description" content="Contractors - Manufacturers - Dealers - Suppliers - Government - MES - Crispdata - AADH Datamatics">
-        <meta name="keywords" content="LTD,CABLE,GOVT,US,PVT,GOVT DEPARTMENTS,CONTRACTORS MANUFACTURERS,DEALERS DISTRIBUTORS,SUPPLIERS,AADH DATAMATICS LTD,CRISPDATA">
+        <meta name="keywords" content="LTD,CABLE,GOVT,US,PVT,GOVT DEPARTMENTS,TENDERS,CONTRACTORS MANUFACTURERS,DEALERS DISTRIBUTORS,SUPPLIERS,AADH DATAMATICS LTD,CRISPDATA,crispdata.co.in">
         <link rel="shortcut icon" href="<?= $imageURL ?>assets/images/favicon.ico" /> 
+        <link rel="canonical" href="https://www.crispdata.co.in/"/>
         <?= Html::csrfMetaTags() ?>
-        <title><?= Html::encode($this->title) ?> - Contractors / Manufacturers / Dealers / Suppliers</title>
+        <title><?= Html::encode($this->title) ?> - Data Management Company, Mohali, India</title>
         <?php $this->head() ?>
     </head>
-    <body>
+    <body oncontextmenu="return false">
         <script src="//code.jquery.com/jquery-1.12.4.min.js"></script>
         <script src="//cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
         <?php $this->beginBody() ?>

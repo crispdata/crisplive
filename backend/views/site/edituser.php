@@ -14,14 +14,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
     .row{margin-bottom: 0px;}
 </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    $(function () {
-        $("#Phone").keyup(function () {
-            $("#Phone").val(this.value.match(/[0-9]*/));
-        });
-    });
-</script>
+
 <main class="mn-inner">
     <div class="row">
         <div class="col s12">
@@ -80,6 +73,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         echo "selected";
                                     }
                                     ?>>Admin</option>
+                                    <option value="4" <?php
+                                    if ($user->group_id == 4) {
+                                        echo "selected";
+                                    }
+                                    ?>>Sales</option>
                                 </select>
                             </div>
 

@@ -30,7 +30,7 @@ if ($model->getErrors()) {
         color: #dc3545;
     }
     .modal {
-        background-image: url('/admin/images/datafour.png');
+        background-image: url('/images/datafour.png');
         background-repeat: no-repeat;
         background-size: cover;
 
@@ -105,7 +105,18 @@ if ($model->getErrors()) {
         width: 100%;
         margin-bottom:30px;
     }
+
+    #text {display:none;margin-top:20px;}
+
 </style>
+<?php
+$cookies = Yii::$app->response->cookies;
+// add a new cookie to the response to be sent
+$cookies->add(new \yii\web\Cookie([
+    'name' => 'cookie',
+    'value' => '1',
+]));
+?>
 <div class="loader-bg"></div>
 <div class="loader">
     <div class="preloader-wrapper big active">
@@ -154,7 +165,7 @@ if ($model->getErrors()) {
         <div class="valign">
             <div class="row">
                 <div class="col s12 m6 l4 offset-l4 offset-m3 card-resp">
-                    <img class="logoimage" src="/admin/images/clogo.png" alt="Crispdata">
+                    <img class="logoimage" src="/images/clogo.png" alt="Crispdata">
                     <div class="card white darken-1">
                         <div class="card-content ">
                             <span class="card-title">Sign In</span>
@@ -184,13 +195,15 @@ if ($model->getErrors()) {
                                             <?php
                                         }
                                         ?>
+                                        <label id="text" class="error">Caps lock is ON.</label>    
                                     </div>
                                     <div class="input-field col s6">
 <!--a href = "<?= $baseURL ?>site/request-password-reset" class = "right">Forgot Password?</a-->
 
                                     </div>
                                     <div class="col s6 right-align m-t-sm">
-                                        <button class="waves-effect waves-light btn teal btn-resp">sign in</button>
+                                       <button class="waves-effect waves-light btn teal btn-resp">sign in</button>
+
                                     </div>
                                 </form>
                             </div>
@@ -220,4 +233,14 @@ if ($model->getErrors()) {
 </div>
 <script>
     document.body.className += ' ' + 'signin-page';
+    var input = document.getElementById("password");
+    var text = document.getElementById("text");
+    input.addEventListener("keyup", function (event) {
+
+        if (event.getModifierState("CapsLock")) {
+            text.style.display = "block";
+        } else {
+            text.style.display = "none"
+        }
+    });
 </script>

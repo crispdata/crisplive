@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Create New Item';
-
+use yii\helpers\Url;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 $rootURL = Yii::$app->params['ROOT_URL'];
@@ -123,6 +123,14 @@ $rootURL = Yii::$app->params['ROOT_URL'];
     }
     td.desc{word-break: break-word;}
     .waves-input-wrapper{float:left; width:100%;}
+    span.viewmake {
+        background-color: #E4E4E4;
+        border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 5px;
+        width: 80%;
+        float: left;
+    }
 </style>
 <script>
     // Change the selector if needed
@@ -193,7 +201,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
         <div class="col s6">
             <div class="page-title"><?= $this->title ?></div>
         </div>
-        <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/view-items?id=<?= $tender->id; ?>"> View Items</a>
+        <a class="waves-effect waves-light btn blue m-b-xs add-contact" target="_blank" href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>"> View Items</a>
         <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
@@ -226,7 +234,6 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                     <th data-field="name">Units</th>
                                     <th data-field="email">Quantity</th>
                                     <th data-field="email">Make</th>
-                                    <th data-field="email">CatPart Id</th>
                                 </tr>
                             </thead>
                             <tbody id="contacts_list">
@@ -238,10 +245,9 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                         <tr data-id = "<?= $idetail->id ?>">
                                             <td class = ""><?= $key + 1 ?></td>
                                             <td class = "desc"><?= $idetail->description ?></td>
-                                            <td class = ""><?= $idetail->units ?></td>
-                                            <td class = ""><?= $idetail->quantity ?></td>
-                                            <td class = ""><?= $idetail->make ?></td>
-                                            <td class = ""><?= $idetail->makeid ?></td>
+                                            <td class = ""><?= ($idetail->units) ? $idetail->units : '---' ?></td>
+                                            <td class = ""><?= ($idetail->quantity) ? $idetail->quantity : '---' ?></td>
+                                            <td class = ""><?= ($idetail->make) ? $idetail->make : '---' ?></td>
                                         </tr>
 
                                         <?php
@@ -279,7 +285,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                             <select class="validate required materialSelect" name="tenderone" id="tenderone" onchange="getdata(this.value)">
                                                 <option value="" disabled selected>Select</option>
                                                 <option value="1">E/M</option>
-                                                <!--option value="2">B/R</option-->
+                                                <option value="2">Civil</option>
                                             </select>
                                         </div>
 
@@ -343,7 +349,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                         </div>
                                     </div>
 
-                                    <div id="itemdata" style="display: none;">
+                                    <div class="col s12" id="itemdata" style="display: none;">
                                         <div class="row iteminfo" id="inforows">
                                             <div class="input-field col s1">
                                                 <input id="itemtender" type="text" name = "itemtender[]" required="" class="validate required" value="">
@@ -372,20 +378,35 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                     <option value="3">3 Core</option>
                                                     <option value="4">3.5 Core</option>
                                                     <option value="5">4 Core</option>
+                                                    <option value="6">5 Core</option>
+                                                    <option value="7">6 Core</option>
+                                                    <option value="8">7 Core</option>
+                                                    <option value="9">8 Core</option>
+                                                    <option value="10">10 Core</option>
 
                                                 </select>
                                             </div>
-                                            <div class="input-field col s2" id="typefit">
-                                                <select class="validate required materialSelecttypefit" required="" name="type[]" id="type0">
+                                            <div class="input-field col s3" id="typefit">
+                                                <select class="validate required materialSelecttypefit browser-default" required="" name="type[]" id="type0">
 
 
                                                 </select>
                                             </div>
-                                            <div class="input-field col s3" id="capacityfit">
+                                            <div class="input-field col s2" id="capacityfit">
                                                 <select class="validate required materialSelectcapacityfit browser-default" required="" name="text[]" id="text0">
 
 
                                                 </select>
+                                            </div>
+                                            <div class="input-field col s3" id="accessoryone">
+                                                <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone[]" id="accone0">
+
+
+                                                </select>
+                                            </div>
+                                            <div class="input-field col s2" id="accessorytwo">
+                                                <input id="acctwo0" type="text" name = "accessorytwo[]" required="" class="validate required" value="">
+                                                <label for="acctwo0">Model</label>
                                             </div>
                                             <div class="input-field col s1">
                                                 <input id="itemunit" type="text" name = "units[]" required="" class="validate required" value="RM">

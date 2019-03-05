@@ -3,7 +3,7 @@
 
 use backend\controllers\SiteController;
 
-$this->title = 'Create New Tender';
+$this->title = 'Add New Tender';
 
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
@@ -16,6 +16,61 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
     .row{margin-bottom: 0px;}
 </style>
+<script>
+    function GetFileSize() {
+        var fi = document.getElementById('file'); // GET THE FILE INPUT.
+        var com = document.forms["myform"]["command"].value;
+        var work = document.forms["myform"]["work"].value;
+        var ref = document.forms["myform"]["refno"].value;
+        var tid = document.forms["myform"]["tid"].value;
+        var edate = document.forms["myform"]["enddate"].value;
+        var odate = document.forms["myform"]["odate"].value;
+        var cvalue = document.forms["myform"]["costvalue"].value;
+        if (com == "") {
+            swal("", "Please select Command", "warning");
+            return false;
+        }
+        if (work == "") {
+            swal("", "Please enter Name of work", "warning");
+            return false;
+        }
+        if (ref == "") {
+            swal("", "Please enter Ref. no.", "warning");
+            return false;
+        }
+        if (tid == "") {
+            swal("", "Please enter Tender Id", "warning");
+            return false;
+        }
+        if (edate == "") {
+            swal("", "Please enter Bid end date", "warning");
+            return false;
+        }
+        if (odate == "") {
+            swal("", "Please enter Bid opening date", "warning");
+            return false;
+        }
+        if (cvalue == "") {
+            swal("", "Please enter Cost Value", "warning");
+            return false;
+        }
+        // VALIDATE OR CHECK IF ANY FILE IS SELECTED.
+        if (fi.files.length > 0) {
+            // RUN A LOOP TO CHECK EACH SELECTED FILE.
+            for (var i = 0; i <= fi.files.length - 1; i++) {
+
+                var fsize = fi.files.item(i).size;      // THE SIZE OF THE FILE.
+                var returnsize = Math.round((fsize / 1024));
+                if (returnsize > 80000) {
+                    swal("", "Please upload file size less than 80MB", "warning");
+                    return false;
+                } else {
+                    $("#create-project-form-tender").submit();
+                }
+            }
+        }
+    }
+</script>
 <main class="mn-inner">
     <div class="row">
         <div class="col s12">
@@ -47,13 +102,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="card-content">
 
                     <div class="row">
-                        <form id="create-project-form" class="col s12" enctype="multipart/form-data" method = "post" action = "<?= $baseURL ?>site/create-tender">
+                        <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "post" onsubmit="return GetFileSize()" action = "<?= $baseURL ?>site/create-tender">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <input type="hidden" value="<?= @$tender->id; ?>" name="id">
                             <div class="row">
                                 <div class="input-fields col s12 row">
                                     <label>Select Command</label>
-                                    <select class="validate required materialSelect" name="command" id="command" onchange="getcengineer(this.value)">
+                                    <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
                                         <option value="">Select Command</option>
                                         <option value="1" <?php
                                         if (@$tender->command == 1) {
@@ -80,6 +135,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             echo "selected";
                                         }
                                         ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
+                                        <option value="13" <?php
+                                        if (@$tender->command == 13) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
                                         <option value="6" <?php
                                         if (@$tender->command == 6) {
                                             echo "selected";
@@ -121,13 +181,31 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                             <?php
                             if (@$tender->id) {
-                                if ($tender->cengineer != 0) {
+                                if ($tender->cengineer != 0 || $tender->cengineer != null) {
                                     ?>
                                     <div id="ce">
                                         <div class="input-fields col s12 row">
                                             <label>Select CE</label>
                                             <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
                                                 <?php SiteController::actionGetcengineerbycommand($tender->command, $tender->cengineer); ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <?php } elseif ($tender->cwengineer != 0 || $tender->cwengineer != null) { ?>
+                                    <div id="cwe">
+                                        <div class="input-fields col s12 row">
+                                            <label>Select CWE</label>
+                                            <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                <?php SiteController::actionGetcengineerbycommand($tender->command, $tender->cwengineer); ?>
+                                            </select>
+                                        </div>
+                                    </div>
+                                <?php } elseif ($tender->gengineer != 0 || $tender->gengineer != null) { ?>
+                                    <div id="ge">
+                                        <div class="input-fields col s12 row">
+                                            <label>Select GE</label>
+                                            <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                <?php SiteController::actionGetcengineerbycommand($tender->command, $tender->gengineer); ?>
                                             </select>
                                         </div>
                                     </div>
@@ -143,7 +221,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } ?>
 
                                 <?php
-                                if ($tender->cwengineer != 0) {
+                                if (($tender->cengineer != 0 || $tender->cengineer != null) && ($tender->cwengineer != 0 || $tender->cwengineer != null)) {
                                     ?>
                                     <div id="cwe">
                                         <div class="input-fields col s12 row">
@@ -165,7 +243,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <?php
                                 }
 
-                                if ($tender->gengineer != 0) {
+                                if (($tender->cengineer != 0 || $tender->cengineer != null) && ($tender->cwengineer != 0 || $tender->cwengineer != null) && $tender->gengineer != 0) {
                                     ?>
 
                                     <div id="ge">
@@ -221,7 +299,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <input id="work" type="text" name = "work" class="validate required" value="<?= @$tender->work; ?>">
+                                    <textarea name="work" id="work" class="materialize-textarea validate required" required=""><?= @$tender->work; ?></textarea>
                                     <label for="work">Name of work</label>
                                 </div>
 
@@ -238,37 +316,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
 
                                 <div class="input-field col s6">
-                                    <input id="pdate" type="text" name = "pdate" class="pdatepicker required" value="<?php
-                                    if (@$tender->published_date) {
-                                        echo @$tender->published_date;
-                                    }
-                                    ?>">
-                                    <label for="pdate">Published date</label>
-
-                                </div>
-                            </div>
-
-                            <div class="row">
-                                <div class="input-field col s6">
-                                    <input id="ddate" type="text" name = "ddate" class="required ddatepicker" value="<?php
-                                    if (@$tender->document_date) {
-                                        echo @$tender->document_date;
-                                    }
-                                    ?>">
-                                    <label for="ddate">Document download date</label>
-                                </div>
-
-                                <div class="input-field col s6">
-                                    <input id="subdate" type="text" name = "subdate" class="required bsdatepicker" value="<?php
-                                    if (@$tender->bid_sub_date) {
-                                        echo @$tender->bid_sub_date;
-                                    }
-                                    ?>">
-                                    <label for="subdate">Bid submission date</label>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="input-field col s6">
                                     <input id="enddate" type="text" name = "enddate" class="required bedatepicker" value="<?php
                                     if (@$tender->bid_end_date) {
                                         echo @$tender->bid_end_date;
@@ -276,6 +323,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="enddate">Bid end date</label>
                                 </div>
+
+
+                            </div>
+
+                            <div class="row">
 
                                 <div class="input-field col s6">
                                     <input id="odate" type="text" name = "odate" class="required bodatepicker" value="<?php
@@ -285,8 +337,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="odate">Bid opening date</label>
                                 </div>
-                            </div>
-                            <div class="row">
+
                                 <div class="input-field col s6">
                                     <input id="costvalue" type="text" name = "costvalue" class="required" value="<?php
                                     if (@$tender->cvalue) {
@@ -295,10 +346,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="costvalue">Cost Value</label>
                                 </div>
-                                <div class="input-field col s6 file-field input-field">
+                            </div>
+                            <div class="row">
+
+                                <div class="input-field col s12 file-field input-field">
                                     <div class="btn teal lighten-1">
                                         <span>File</span>
-                                        <input type="file" name="tfile">
+                                        <input type="file" name="tfile" id="file">
                                     </div>
                                     <div class="file-path-wrapper">
                                         <input class="file-path validate" type="text">

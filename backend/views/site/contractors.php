@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 use backend\controllers\SiteController;
-
+use yii\helpers\Url;
 $this->title = 'All Contractors';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -101,9 +101,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <td class = ""><?= $user->cnumber ?></td>
                                         <td class = ""><?= $user->cemail ?></td>
                                         <td class = ""><?= $ctype; ?></td>
-                                        <td ><a href="<?= $baseURL ?>site/change-status-client?id=<?= $user->id; ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
+                                        <td ><a href="<?= Url::to(['site/change-status-client', 'id' => $user->id]) ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
                                         <td>
-                                            <a href="<?= $baseURL ?>site/edit-client?id=<?= $user->id; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                            <a href="<?= Url::to(['site/edit-client', 'id' => $user->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                             <a href="#modal<?= $user->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                             <?php if ($user->type == 3) { ?>
                                                 <a href="#modalfiles<?= $user->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Products</a>
@@ -118,7 +118,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                     <div class="modal-footer">
                                         <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                        <a href="<?= $baseURL ?>site/delete-client?id=<?= $user->id; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                        <a href="<?= Url::to(['site/delete-client', 'id' => $user->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                     </div>
                                 </div>
                                 <div id="modalfiles<?= $user->id; ?>" class="modal">

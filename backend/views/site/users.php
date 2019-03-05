@@ -2,7 +2,7 @@
 /* @var $this yii\web\View */
 
 use backend\controllers\SiteController;
-
+use yii\helpers\Url;
 $this->title = 'All Users';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -82,9 +82,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <img width="100" height="100" src="<?= $imageURL . $user->Logo ?>">
                                             <?php } ?>
                                         </td>
-                                        <td ><a href="<?= $baseURL ?>site/change-status?id=<?= $user->UserId; ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
+                                        <td ><a href="<?= Url::to(['site/change-status', 'id' => $user->UserId]) ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
                                         <td>
-                                            <a href="<?= $baseURL ?>site/edit-user?id=<?= $user->UserId; ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                            <a href="<?= Url::to(['site/edit-user', 'id' => $user->UserId]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                             <a href="#modal<?= $user->UserId; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                         </td>
 
@@ -96,7 +96,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                     <div class="modal-footer">
                                         <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                        <a href="<?= $baseURL ?>site/delete-user?id=<?= $user->UserId; ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                        <a href="<?= Url::to(['site/delete-user', 'id' => $user->UserId]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                     </div>
                                 </div>
 

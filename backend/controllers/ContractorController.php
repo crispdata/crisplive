@@ -115,18 +115,18 @@ class ContractorController extends Controller {
 
                     // It reads data after header. In the my excel sheet, 
                     // header is in the first row. 
-                    if ($count > 2) {
-
+                    if ($count > 1) {
+                        
                         // Data of excel sheet
-                        $data['firm'] = $row[1];
-                        $data['name'] = $row[2];
-                        $data['address'] = $row[3];
-                        $data['contact'] = $row[4];
-                        $data['email'] = $row[5];
+                        $data['firm'] = @$row[1];
+                        $data['name'] = @$row[2];
+                        $data['address'] = @$row[3];
+                        $data['contact'] = @$row[4];
+                        $data['email'] = @$row[5];
 
                         $data = ['firm' => $data['firm'], 'name' => $data['name'], 'address' => $data['address'], 'contact' => $data['contact'], 'email' => $data['email'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
 
-                        if ($row[0] != '') {
+                        if (@$row[1] != '') {
                             $contractor = \Yii::$app
                                     ->db
                                     ->createCommand()

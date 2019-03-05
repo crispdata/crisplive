@@ -14,6 +14,7 @@ img#place-icon {
     right: 0;
     top: 16px;
 }
+
 .select-wrapper {
     line-height: normal !important;
     position: relative;
@@ -367,10 +368,10 @@ table#current-project{
     width: 100%;
     clear: both;
     border-collapse: collapse;
-    table-layout: fixed; // ***********add this
     word-wrap:break-word; // ***********and this
     vertical-align: top;
 }
+.cyan.darken-1{background-color:lightskyblue!important}
 #timeline_list td {
     word-wrap: break-word;
     vertical-align: top;

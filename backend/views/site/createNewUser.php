@@ -14,14 +14,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
     .row{margin-bottom: 0px;}
 </style>
-<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-<script>
-    $(function () {
-        $("#Phone").keyup(function () {
-            $("#Phone").val(this.value.match(/[0-9]*/));
-        });
-    });
-</script>
+
 <main class="mn-inner">
     <div class="row">
         <div class="col s12">
@@ -42,9 +35,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <input id="FirstName" type="text" maxlength="50" name = "CreateUser[username]" class="validate required" value="">
                                     <label for="FirstName">Username</label>
                                 </div>
-                                
-                                 <div class="input-field col s6">
-                                     <input id="Email" type="email" autocomplete="off" maxlength="100" size="30" name = "CreateUser[Email]" class="validate required" value="">
+
+                                <div class="input-field col s6">
+                                    <input id="Email" type="email" autocomplete="off" maxlength="100" size="30" name = "CreateUser[Email]" class="validate required" value="">
                                     <label for="Email">Email</label>
                                 </div>
 
@@ -52,15 +45,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                             <div class="row">
                                 <div class="input-field col s6">
-                                        <select class="validate required" required="" name="CreateUser[group_id]" id="group">
-                                            <option value="" disabled selected>Select Group</option>
-                                            <option value="3" >User</option>
-                                            <option value="2" >Admin</option>
-                                        </select>
-                                    </div>
+                                    <select class="validate required" required="" name="CreateUser[group_id]" id="group">
+                                        <option value="" disabled selected>Select Group</option>
+                                        <option value="2" >Admin</option>
+                                        <option value="3" >User</option>
+                                        <option value="4" >Sales</option>
+                                    </select>
+                                </div>
 
-                                 <div class="input-field col s6">
-                                     <input id="password" type="password" autocomplete="off" name = "CreateUser[password]" class="validate" value="">
+                                <div class="input-field col s6">
+                                    <input id="password" type="password" autocomplete="off" name = "CreateUser[password]" class="validate" value="">
                                     <label for="password">Password</label>
                                 </div>
                             </div>

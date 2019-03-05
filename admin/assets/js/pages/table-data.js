@@ -19,20 +19,21 @@ $(document).ready(function () {
                 sLast: '<i class="material-icons">chevron_right</i>'
             }
         },
-       
-        /*"bProcessing": true,
-         "serverSide": true,
-         "ajax": {
-         url: baseUrl + 'site/gettenders',
-         type: "post", // type of method  ,GET/POST/DELETE
-         data: {
-         '_csrf-backend': csrf_token
-         },
-         error: function () {
-         $("#employee_grid_processing").css("display", "none");
-         }
-         }*/
-
+    });
+    $('.quantities').DataTable({
+        language: {
+            searchPlaceholder: 'Search records',
+            sSearch: '',
+            sLengthMenu: 'Show _MENU_',
+            sLength: 'dataTables_length',
+            "decimal": ".",
+            oPaginate: {
+                sFirst: '<i class="material-icons">chevron_left</i>',
+                sPrevious: '<i class="material-icons">chevron_left</i>',
+                sNext: '<i class="material-icons">chevron_right</i>',
+                sLast: '<i class="material-icons">chevron_right</i>'
+            }
+        },
     });
 
     $('#current-project-tenders').DataTable({
@@ -109,6 +110,10 @@ $(document).ready(function () {
     $('#statusFilter').on('change', function () {
         $("#make-types").submit();
     });
+    
+    $('#product').on('change', function () {
+        $("#product-types").submit();
+    });
 
     $('#statusFiltersizes').on('change', function () {
         if (this.value == 1) {
@@ -175,7 +180,7 @@ $(document).ready(function () {
 });
 
 function deleteConfirm() {
-    var result = confirm("Do you really want to delete items?");
+    var result = confirm("Do you really want to perform this action?");
     if (result) {
         return true;
     } else {
