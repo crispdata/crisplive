@@ -15,6 +15,51 @@ $(document).ready(function () {
         $(this).closest('div.row').remove();
     });
 
+    $("#conform").submit(function (e) {
+        e.preventDefault();
+        var val = $("#consearch").val() // get the current value of the input field.
+        if (val) {
+            $.ajax({
+                url: baseUrl + 'products/searchcontractor',
+                type: "post",
+                data: 'val=' + val + '&_csrf-backend=' + csrf_token,
+                beforeSend: function () {
+                    $(".mn-inner .card-content.card-contractors").html('<span class="fetchmess"><p>Fetching Contractor.....</p></span>');
+                },
+                success: function (data) {
+                    if (data) {
+                        $('.mn-inner .card-content.card-contractors').html(data);
+                        $(".modalclose").css('z-index', '1');
+                        $('#current-project').DataTable({
+                            language: {
+                                searchPlaceholder: 'Search records',
+                                sSearch: '',
+                                sLengthMenu: 'Show _MENU_',
+                                sLength: 'dataTables_length',
+                                oPaginate: {
+                                    sFirst: '<i class="material-icons">chevron_left</i>',
+                                    sPrevious: '<i class="material-icons">chevron_left</i>',
+                                    sNext: '<i class="material-icons">chevron_right</i>',
+                                    sLast: '<i class="material-icons">chevron_right</i>'
+                                }
+                            },
+                            "deferRender": true,
+                        });
+                        $("select[name='current-project_length']").css('display', 'block');
+                    } else {
+                        $('.mn-inner .card-content.card-contractors').html('No Contractors Found.');
+                    }
+                    // $('#notification-bar').text('The page has been successfully loaded');
+                },
+                error: function () {
+                    // $('#notification-bar').text('An error occurred');
+                }
+            });
+        } else {
+            alert('Please enter firm name!');
+        }
+    });
+
     $("#searchform").submit(function (e) {
         e.preventDefault();
         var val = $("#searchdata").val() // get the current value of the input field.
@@ -2364,7 +2409,7 @@ function getsixdata(value) {
             $('.materialSelectsize').on('contentChanged', function () {
                 $(this).select2({closeOnSelect: true, placeholder: 'Select Sizes'});
             });
-            
+
             $.each(resultData.sizes, function (key, value) {
                 if (key != 0) {
                     selects += '<option value="' + key + '">' + value + '</option>';

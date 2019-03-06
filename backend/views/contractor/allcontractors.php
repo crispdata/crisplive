@@ -1,7 +1,9 @@
 <?php
 /* @var $this yii\web\View */
+
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
+
 $this->title = 'Manage Contractors';
 
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -24,9 +26,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         margin-top: 20px;
     }
     form#sort-data {
-        float: left;
-        width: 60%;
+        width: 55%;
         z-index: 100000000;
+    }
+    .col.s4.searchfield {
+        float: left;
+        margin-left: 185px;
+        height:0px;
+    }
+    ::placeholder {
+        color: rgba(0,0,0,.6);
+        opacity: 1; /* Firefox */
     }
 </style>
 
@@ -45,6 +55,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <option value="50" <?= (@$_GET['filter'] == 50) ? 'selected' : '' ?>>50</option>
                     <option value="100" <?= (@$_GET['filter'] == 100) ? 'selected' : '' ?>>100</option>
                 </select>
+            </div>
+        </form>
+        <form id="conform">
+            <div class="col s4 searchfield">
+                <input type="text" name="keyword" value="" id="consearch" placeholder="Search contractors" autocomplete="off">
+                <label for="consearch"><i class="material-icons search-icon">search</i></label>
             </div>
         </form>
 
@@ -73,7 +89,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="card-content card-contractors">
 
                     <div id="tables">
-                        <table id = "current-project-tenders" class="responsive-table">
+                        <table class="responsive-table bordered">
                             <thead>
                                 <tr>
                                     <th data-field="firm">Firm name</th>

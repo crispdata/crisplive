@@ -156,13 +156,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </select>
                         </div>
                     </form>
-                    <table id = "current-project-tenders" class="responsive-table">
+                    <table class="responsive-table bordered">
                         <thead>
                             <tr>
                                 <th data-field="email" width="100px">Tender Id</th>
                                 <th data-field="name">Details of Contracting Office</th>
-                                <th data-field="email" width="100px">Cost of Tender</th>
-                                <th data-field="email" width="80px">Bid end date</th>
+                                <th data-field="email" width="120px">Cost of Tender</th>
+                                <th data-field="email" width="100px">Bid end date</th>
                                 <th data-field="email" width="100px">Bid open date</th>
                                 <th data-field="email">Status</th>
                                 <th data-field="email">Actions</th>
