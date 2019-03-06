@@ -93,15 +93,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="card">
                     <div class="card-content card-tenders">
 
-                        <table id = "current-project-tenders" class="responsive-table">
+                        <table class="responsive-table bordered">
                             <thead>
                                 <tr>
                                     <th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
-                                    <th data-field="email" width="100px">Cost of Tender</th>
-                                    <th data-field="email" width="80px">Bid end date</th>
-                                    <th data-field="email" width="80px">Bid open date</th>
+                                    <th data-field="email" width="120px">Cost of Tender</th>
+                                    <th data-field="email" width="100px">Bid end date</th>
+                                    <th data-field="email" width="100px">Bid open date</th>
                                     <th data-field="email">Status</th>
                                     <th data-field="email">Actions</th>
                                 </tr>

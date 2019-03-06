@@ -54,6 +54,26 @@ $(document).ready(function () {
         "bLengthChange": true,
 
     });
+    
+    $('#current-project-contractors').DataTable({
+        language: {
+            searchPlaceholder: 'Search records',
+            sSearch: '',
+            sLengthMenu: 'Show _MENU_',
+            sLength: 'dataTables_length',
+            oPaginate: {
+                sFirst: '<i class="material-icons">chevron_left</i>',
+                sPrevious: '<i class="material-icons">chevron_left</i>',
+                sNext: '<i class="material-icons">chevron_right</i>',
+                sLast: '<i class="material-icons">chevron_right</i>'
+            }
+        },
+        'bPaginate': false,
+        "bInfo": false,
+        "bFilter": false,
+        "bLengthChange": true,
+
+    });
 
     $('#view-items').DataTable({
         language: {

@@ -39,7 +39,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'getaccessories','updatedetails','updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'getaccessories', 'searchcontractor', 'updatedetails', 'backup', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -482,7 +482,7 @@ class ProductsController extends Controller {
             return $this->redirect(array('products/accessories'));
         }
     }
-    
+
     public function actionGetaccessories() {
         $user = Yii::$app->user->identity;
         $alltypes = [];
@@ -500,37 +500,46 @@ class ProductsController extends Controller {
         echo json_encode(['alltypes' => $alltypes]);
         die;
     }
-    
+
     public function actionUpdatedetails() {
         $tenders = \common\models\ItemDetails::find()->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => 504])->all();
         echo "<pre/>";
         print_r($tenders);
         die();
-        if($tenders){
-            foreach($tenders as $_ten){
-                $arr = explode(',',$_ten->make);
-                $a = array_search("26",$arr);
-                $arr[$a] = '21';    
+        if ($tenders) {
+            foreach ($tenders as $_ten) {
+                $arr = explode(',', $_ten->make);
+                $a = array_search("26", $arr);
+                $arr[$a] = '21';
                 $narr = array_unique($arr);
-                $_ten->make = implode(',',$narr);
+                $_ten->make = implode(',', $narr);
                 $_ten->save();
             }
         }
-       
     }
-    
+
     public function actionUpdatedetailsitems() {
-        $tenders = \common\models\ItemDetails::find()->where(['typefitting'=>1])->all();
+        $tenders = \common\models\ItemDetails::find()->where(['typefitting' => 1])->all();
         echo "<pre/>";
         print_r($tenders);
         die();
-        if($tenders){
-            foreach($tenders as $_ten){
+        if ($tenders) {
+            foreach ($tenders as $_ten) {
                 $_ten->typefitting = 6;
                 $_ten->save();
             }
         }
-       
+    }
+
+    public function actionSearchcontractor() {
+        $val = $_REQUEST['val'];
+        $contractors = \common\models\Contractor::find()->where(['like', 'firm', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
+
+        echo $this->renderPartial('scontractors', [
+            'contractors' => $contractors,
+        ]);
+
+        die();
     }
 
 }

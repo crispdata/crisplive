@@ -58,9 +58,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <thead>
                         <tr>
 
-                            <th data-field="name">Sr. No.</th>
+                           
                             <th data-field="email">Tender Id</th>
-                            <th data-field="name">Details of Contracting Office</th>
+                            <th data-field="name" width="150px">Details of Contracting Office</th>
                             <th data-field="email" width="100px">Cost of Tender</th>
                             <th data-field="email" width="80px">Bid end date</th>
                             <th data-field="email" width="80px">Bid open date</th>
@@ -97,7 +97,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 ?>
                                 <tr data-id = "<?= $tender->tender_id ?>">
 
-                                    <td class = ""><?= $key + 1; ?></td>
                                     <td class = ""><?= $tender->tender_id ?></td>
                                     <td class = ""><?= $tdetails ?></td>
                                     <td class = ""><?= $tender->cvalue; ?></td>
