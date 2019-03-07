@@ -201,7 +201,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                             <?php
                                                         } else {
-                                                            if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
+                                                            if ($tender->status == 1 && $tender->is_archived != 1) {
                                                                 ?>
 
                                                                 <a class="waves-effect waves-light btn blue proj-delete">AOC</a>

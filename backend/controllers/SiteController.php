@@ -129,7 +129,7 @@ class SiteController extends Controller {
                     $iidsc[] = $_item->id;
                 }
             }
-
+           
             $graphonequantity = 0;
             $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
             if (isset($idetails) && count($idetails)) {
@@ -280,7 +280,7 @@ class SiteController extends Controller {
         if (isset($itemdetailsix)) {
             foreach ($itemdetailsix as $_detail) {
                 $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
-                if (@$price->price) {
+                if (@$price->price && $_detail->quantity != '' && is_numeric($_detail->quantity)) {
                     $eprice += ($_detail->quantity * $price->price);
                 }
             }
@@ -433,7 +433,7 @@ class SiteController extends Controller {
                 $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
                 if (isset($idetails) && count($idetails)) {
                     foreach ($idetails as $_idetail) {
-                        if ($_idetail->quantity != '') {
+                        if ($_idetail->quantity != '' && is_numeric($_idetail->quantity)) {
                             $graphonequantity += $_idetail->quantity;
                         }
                     }
@@ -486,7 +486,9 @@ class SiteController extends Controller {
             $onequantity = 0;
             if (isset($allquantity) && count($allquantity)) {
                 foreach ($allquantity as $_quantity) {
-                    $onequantity += $_quantity['quantity'];
+                    if ($_quantity['quantity'] != '' && is_numeric($_quantity['quantity'])) {
+                        $onequantity += $_quantity['quantity'];
+                    }
                 }
             }
 
@@ -3136,7 +3138,7 @@ class SiteController extends Controller {
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
 //$tenders=[];
-        $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
+        $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all();
 
         if ($val) {
             return $this->redirect(array('site/atenders?filter=' . $val . ''));
@@ -3764,7 +3766,7 @@ class SiteController extends Controller {
 
     public function actionGetcengineer() {
         $value = $_REQUEST['value'];
-        $data = '<option value="" selected>Select</option>';
+        $data = '<option value="" selected>Select CE</option>';
         if ($value == 6) {
             $data .= '<option value="1">CE CC AND CE (AF) ALLAHABAD - MES</option>';
             $data .= '<option value="2">CE CC AND CE BAREILLY ZONE - MES</option>';
@@ -3847,7 +3849,7 @@ class SiteController extends Controller {
 
     public function actionGetcwengineer() {
         $value = $_REQUEST['value'];
-        $data = '<option value="" selected>Select</option>';
+        $data = '<option value="" selected>Select CWE</option>';
         if ($value == 1) {
             $data .= '<option value="1">CWE (AF) BAMRAULI ALLAHABAD - MES</option>';
             $data .= '<option value="2">CWE (AF) IZATNAGAR - MES</option>';
@@ -4025,7 +4027,7 @@ class SiteController extends Controller {
 
     public function actionGetgengineer() {
         $value = $_REQUEST['value'];
-        $data = '<option value="" selected>Select</option>';
+        $data = '<option value="" selected>Select GE</option>';
         if ($value == 1) {
             $data .= '<option value="1">GE (AF) BAMRAULI - MES</option>';
             $data .= '<option value="2">GE (AF) BIHTA</option>';
@@ -4128,6 +4130,7 @@ class SiteController extends Controller {
         } elseif ($value == 28) {
             $data .= '<option value="64">GE BARRACKPORE - MES</option>';
             $data .= '<option value="65">GE PANAGARH - MES</option>';
+            $data .= '<option value="356">GE (NORTH) KOLKATA - MES</option>';
         } elseif ($value == 29) {
             $data .= '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
             $data .= '<option value="67">GE(NAVY)CHENNAI - MES</option>';
@@ -4213,6 +4216,7 @@ class SiteController extends Controller {
             $data .= '<option value="131">GE (S) AKHNOOR - MES</option>';
         } elseif ($value == 50) {
             $data .= '<option value="132">GE 862 EWS - MES</option>';
+            $data .= '<option value="357">AGE I CIF R - MES</option>';
         } elseif ($value == 51) {
             $data .= '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
             $data .= '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
@@ -4487,6 +4491,8 @@ class SiteController extends Controller {
             $data .= '<option value="314">GE DALHOUSIE - MES</option>';
             $data .= '<option value="315">GE (KH) YOL - MES</option>';
             $data .= '<option value="316">GE PALAMPUR - MES</option>';
+        } elseif ($value == 126) {
+            $data .= '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
         }
         echo json_encode(['data' => $data]);
         die;
@@ -6587,6 +6593,7 @@ class SiteController extends Controller {
         } elseif ($value == 28) {
             $data[] = '<option value="64">GE BARRACKPORE - MES</option>';
             $data[] = '<option value="65">GE PANAGARH - MES</option>';
+            $data[] = '<option value="356">GE (NORTH) KOLKATA - MES</option>';
         } elseif ($value == 29) {
             $data[] = '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
             $data[] = '<option value="67">GE(NAVY)CHENNAI - MES</option>';
@@ -6672,6 +6679,7 @@ class SiteController extends Controller {
             $data[] = '<option value="131">GE (S) AKHNOOR - MES</option>';
         } elseif ($value == 50) {
             $data[] = '<option value="132">GE 862 EWS - MES</option>';
+            $data[] = '<option value="357">AGE I CIF R - MES</option>';
         } elseif ($value == 51) {
             $data[] = '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
             $data[] = '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
@@ -6946,6 +6954,8 @@ class SiteController extends Controller {
             $data[] = '<option value="314">GE DALHOUSIE - MES</option>';
             $data[] = '<option value="315">GE (KH) YOL - MES</option>';
             $data[] = '<option value="316">GE PALAMPUR - MES</option>';
+        } elseif ($value == 126) {
+            $data[] = '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
         }
         $i = 0;
         if (!empty($data)) {
@@ -7078,6 +7088,7 @@ class SiteController extends Controller {
             } elseif ($value == 28) {
                 $data[] = '<option value="64">GE BARRACKPORE - MES</option>';
                 $data[] = '<option value="65">GE PANAGARH - MES</option>';
+                $data[] = '<option value="356">GE (NORTH) KOLKATA - MES</option>';
             } elseif ($value == 29) {
                 $data[] = '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
                 $data[] = '<option value="67">GE(NAVY)CHENNAI - MES</option>';
@@ -7163,6 +7174,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="131">GE (S) AKHNOOR - MES</option>';
             } elseif ($value == 50) {
                 $data[] = '<option value="132">GE 862 EWS - MES</option>';
+                $data[] = '<option value="357">AGE I CIF R - MES</option>';
             } elseif ($value == 51) {
                 $data[] = '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
                 $data[] = '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
@@ -7437,6 +7449,8 @@ class SiteController extends Controller {
                 $data[] = '<option value="314">GE DALHOUSIE - MES</option>';
                 $data[] = '<option value="315">GE (KH) YOL - MES</option>';
                 $data[] = '<option value="316">GE PALAMPUR - MES</option>';
+            } elseif ($value == 126) {
+                $data [] = '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
             }
             $i = 0;
             if (!empty($data)) {

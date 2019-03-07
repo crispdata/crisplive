@@ -168,7 +168,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                     <th data-field="email">Quantity</th>
                                     <th data-field="email">Make</th>
                                     <?php
-                                    if ($user->group_id == 3) {
+                                    if ($user->group_id == 9) {
                                         if ($stop_date >= date('Y-m-d H:i:s') && $tdetails->status == 0) {
                                             ?>
                                             <th data-field="email">Actions</th>
@@ -198,7 +198,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                             <td class = ""><?= $idetail->make ?></td>
 
                                             <?php
-                                            if ($user->group_id == 3) {
+                                            if ($user->group_id == 9) {
                                                 if ($stop_date >= date('Y-m-d H:i:s') && $tdetails->status == 0) {
                                                     ?>
                                                     <td>

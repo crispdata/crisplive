@@ -542,4 +542,75 @@ class ProductsController extends Controller {
         die();
     }
 
+    public function actionBackup() {
+        $dbHost = 'localhost';
+        $dbUsername = 'root';
+        $dbPassword = 'WRcqP^UiFk0#k0L';
+        $database_name = 'crispdata';
+        $tables = '*';
+        //connect & select the database
+        $link = new \mysqli($dbHost, $dbUsername, $dbPassword, $database_name);
+        $link->set_charset("utf8");
+
+        //get all of the tables
+        if ($tables == '*') {
+            $tables = array();
+            $result = mysqli_query($link,'SHOW TABLES');
+            while ($row = mysqli_fetch_row($result)) {
+                $tables[] = $row[0];
+            }
+        } else {
+            $tables = is_array($tables) ? $tables : explode(',', $tables);
+        }
+        $return='';
+        //cycle through
+        foreach ($tables as $table) {
+            $result = mysqli_query($link,'SELECT * FROM ' . $table);
+            $num_fields = mysqli_num_fields($result);
+            
+            //$return .= 'DROP TABLE ' . $table . ';';
+            $row2 = mysqli_fetch_row(mysqli_query($link,'SHOW CREATE TABLE ' . $table));
+            $return .= "\n\n" . $row2[1] . ";\n\n";
+
+            for ($i = 0; $i < $num_fields; $i++) {
+                while ($row = mysqli_fetch_row($result)) {
+                    $return .= 'INSERT INTO ' . $table . ' VALUES(';
+                    for ($j = 0; $j < $num_fields; $j++) {
+                        $row[$j] = addslashes($row[$j]);
+                        $row[$j] = str_replace("\n", "\\n", $row[$j]);
+                        if (isset($row[$j])) {
+                            $return .= '"' . $row[$j] . '"';
+                        } else {
+                            $return .= '""';
+                        }
+                        if ($j < ($num_fields - 1)) {
+                            $return .= ',';
+                        }
+                    }
+                    $return .= ");\n";
+                }
+            }
+            $return .= "\n\n\n";
+        }
+
+        //save file
+        $backup_file_name = 'db-backup-' . time() . '-' . (md5(implode(',', $tables))) . '.sql';
+        $handle = fopen('db-backup-' . time() . '-' . (md5(implode(',', $tables))) . '.sql', 'w+');
+        fwrite($handle, $return);
+        fclose($handle);
+        // Download the SQL backup file to the browser
+        header('Content-Description: File Transfer');
+        header('Content-Type: application/octet-stream');
+        header('Content-Disposition: attachment; filename=' . basename($backup_file_name));
+        header('Content-Transfer-Encoding: binary');
+        header('Expires: 0');
+        header('Cache-Control: must-revalidate');
+        header('Pragma: public');
+        header('Content-Length: ' . filesize($backup_file_name));
+        ob_clean();
+        flush();
+        readfile($backup_file_name);
+        exec('rm ' . $backup_file_name);
+    }
+
 }

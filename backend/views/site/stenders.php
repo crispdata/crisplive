@@ -58,7 +58,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <thead>
                         <tr>
 
-                           
+
                             <th data-field="email">Tender Id</th>
                             <th data-field="name" width="150px">Details of Contracting Office</th>
                             <th data-field="email" width="100px">Cost of Tender</th>
@@ -93,7 +93,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $status = 'Unapproved';
                                     $class = 'red';
                                 }
+                                if ($tender->on_hold == 1) {
+                                    $classaoc = 'red';
+                                    $text = 'On Hold';
+                                } else {
+                                    $classaoc = 'green';
+                                    $text = 'Ready';
+                                }
                                 $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
+                                $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                 ?>
                                 <tr data-id = "<?= $tender->tender_id ?>">
 
@@ -176,8 +184,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
 
                                         <a onclick="openmodal('modalfiles<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
-                                        <?php if ($tender->aoc_status == 1) { ?>
+                                        <?php if ($contractor) { ?>
                                             <a onclick="openmodal('modalcont<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
+                                        <?php } ?>
+                                        <?php if ($tender->is_archived != 1 && $contractor) { ?>
+                                            <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                         <?php } ?>
 
                                     </td>
