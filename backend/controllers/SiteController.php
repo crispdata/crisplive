@@ -44,7 +44,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -129,7 +129,7 @@ class SiteController extends Controller {
                     $iidsc[] = $_item->id;
                 }
             }
-           
+
             $graphonequantity = 0;
             $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iidsc])->all();
             if (isset($idetails) && count($idetails)) {
@@ -502,7 +502,7 @@ class SiteController extends Controller {
 
             if ($type == 1) {
                 $unit = 'RM';
-                $head = 'Quantity in Metres';
+                $head = 'Quantity in Meter';
             } else {
                 $unit = 'NOS';
                 $head = 'No. of Fixtures';
@@ -3013,7 +3013,7 @@ class SiteController extends Controller {
             $fromdate = $_POST['fromdate'];
             $todate = $_POST['todate'];
 
-            $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->andWhere(['>=', 'bid_end_date', $fromdate])->andWhere(['<=', 'bid_end_date', $todate])->orderBy(['id' => SORT_DESC]);
+            $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->andWhere(['>=', 'bid_end_date', $fromdate])->andWhere(['<=', 'bid_end_date', $todate])->orderBy(['bid_end_date' => SORT_ASC]);
             $countQuery = clone $tenders;
             if ($val && $page) {
                 $items_per_page = $val;
@@ -3239,7 +3239,7 @@ class SiteController extends Controller {
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
 //$tenders=[];
-        $contractors = [];
+        $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all();
         $commandname = $this->actionGetcommand($command);
 
         if ($val) {
@@ -3392,6 +3392,7 @@ class SiteController extends Controller {
                 $model->bid_end_date = @$_POST['enddate'];
                 $model->cvalue = $_POST['costvalue'];
                 $model->bid_opening_date = @$_POST['odate'];
+                $model->on_hold = 1;
                 $model->user_id = $user->UserId;
                 $model->createdon = date('Y-m-d h:i:s');
                 if ($user->group_id == 3) {
@@ -3443,7 +3444,11 @@ class SiteController extends Controller {
                 }
             }
 
-            return $this->redirect(array('site/tenders'));
+            if ($user->group_id == 3) {
+                return $this->redirect(array('site/utenders'));
+            } else {
+                return $this->redirect(array('site/atenders'));
+            }
 
             die();
         } else {
@@ -3658,6 +3663,7 @@ class SiteController extends Controller {
 
     public function actionDeleteTender() {
         $id = $_GET['id'];
+        $url = @$_GET['url'];
         $ids = [];
         $delete = \common\models\Tender::deleteAll(['id' => $id]);
         if ($delete) {
@@ -3671,7 +3677,36 @@ class SiteController extends Controller {
             $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
             $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
             Yii::$app->session->setFlash('success', "Tender successfully deleted");
-            return $this->redirect(array('site/tenders'));
+            if ($url != '') {
+                return $this->redirect(array('site/' . $url . ''));
+            } else {
+                return $this->redirect(array('site/atenders'));
+            }
+        }
+    }
+
+    public function actionDeleteApproveTender() {
+        $id = $_GET['id'];
+        $command = @$_GET['command'];
+        $page = @$_GET['page'];
+        $ids = [];
+        $delete = \common\models\Tender::deleteAll(['id' => $id]);
+        if ($delete) {
+            $idetails = \common\models\Item::find()->where(['tender_id' => $id])->all();
+            if (@$idetails) {
+                foreach ($idetails as $idet) {
+                    $ids[] = $idet->id;
+                }
+            }
+            $itemid = \common\models\Item::deleteAll(['tender_id' => $id]);
+            $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
+            $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
+            Yii::$app->session->setFlash('success', "Tender successfully deleted");
+            if ($page != '') {
+                return $this->redirect(array('site/approvetenders/' . $command . '?page=' . $page . ''));
+            } else {
+                return $this->redirect(array('site/approvetenders/' . $command . ''));
+            }
         }
     }
 
@@ -3697,6 +3732,7 @@ class SiteController extends Controller {
     }
 
     public function actionDeleteTenders() {
+        $url = $_POST["url"];
         if (count(@$_POST["selected_id"]) > 0) {
             $all = implode(",", $_POST["selected_id"]);
             $delete = \common\models\Tender::deleteAll(['id' => $_POST["selected_id"]]);
@@ -3711,11 +3747,11 @@ class SiteController extends Controller {
                 $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
                 $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
                 Yii::$app->session->setFlash('success', "Tenders successfully deleted");
-                return $this->redirect(array('site/tenders'));
+                return $this->redirect(array('site/' . $url . ''));
             }
         } else {
             Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
-            return $this->redirect(array('site/tenders'));
+            return $this->redirect(array('site/' . $url . ''));
         }
     }
 
@@ -4747,7 +4783,7 @@ class SiteController extends Controller {
             $tenderid = $tender->tender_id;
             $tdetails = $tender;
         } else {
-            return $this->redirect(array('site/tenders'));
+            return $this->redirect(array('site/atenders'));
         }
 
         $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_ASC])->all();
@@ -8119,9 +8155,9 @@ class SiteController extends Controller {
             die("Error: " . $e->getMessage());
         }
 
-        $file_name_one = time() . $_FILES['fileone']['name'];
-        $file_name_two = time() . $_FILES['filetwo']['name'];
-        $file_name_three = time() . $_FILES['filethree']['name'];
+        $file_name_one = time() . '1' . $_FILES['fileone']['name'];
+        $file_name_two = time() . '2' . $_FILES['filetwo']['name'];
+        $file_name_three = time() . '3' . $_FILES['filethree']['name'];
         $file_tmp_one = $_FILES['fileone']['tmp_name'];
         $file_tmp_two = $_FILES['filetwo']['tmp_name'];
         $file_tmp_three = $_FILES['filethree']['tmp_name'];
@@ -8193,7 +8229,11 @@ class SiteController extends Controller {
                         ->insert('tenderfiles', $datathree)
                         ->execute();
                 if ($querydata) {
+                    $contractor = \common\models\Contractor::find()->where(['id' => $lid])->one();
                     $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
+                    if($contractor->contact != ''){
+                        $tender->on_hold = '';
+                    }
                     $tender->aoc_status = 1;
                     $tender->qvalue = @$_POST['qvalue'];
                     $tender->aoc_date = @$_POST['aoc_date'];
@@ -8203,7 +8243,154 @@ class SiteController extends Controller {
                 } else {
                     Yii::$app->session->setFlash('error', "AOC Not Completed");
                 }
-                return $this->redirect(array('site/tenders'));
+                return $this->redirect(array('site/atenders'));
+            }
+        } catch (S3Exception $e) {
+            die('Error:' . $e->getMessage());
+        } catch (Exception $e) {
+            die('Error:' . $e->getMessage());
+        }
+    }
+
+    public function actionAocapprovestatus() {
+        $user = Yii::$app->user->identity;
+        $command = @$_POST['command'];
+        $page = @$_POST['page'];
+        if ($_POST['contractor'] == '') {
+            $model = new \common\models\Contractor();
+            $model->firm = @$_POST['firm'];
+            $model->name = @$_POST['name'];
+            $model->address = @$_POST['address'];
+            $model->contact = @$_POST['contact'];
+            $model->email = $_POST['email'];
+            $model->user_id = $user->UserId;
+            $model->createdon = date('Y-m-d h:i:s');
+            $model->status = 1;
+
+            $contractor = \Yii::$app
+                    ->db
+                    ->createCommand()
+                    ->insert('contractors', $model)
+                    ->execute();
+            $lid = Yii::$app->db->getLastInsertID();
+        } else {
+            $lid = $_POST['contractor'];
+        }
+
+
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        try {
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
+            $s3 = S3Client::factory(
+                            array(
+                                'credentials' => array(
+                                    'key' => Yii::$app->params['IAM_KEY'],
+                                    'secret' => Yii::$app->params['IAM_SECRET']
+                                ),
+                                'version' => 'latest',
+                                'region' => 'us-east-2',
+                            )
+            );
+        } catch (Exception $e) {
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
+            die("Error: " . $e->getMessage());
+        }
+
+        $file_name_one = time() . '1' . $_FILES['fileone']['name'];
+        $file_name_two = time() . '2' . $_FILES['filetwo']['name'];
+        $file_name_three = time() . '3' . $_FILES['filethree']['name'];
+        $file_tmp_one = $_FILES['fileone']['tmp_name'];
+        $file_tmp_two = $_FILES['filetwo']['tmp_name'];
+        $file_tmp_three = $_FILES['filethree']['tmp_name'];
+        move_uploaded_file($file_tmp_one, "assets/files/" . $file_name_one);
+        move_uploaded_file($file_tmp_two, "assets/files/" . $file_name_two);
+        move_uploaded_file($file_tmp_three, "assets/files/" . $file_name_three);
+
+        $keyNameone = 'files/' . $file_name_one;
+        $keyNametwo = 'files/' . $file_name_two;
+        $keyNamethree = 'files/' . $file_name_three;
+
+        $pathInS3one = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNameone;
+        $pathInS3two = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNametwo;
+        $pathInS3three = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyNamethree;
+
+        try {
+// Uploaded:
+            $fileone = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_one;
+            $filetwo = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_two;
+            $filethree = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name_three;
+            $fileuploadone = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyNameone,
+                        'SourceFile' => $fileone,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            $fileuploadtwo = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyNametwo,
+                        'SourceFile' => $filetwo,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            $fileuploadthree = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyNamethree,
+                        'SourceFile' => $filethree,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            if ($fileuploadone) {
+                unlink($fileone);
+                $dataone = ['tender_id' => $_POST['tid'], 'type' => 3, 'file' => $pathInS3one, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenderfiles', $dataone)
+                        ->execute();
+            }
+            if ($fileuploadtwo) {
+                unlink($filetwo);
+                $datatwo = ['tender_id' => $_POST['tid'], 'type' => 2, 'file' => $pathInS3two, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenderfiles', $datatwo)
+                        ->execute();
+            }
+            if ($fileuploadthree) {
+                unlink($filethree);
+                $datathree = ['tender_id' => $_POST['tid'], 'type' => 3, 'file' => $pathInS3three, 'user_id' => $user->id, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                $querydata = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('tenderfiles', $datathree)
+                        ->execute();
+                if ($querydata) {
+                    $contractor = \common\models\Contractor::find()->where(['id' => $lid])->one();
+                    $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
+                    if($contractor->contact != ''){
+                        $tender->on_hold = '';
+                    }
+                    $tender->aoc_status = 1;
+                    $tender->qvalue = @$_POST['qvalue'];
+                    $tender->aoc_date = @$_POST['aoc_date'];
+                    $tender->contractor = $lid;
+                    $tender->save();
+                    Yii::$app->session->setFlash('success', "AOC Completed");
+                } else {
+                    Yii::$app->session->setFlash('error', "AOC Not Completed");
+                }
+                if ($page != '') {
+                    return $this->redirect(array('site/approvetenders/' . $command . '?page=' . $page . ''));
+                } else {
+                    return $this->redirect(array('site/approvetenders/' . $command . ''));
+                }
             }
         } catch (S3Exception $e) {
             die('Error:' . $e->getMessage());

@@ -114,7 +114,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
             <div class="page-title">View Items of <?= $tname; ?></div>
         </div>
 
-<?php if (Yii::$app->session->hasFlash('success')): ?>
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
                     title: "<?= Yii::$app->session->getFlash('success'); ?>",
@@ -126,11 +126,11 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
             </script>
         <?php endif; ?>
 
-            <?php if (Yii::$app->session->hasFlash('error')): ?>
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
             <div class="alert alert-danger">
-            <?= Yii::$app->session->getFlash('error'); ?>
+                <?= Yii::$app->session->getFlash('error'); ?>
             </div>
-<?php endif; ?>
+        <?php endif; ?>
 
         <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-items">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
@@ -144,12 +144,15 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                     <?php
                 }
             } else {
-                ?>
-                <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= Url::to(['site/create-item', 'id' => $tid]) ?>"> Add Item</a>
-                <input type="submit" class="waves-effect waves-light btn blue m-b-xs add-contact" name="btn_delete" value="Delete Items"/>
-                <input type="submit" class="waves-effect waves-light btn blue m-b-xs add-contact" name="btn_approve" value="Approve Items"/>
-<?php }
-?>
+                if ($user->group_id != 4) {
+                    ?>
+                    <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= Url::to(['site/create-item', 'id' => $tid]) ?>"> Add Item</a>
+                    <input type="submit" class="waves-effect waves-light btn blue m-b-xs add-contact" name="btn_delete" value="Delete Items"/>
+                    <input type="submit" class="waves-effect waves-light btn blue m-b-xs add-contact" name="btn_approve" value="Approve Items"/>
+                    <?php
+                }
+            }
+            ?>
 
 
 
@@ -160,7 +163,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                         <table id = "view-items" class="responsive-table">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th>
+                                    <?php if ($user->group_id != 4) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="name">Sr. No.</th>
                                     <th data-field="name">Item Sr. No. of Tender</th>
                                     <th data-field="name">Item Description</th>
@@ -175,10 +178,13 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                             <?php
                                         }
                                     } else {
-                                        ?>
-                                        <th data-field="email">Actions</th>
-<?php }
-?>
+                                        if ($user->group_id != 4) {
+                                            ?>
+                                            <th data-field="email">Actions</th>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
 
                                 </tr>
                             </thead>
@@ -189,7 +195,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                     foreach ($idetails as $key => $idetail) {
                                         ?>
                                         <tr data-id = "<?= $idetail->id ?>">
-                                            <td align="center"><input type="checkbox" name="selected_id[]" <?= ($idetail->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $idetail->id; ?>" value="<?php echo $idetail->id; ?>"/><label for="check<?php echo $idetail->id; ?>"></label></td> 
+                                            <?php if ($user->group_id != 4) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($idetail->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $idetail->id; ?>" value="<?php echo $idetail->id; ?>"/><label for="check<?php echo $idetail->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $key + 1 ?></td>
                                             <td class = ""><?= ($idetail->itemtender) ? $idetail->itemtender : '---' ?></td>
                                             <td class = ""><?= $idetail->description ?></td>
@@ -208,23 +214,29 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                                     <?php
                                                 }
                                             } else {
-                                                ?>
-
-                                                <td><?php
-                                                if ($idetail->status == 1) {
+                                                if ($user->group_id != 4) {
                                                     ?>
-                                                        <a class="waves-effect waves-light btn green">Approved</a>
-                                                    <?php } else { ?>
-                                                        <a class="waves-effect waves-light btn blue" onclick='approveitem(<?php echo $idetail->id; ?>)'>Approve</a>
-            <?php }
-            ?>
 
-                                                    <a href="<?= Url::to(['site/edit-item', 'id' => $idetail->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
-                                                    <a href="#modal<?= $idetail->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                    <td><?php
+                                                        if ($user->group_id != 3) {
+                                                            if ($idetail->status == 1) {
+                                                                ?>
+                                                                <a class="waves-effect waves-light btn green">Approved</a>
+                                                            <?php } else { ?>
+                                                                <a class="waves-effect waves-light btn blue" onclick='approveitem(<?php echo $idetail->id; ?>)'>Approve</a>
+                                                                <?php
+                                                            }
+                                                        }
+                                                        ?>
 
-                                                </td>                               
-        <?php }
-        ?>
+                                                        <a href="<?= Url::to(['site/edit-item', 'id' => $idetail->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                                        <a href="#modal<?= $idetail->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+
+                                                    </td>                               
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
 
                                         </tr>
                                     <div id="modal<?= $idetail->id; ?>" class="modal">
@@ -237,7 +249,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                             <a href="<?= Url::to(['site/delete-item', 'id' => $idetail->id, 'tid' => $tid]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
-                                    
+
                                     <?php
                                     $i++;
                                 }

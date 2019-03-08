@@ -412,22 +412,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     }
                                                 } else {
                                                     if ($tender->status == 1) {
-                                                        ?>
-                                                        <a class = "waves-effect waves-light btn <?php
-                                                        if ($tender->is_archived == 1) {
-                                                            echo "orange";
-                                                        } else {
-                                                            echo "green";
-                                                        }
-                                                        ?>"><?php
-                                                               if ($tender->is_archived == 1) {
-                                                                   echo "Archived";
-                                                               } else {
-                                                                   echo "Approved";
-                                                               }
-                                                               ?></a>
-
-                                                        <?php
+                                                        
                                                         if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                             ?>
 

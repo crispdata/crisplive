@@ -104,10 +104,20 @@ $(document).ready(function () {
                             "deferRender": true
 
                         });
+                        
                         $('.pdatepicker').pickadate({
                             format: 'dd-mm-yyyy',
                             selectMonths: true, // Creates a dropdown to control month
                             selectYears: 15, // Creates a dropdown of 15 years to control year
+                            onSet: function (ele) {
+                                if (ele.select) {
+                                    $('.picker__holder').css('height', '0px');
+                                    this.close();
+                                }
+                            },
+                            onClose: function (ele) {
+                                $('.picker__holder').css('height', '0px');
+                            }
                         });
                         $('select').css('display', 'block');
                     } else {
@@ -996,10 +1006,20 @@ $(document).ready(function () {
                             "deferRender": true
 
                         });
+                       
                         $('.pdatepicker').pickadate({
                             format: 'dd-mm-yyyy',
                             selectMonths: true, // Creates a dropdown to control month
                             selectYears: 15, // Creates a dropdown of 15 years to control year
+                            onSet: function (ele) {
+                                if (ele.select) {
+                                    $('.picker__holder').css('height', '0px');
+                                    this.close();
+                                }
+                            },
+                            onClose: function (ele) {
+                                $('.picker__holder').css('height', '0px');
+                            }
                         });
                         $('select').css('display', 'block');
                     } else {

@@ -1,6 +1,8 @@
 <?php
 /* @var $this yii\web\View */
+
 use yii\helpers\Url;
+
 $this->title = 'Dashboard';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -55,6 +57,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
     .make .counter{color:#ff6666;}
     label{color:#000!important;}
+    label[for="quotedvalue"] {
+       color:#9e9e9e!important;
+    }
     .piechart {
         background-color: lightblue;
         border:5px solid lightblue;
@@ -91,7 +96,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             for (i = 0; i < years.length; i++)
                 data.addRow([years[i], sales[i]]);
 
-            
+
             var options = {
                 legend: {position: 'labeled'},
                 displayExactValues: true,
@@ -183,7 +188,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart'));
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
 
             chart.draw(data, options);
         }
@@ -220,7 +225,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById('curve_chart_ce'));
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ce'));
 
             chart.draw(data, options);
         }
@@ -257,7 +262,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById(id));
+            var chart = new google.visualization.ColumnChart(document.getElementById(id));
 
             chart.draw(data, options);
         }
@@ -294,7 +299,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 }
             };
 
-            var chart = new google.visualization.LineChart(document.getElementById(id));
+            var chart = new google.visualization.ColumnChart(document.getElementById(id));
 
             chart.draw(data, options);
         }
@@ -315,9 +320,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     </script>
 <?php endif; ?>
 
-<?php if (Yii::$app->session->hasFlash('error')): ?>
+    <?php if (Yii::$app->session->hasFlash('error')): ?>
     <div class="alert alert-danger">
-        <?= Yii::$app->session->getFlash('error'); ?>
+    <?= Yii::$app->session->getFlash('error'); ?>
     </div>
 <?php endif; ?>
 
@@ -339,7 +344,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </select>
                             </form>
 
-                            <?php if (isset($details) && count($details)) { ?>
+    <?php if (isset($details) && count($details)) { ?>
 
                                 <select class="validate required materialSelect" name="command" id="command" required="">
                                     <option value="">Select Command</option>
@@ -739,7 +744,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '10']) ?>">SOUTH WESTERN COMMAND</a>
                         <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '11']) ?>">WESTERN COMMAND</a>
                         <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '12']) ?>">DGNP MUMBAI - MES</a>
-                        
+
 
                     </div></div></div></div></main>
 <?php } ?>
