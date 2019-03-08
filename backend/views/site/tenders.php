@@ -44,7 +44,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 60%;
         z-index: 100000000;
     }
-
+    ::placeholder{color:#9e9e9e;}
 </style>
 <?php //$contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();   ?>
 <main class="mn-inner">
@@ -66,8 +66,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         </form>
         <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-tenders">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-            <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
-            <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
+            <input type="hidden" name="url" value="<?= $url; ?>" />
+            <?php if ($user->group_id != 4) { ?>
+                <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
+                <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
+            <?php } ?>
             <?php if (Yii::$app->session->hasFlash('success')): ?>
                 <script>
                     swal({
@@ -96,7 +99,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table class="responsive-table bordered">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th>
+                                    <?php if ($user->group_id != 4) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
                                     <th data-field="email" width="120px">Cost of Tender</th>
@@ -131,7 +134,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
-                                            <td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td> 
+                                            <?php if ($user->group_id != 4) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->cvalue ?></td>
@@ -151,10 +154,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     }
                                                 } else {
                                                     if ($tender->status == 1) {
-                                                        ?>
-                                                        <a class = "waves-effect waves-light btn green">Approved</a>
-
-                                                        <?php
                                                         if ($tender->aoc_status == 1) {
                                                             ?>
 
@@ -162,17 +161,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                             <?php
                                                         } else {
-                                                            if ($tender->status == 1) {
+                                                            if ($user->group_id == 4) {
                                                                 ?>
-
+                                                                <a class="waves-effect waves-light btn blue">AOC</a>
+                                                            <?php } else { ?>
                                                                 <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
                                                                 <?php
                                                             }
                                                         }
-                                                    } else {
-                                                        ?>
-                                                        <a class="waves-effect waves-light btn red">Unapproved</a>
-                                                        <?php
                                                     }
 
                                                     if ($tender->status == 1) {
@@ -209,7 +205,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="modal-footer">
                                             <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                            <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id, 'url' => $url]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
 
@@ -376,9 +372,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <label for="item">Item description</label-->
                                             </div>
                                             <div class="row">
-                                                <div class="input-field col s12">
-                                                    <input id="pdate" type="text" name = "aoc_date" class="pdatepicker required">
-                                                    <label for="pdate">AOC Date</label>
+                                                <div class="input-field col s12 tender<?= $tender->id; ?>">
+                                                    <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" class="pdatepicker required" placeholder="AOC Date">
                                                 </div>
                                             </div>
                                             <div class="input-field col s12 row">

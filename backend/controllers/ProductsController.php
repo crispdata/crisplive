@@ -20,6 +20,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use backend\controllers\SiteController;
 use Twilio\Rest\Client;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
 
 /**
  * Products controller
@@ -35,11 +37,11 @@ class ProductsController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'signup', 'request-password-reset', 'reset-password', 'error'],
+                        'actions' => ['login', 'signup', 'request-password-reset', 'reset-password', 'error', 'backup'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'getaccessories', 'searchcontractor', 'updatedetails', 'backup', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'getaccessories', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -540,6 +542,83 @@ class ProductsController extends Controller {
         ]);
 
         die();
+    }
+
+    public function actionBackup() {
+        $files = [];
+        $dir = $_SERVER['DOCUMENT_ROOT'] . '/backups';
+        if (is_dir($dir)) {
+            if ($dh = opendir($dir)) {
+                while (($file = readdir($dh)) !== false) {
+                    $files[] = $file;
+                }
+                closedir($dh);
+            }
+        }
+
+        $nfiles = [];
+        if ($files) {
+            foreach ($files as $_file) {
+                if ($_file != '..' && $_file != '.') {
+                    $nfiles[] = $_file;
+                }
+            }
+        }
+
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        $s3paths = [];
+        try {
+            // You may need to change the region. It will say in the URL when the bucket is open
+            // and on creation.
+            $s3 = S3Client::factory(
+                            array(
+                                'credentials' => array(
+                                    'key' => Yii::$app->params['IAM_KEY'],
+                                    'secret' => Yii::$app->params['IAM_SECRET']
+                                ),
+                                'version' => 'latest',
+                                'region' => 'us-east-2',
+                            )
+            );
+        } catch (Exception $e) {
+            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+            // return a json object.
+            die("Error: " . $e->getMessage());
+        }
+
+        $keyName = 'backups/' . $nfiles['0'];
+        $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
+
+        try {
+            // Uploaded:
+            $file = $dir . '/' . $nfiles['0'];
+            $fileupload = $s3->putObject(
+                    array(
+                        'Bucket' => Yii::$app->params['bucketName'],
+                        'Key' => $keyName,
+                        'SourceFile' => $file,
+                        'ACL' => 'public-read-write'
+                    )
+            );
+            if ($fileupload) {
+                unlink($file);
+            }
+        } catch (S3Exception $e) {
+            die('Error:' . $e->getMessage());
+        } catch (Exception $e) {
+            die('Error:' . $e->getMessage());
+        }
+    }
+
+    public function actionUpdatetend() {
+        $approvedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orWhere(['status' => 0])->orderBy(['id' => SORT_DESC])->all();
+        
+        if ($approvedtenders) {
+            foreach ($approvedtenders as $_tender) {
+                $_tender->on_hold = '1';
+                $_tender->save();
+            }
+        }
     }
 
 }

@@ -1,6 +1,7 @@
 $(document).ready(function () {
     $('select.materialSelectmake').select2({closeOnSelect: true, placeholder: 'Select Makes'});
     $('select.materialSelectcontractor').select2({closeOnSelect: true, placeholder: 'Select Contractor'});
+    $('select.materialSelectcon').select2({closeOnSelect: true, placeholder: 'All Contractors'});
     $('select.cmakes').select2({closeOnSelect: true, placeholder: 'Select Cables Makes'});
     $('select.lmakes').select2({closeOnSelect: true, placeholder: 'Select Lighting Makes'});
     $('select.cementmakes').select2({closeOnSelect: true, placeholder: 'Select Cement Makes'});

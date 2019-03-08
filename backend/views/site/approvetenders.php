@@ -44,6 +44,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 60%;
         z-index: 100000000;
     }
+    ::placeholder{color:#9e9e9e;}
 </style>
 
 <main class="mn-inner">
@@ -54,7 +55,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
 
-<?php if (Yii::$app->session->hasFlash('success')): ?>
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
                     title: "<?= Yii::$app->session->getFlash('success'); ?>",
@@ -66,11 +67,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </script>
         <?php endif; ?>
 
-            <?php if (Yii::$app->session->hasFlash('error')): ?>
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
             <div class="alert alert-danger">
-            <?= Yii::$app->session->getFlash('error'); ?>
+                <?= Yii::$app->session->getFlash('error'); ?>
             </div>
-<?php endif; ?>
+        <?php endif; ?>
 
 
         <div class="col s12 m12 l12">
@@ -184,12 +185,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
                                     $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
                                     $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
-                                    if ($tender->status == 1) {
+                                    if ($tender->status == 1 && $tender->is_archived == 1) {
+                                        $status = 'Archived';
+                                        $class = 'orange';
+                                    } elseif ($tender->status == 1) {
                                         $status = 'Approved';
                                         $class = 'green';
                                     } else {
                                         $status = 'Unapproved';
                                         $class = 'red';
+                                    }
+                                    $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
+                                    if ($tender->on_hold == 1) {
+                                        $classaoc = 'red';
+                                        $text = 'On Hold';
+                                    } else {
+                                        $classaoc = 'green';
+                                        $text = 'Ready';
                                     }
                                     $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                     ?>
@@ -213,30 +225,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 }
                                             } else {
                                                 if ($tender->status == 1) {
-                                                    ?>
-                                                    <a class = "waves-effect waves-light btn green">Approved</a>
-
-
-                                                    <?php
-                                                    if ($tender->aoc_status == 1) {
+                                                    if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                         ?>
 
                                                         <a href="javascript:void(0);" class="waves-effect waves-light btn green">AOC</a>
 
                                                         <?php
                                                     } else {
-                                                        if ($tender->status == 1) {
+                                                        if ($tender->status == 1 && $tender->is_archived != 1) {
                                                             ?>
 
                                                             <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
                                                             <?php
                                                         }
                                                     }
-                                                } else {
-                                                    ?>
-                                                    <a class="waves-effect waves-light btn red">Unapproved</a>
-
-                                                    <?php
                                                 }
 
                                                 if ($tender->status == 1) {
@@ -262,7 +264,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
 
                                             <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
-
+                                            <?php if ($contractor) { ?>
+                                                <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
+                                            <?php } ?>
+                                            <?php if ($tender->is_archived != 1 && $contractor) {
+                                                ?>
+                                                <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
+                                            <?php } ?>
 
                                         </td>
 
@@ -274,7 +282,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                     <div class="modal-footer">
                                         <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                        <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                        <a href="<?= Url::to(['site/delete-approve-tender', 'id' => $tender->id, 'command' => $tender->command, 'page' => @$_GET['page']]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                     </div>
                                 </div>
 
@@ -299,23 +307,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                             <div id="modalfiles<?= $tender->id; ?>" class="modal">
-        <?php ?>
+                                <?php ?>
                                 <div class="modal-content">
                                     <h4>View Tender Files</h4>
 
                                     <div class="row">
-                                            <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
+                                        <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
                                         <div class="input-field col s6">
                                             <?php if ($tech->tfile != '') { ?>
                                                 <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
                                             <?php } else { ?>
                                                 <a class="notavailable">No Tender files yet</a>
-        <?php } ?>
+                                            <?php } ?>
                                         </div>
                                     </div>
 
                                     <h4>View BOQ Sheet</h4>
-                                        <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                    <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
                                     <div class="row">
                                         <?php
                                         if (@$finfiles) {
@@ -344,7 +352,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     </div>
                                     <h4>View AOC Files</h4>
-                                        <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
+                                    <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
                                     <div class="row">
                                         <?php
                                         if (@$aocfiles) {
@@ -394,13 +402,70 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                             </div>
+                            <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
+                            <?php if ($contractor) { ?>        
+                                <div id="modalcont<?= $tender->id; ?>" class="modal">
+
+                                    <div class="modal-content"> 
+                                        <h5>Contractor Information</h5>
+
+                                        <div class="row">
+
+                                            <div class="col s6">
+                                                <h4>Firm Name</h4>
+                                                <?= $contractor->firm; ?>
+                                            </div>
+
+                                            <div class="col s6">
+                                                <h4>Name</h4>
+                                                <?= $contractor->name; ?>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+
+                                            <div class="col s6">
+                                                <h4>Address</h4>
+                                                <?= $contractor->address; ?>
+                                            </div>
+
+                                            <div class="col s6">
+                                                <h4>Contact No.</h4>
+                                                <?= $contractor->contact; ?>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+
+                                            <div class="col s6">
+                                                <h4>Email</h4>
+                                                <?= $contractor->email; ?>
+                                            </div>
+
+                                        </div>
+                                        <?php if ($tender->is_archived != 1) { ?>
+                                            <div class="row">
+
+                                                <div class="col s6">
+                                                    <a target="_blank" class="waves-effect waves-light btn blue proj-delete" href="<?= Url::to(['contractor/add-contractor', 'id' => $contractor->id]) ?>">Edit</a>
+                                                </div>
+
+                                            </div>
+                                        <?php } ?>
+
+
+
+                                    </div>
+                                </div>
+                            <?php } ?>
                             <div id="modalaoc<?= $tender->id; ?>" class="modal">
 
                                 <div class="modal-content">
-                                    <form id="create-item" method = "post" enctype="multipart/form-data" action = "<?= $baseURL ?>site/aocstatus">
+                                    <form id="create-item" method = "post" enctype="multipart/form-data" action = "<?= $baseURL ?>site/aocapprovestatus">
                                         <h4>AOC Bid Opening Summary Upload</h4>
                                         <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                                         <input type="hidden" name="tid" value="<?= $tender->id; ?>">
+                                        <input type="hidden" name="command" value="<?= $tender->command; ?>">
+                                        <input type="hidden" name="url" value="approvetenders">
+                                        <input type="hidden" name="page" value="<?= @$_GET['page']; ?>">
                                         <div class="file-field input-field">
                                             <div class="btn teal lighten-1">
                                                 <span>File</span>
@@ -437,9 +502,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <label for="item">Item description</label-->
                                         </div>
                                         <div class="row">
-                                            <div class="input-field col s12">
-                                                <input id="pdate" type="text" name = "aoc_date" class="pdatepicker required">
-                                                <label for="pdate">AOC Date</label>
+                                            <div class="input-field col s12 tender<?= $tender->id; ?>">
+                                                <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" class="pdatepicker required" placeholder="AOC Date">
                                             </div>
                                         </div>
                                         <div class="input-field col s12 row">

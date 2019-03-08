@@ -4,6 +4,7 @@
 use backend\controllers\SiteController;
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
+
 $this->title = 'Advanced search';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -43,7 +44,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 60%;
         z-index: 100000000;
     }
-    input.select-dropdown{height:56px!important;}
+    .input-fields.col.s4.row {
+        margin-top: 13px;
+    }
+    .firstrow{margin-bottom: 0px!important;}
+    label,.select2-selection__placeholder{color:rgba(0,0,0,.6)!important;}
 </style>
 <main class="mn-inner">
     <div class="row">
@@ -74,17 +79,71 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="card">
                 <div class="card-content card-tenders">
                     <div class="row">
+                        <?php $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all(); ?>
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/index">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-
-                            <div class="input-field col s6">
-                                <input id="keyword" type="text" name = "keyword" class="validate required" value="<?= @$_GET['keyword']; ?>">
-                                <label for="keyword">Search Keyword</label>
+                            <div class="row firstrow">
+                                <div class="input-field col s4">
+                                    <input id="keyword" type="text" name = "keyword" class="validate required" value="<?= @$_GET['keyword']; ?>">
+                                    <label for="keyword">Search Keyword</label>
+                                </div>
+                                <div class="input-fields col s4 row">
+                                    <select class="validate required materialSelect" name="tendertype" id="tendertype">
+                                        <option value="1" <?php
+                                        if (@$_GET['tendertype'] == 1) {
+                                            echo "selected";
+                                        }
+                                        ?>>All Tenders</option>
+                                        <option value="2" <?php
+                                        if (@$_GET['tendertype'] == 2) {
+                                            echo "selected";
+                                        }
+                                        ?>>Approved (Without AOC) Tenders</option>
+                                        <option value="3" <?php
+                                        if (@$_GET['tendertype'] == 3) {
+                                            echo "selected";
+                                        }
+                                        ?>>Unapproved Tenders</option>
+                                        <option value="4" <?php
+                                        if (@$_GET['tendertype'] == 4) {
+                                            echo "selected";
+                                        }
+                                        ?>>AOC Tenders</option>
+                                        <option value="5" <?php
+                                        if (@$_GET['tendertype'] == 5) {
+                                            echo "selected";
+                                        }
+                                        ?>>AOC Ready Tenders</option>
+                                        <option value="6" <?php
+                                        if (@$_GET['tendertype'] == 6) {
+                                            echo "selected";
+                                        }
+                                        ?>>AOC OnHold Tenders</option>
+                                        <option value="7" <?php
+                                        if (@$_GET['tendertype'] == 7) {
+                                            echo "selected";
+                                        }
+                                        ?>>Archived Tenders</option>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row">
+                                    <select class="validate required materialSelectcon browser-default" name="contype" id="contype">
+                                        <option value="">All Contractors</option>
+                                        <?php
+                                        if (@$contractors) {
+                                            foreach ($contractors as $k => $_con) {
+                                                ?>
+                                                <option value="<?= $_con->id ?>" <?= (@$_GET['contype'] == $_con->id) ? 'selected' : '' ?>><?= $_con->firm . ' - ' . $_con->address ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                             </div>
-
-                            <div class="input-fields col s6 row">
+                            <div class="input-fields col s4 row">
                                 <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
-                                    <option value="">Select Command</option>
+                                    <option value="">ALL COMMANDS</option>
                                     <option value="1" <?php
                                     if (@$_GET['command'] == 1) {
                                         echo "selected";
@@ -160,8 +219,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                     <div id="ce">
                                         <div class="input-fields col s4 row">
-                                            <label>Select CE</label>
                                             <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                <option value="">Select CE</option>
                                                 <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cengineer']); ?>
                                             </select>
                                         </div>
@@ -169,8 +228,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } elseif (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) { ?>
                                     <div id="cwe">
                                         <div class="input-fields col s4 row">
-                                            <label>Select CWE</label>
                                             <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                <option value="">Select CE</option>
                                                 <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cwengineer']); ?>
                                             </select>
                                         </div>
@@ -178,8 +237,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } elseif (@$_GET['gengineer'] != 0 || @$_GET['gengineer'] != null) { ?>
                                     <div id="ge">
                                         <div class="input-fields col s4 row">
-                                            <label>Select GE</label>
                                             <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                <option value="">Select CE</option>
                                                 <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['gengineer']); ?>
                                             </select>
                                         </div>
@@ -187,9 +246,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } else { ?>
                                     <div id="ce" style="display: none;">
                                         <div class="input-fields col s4 row">
-                                            <label>Select CE</label>
                                             <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                                <option value="" disabled selected>Select</option>
+                                                <option value="" disabled selected>Select CE</option>
                                             </select>
                                         </div>
                                     </div>
@@ -200,8 +258,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                     <div id="cwe">
                                         <div class="input-fields col s4 row">
-                                            <label>Select CWE</label>
                                             <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                <option value="">Select CWE</option>
                                                 <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], $_GET['cwengineer']); ?>
                                             </select>
                                         </div>
@@ -209,9 +267,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } else { ?>
                                     <div id="cwe" style="display: none;">
                                         <div class="input-fields col s4 row">
-                                            <label>Select CWE</label>
                                             <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                                <option value="" disabled selected>Select</option>
+                                                <option value="" disabled selected>Select CWE</option>
                                             </select>
                                         </div>
                                     </div>
@@ -223,8 +280,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     <div id="ge">
                                         <div class="input-fields col s4 row">
-                                            <label>Select GE</label>
                                             <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                <option value="">Select GE</option>
                                                 <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], $_GET['gengineer']); ?>
                                             </select>
                                         </div>
@@ -232,9 +289,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php } else { ?>
                                     <div id="ge" style="display: none;">
                                         <div class="input-fields col s4 row">
-                                            <label>Select GE</label>
                                             <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                                <option value="" disabled selected>Select</option>
+                                                <option value="" disabled selected>Select GE</option>
                                             </select>
                                         </div>
                                     </div>
@@ -244,9 +300,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 ?>
                                 <div id="ce" style="display: none;">
                                     <div class="input-fields col s4 row">
-                                        <label>Select CE</label>
                                         <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                            <option value="0" disabled selected>Select</option>
+                                            <option value="0" disabled selected>Select CE</option>
                                         </select>
                                     </div>
                                 </div>
@@ -254,18 +309,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                 <div id="cwe" style="display: none;">
                                     <div class="input-fields col s4 row">
-                                        <label>Select CWE</label>
                                         <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                            <option value="0" disabled selected>Select</option>
+                                            <option value="0" disabled selected>Select CWE</option>
                                         </select>
                                     </div>
                                 </div>
 
                                 <div id="ge" style="display: none;">
                                     <div class="input-fields col s4 row">
-                                        <label>Select GE</label>
                                         <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                            <option value="0" disabled selected>Select</option>
+                                            <option value="0" disabled selected>Select GE</option>
                                         </select>
                                     </div>
                                 </div>
@@ -292,13 +345,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     }
                     if (isset($_GET['submit'])) {
                         ?>
-                        <table id = "current-project-tenders" class="responsive-table">
+                        <table class="responsive-table bordered">
                             <thead>
                                 <tr>
                                     <th data-field="email" width="100px">Tender Id</th>
-                                    <th data-field="name" width="100px">Details of Contracting Office</th>
-                                    <th data-field="email" width="100px">Cost of Tender</th>
-                                    <th data-field="email" width="80px">Bid end date</th>
+                                    <th data-field="name" >Details of Contracting Office</th>
+                                    <th data-field="email" width="120px">Cost of Tender</th>
+                                    <th data-field="email" width="100px">Bid end date</th>
                                     <th data-field="email" width="100px">Bid open date</th>
                                     <th data-field="email">Status</th>
                                     <th data-field="email">Actions</th>
@@ -319,14 +372,25 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
                                         $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
                                         $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
-                                        if ($tender->status == 1) {
+                                        if ($tender->status == 1 && $tender->is_archived == 1) {
+                                            $status = 'Archived';
+                                            $class = 'orange';
+                                        } elseif ($tender->status == 1) {
                                             $status = 'Approved';
                                             $class = 'green';
                                         } else {
                                             $status = 'Unapproved';
                                             $class = 'red';
                                         }
+                                        if ($tender->on_hold == 1) {
+                                            $classaoc = 'red';
+                                            $text = 'On Hold';
+                                        } else {
+                                            $classaoc = 'green';
+                                            $text = 'Ready';
+                                        }
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
+                                        $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
                                             <td class = ""><?= $tender->tender_id ?></td>
@@ -348,18 +412,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     }
                                                 } else {
                                                     if ($tender->status == 1) {
-                                                        ?>
-                                                        <a class = "waves-effect waves-light btn green">Approved</a>
-
-                                                        <?php
-                                                        if ($tender->aoc_status == 1) {
+                                                        
+                                                        if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                             ?>
 
                                                             <a href="javascript:void(0);" class="waves-effect waves-light btn green">AOC</a>
 
                                                             <?php
                                                         } else {
-                                                            if ($tender->status == 1) {
+                                                            if ($tender->status == 1 && $tender->is_archived != 1) {
                                                                 ?>
 
                                                                 <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
@@ -393,8 +454,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 ?>
 
                                                 <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
-
                                                 <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
+                                                <?php if ($contractor) { ?>
+                                                    <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
+                                                <?php } ?>
+                                                <?php if ($tender->is_archived != 1 && $contractor) { ?>
+                                                    <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
+                                                <?php } ?>
 
                                             </td>
 
@@ -530,6 +596,60 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                 </div>
 
+                                <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
+                                <?php if ($contractor) { ?>        
+                                    <div id="modalcont<?= $tender->id; ?>" class="modal">
+
+                                        <div class="modal-content"> 
+                                            <h5>Contractor Information</h5>
+
+                                            <div class="row">
+
+                                                <div class="col s6">
+                                                    <h4>Firm Name</h4>
+                                                    <?= $contractor->firm; ?>
+                                                </div>
+
+                                                <div class="col s6">
+                                                    <h4>Name</h4>
+                                                    <?= $contractor->name; ?>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="col s6">
+                                                    <h4>Address</h4>
+                                                    <?= $contractor->address; ?>
+                                                </div>
+
+                                                <div class="col s6">
+                                                    <h4>Contact No.</h4>
+                                                    <?= $contractor->contact; ?>
+                                                </div>
+                                            </div>
+                                            <div class="row">
+
+                                                <div class="col s6">
+                                                    <h4>Email</h4>
+                                                    <?= $contractor->email; ?>
+                                                </div>
+
+                                            </div>
+                                            <?php if ($tender->is_archived != 1) { ?>
+                                                <div class="row">
+
+                                                    <div class="col s6">
+                                                        <a target="_blank" class="waves-effect waves-light btn blue proj-delete" href="<?= Url::to(['contractor/add-contractor', 'id' => $contractor->id]) ?>">Edit</a>
+                                                    </div>
+
+                                                </div>
+                                            <?php } ?>
+
+
+
+                                        </div>
+                                    </div>
+                                <?php } ?>
                                 <div id="modalaoc<?= $tender->id; ?>" class="modal">
 
                                     <div class="modal-content">

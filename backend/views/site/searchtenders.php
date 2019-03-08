@@ -196,7 +196,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table id = "current-project" class="responsive-table">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
                                     <th data-field="email">Cost of Tender</th>
@@ -213,7 +212,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     foreach ($tenders as $key => $tender) {
                                         $tdetails = '';
                                         $command = Sitecontroller::actionGetcommand($tender->command);
-                                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                        if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                        } else {
+                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                        }
                                         $cwengineer = \common\models\Cwengineer::find()->where(['cid' => $tender->cwengineer, 'status' => 1])->one();
                                         $gengineer = \common\models\Gengineer::find()->where(['gid' => $tender->gengineer, 'status' => 1])->one();
                                         $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
@@ -227,7 +230,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
-                                            <td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td> 
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->cvalue ?></td>
@@ -236,7 +238,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                             <td>
 
+                                                <?php
+                                                if ($tender->aoc_status == 1) {
+                                                    ?>
 
+                                                    <a class="waves-effect waves-light btn green">AOC</a>
+
+                                                <?php } else {
+                                                    ?>
+                                                    <a class="waves-effect waves-light btn blue">AOC</a>
+                                                <?php }
+                                                ?>
                                                 <a href="<?= $baseURL ?>site/view-items?id=<?= $tender->id; ?>" class="waves-effect waves-light btn blue">View Items</a>
 
                                                 <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>

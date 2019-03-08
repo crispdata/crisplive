@@ -44,10 +44,11 @@ $pages = [];
 $projectid = '';
 $allroles = [];
 
-$approvedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC])->count();
+
 $total = \common\models\Tender::find()->orderBy(['id' => SORT_DESC])->count();
 $atenders = \common\models\Tender::find()->where(['status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC])->count();
 $aoctenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC])->count();
+$approvedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC])->count();
 $unapprovedtenders = \common\models\Tender::find()->where(['status' => 0])->orderBy(['id' => SORT_DESC])->count();
 $archivetenders = \common\models\Tender::find()->where(['aoc_status' => 1, 'is_archived' => 1])->orderBy(['id' => SORT_DESC])->count();
 $aocready = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC])->count();

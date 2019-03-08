@@ -71,7 +71,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <?php if ($user->group_id == 1) { ?>
                 <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
             <?php } ?>
-            <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
+            <?php if ($user->group_id != 4) { ?>
+                <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
+            <?php } ?>
             <?php if (Yii::$app->session->hasFlash('success')): ?>
                 <script>
                     swal({
@@ -100,7 +102,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table class="responsive-table bordered">
                             <thead>
                                 <tr>
-                                    <th><input type="checkbox" name="check_all" <?= ($user->group_id != 1) ? 'disabled' : '' ?> id="check_all" value=""/><label for="check_all"></label></th>
+                                    <?php if ($user->group_id != 4) { ?><th><input type="checkbox" name="check_all" <?= ($user->group_id != 1) ? 'disabled' : '' ?> id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
                                     <th data-field="email">Awarded Amount</th>
@@ -135,6 +137,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             $class = 'red';
                                         }
 
+                                        $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                         if ($tender->on_hold == 1) {
                                             $classaoc = 'red';
                                             $text = 'On Hold';
@@ -143,10 +146,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             $text = 'Ready';
                                         }
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
-                                        $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
-                                            <td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1 && $user->group_id != 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td> 
+                                            <?php if ($user->group_id != 4) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1 && $user->group_id != 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->qvalue ?></td>
@@ -154,78 +156,54 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                             <td>
                                                 <?php
-                                                if ($user->group_id == 9) {
-                                                    if ($stop_date >= date('Y-m-d H:i:s') && $tender->status == 0) {
+                                                if ($tender->status == 1) {
+                                                    if ($tender->technical_status == 1) {
+                                                        ?>
+                                                        <!--a class="waves-effect waves-light btn green">Technical</a-->
+
+                                                    <?php } else { ?>
+                                                        <!--a class="waves-effect waves-light btn blue proj-delete">Technical</a-->
+                                                        <?php
+                                                    }
+                                                    if ($tender->financial_status == 1) {
                                                         ?>
 
+                                                        <!--a class="waves-effect waves-light btn green">Financial</a-->
+
+                                                        <?php
+                                                    } else {
+                                                        if ($tender->technical_status == 1) {
+                                                            ?>
+                                                            <!--a class="waves-effect waves-light btn blue proj-delete">Financial</a-->
+                                                        <?php }
+                                                        ?>
 
                                                         <?php
                                                     }
-                                                } else {
-                                                    if ($tender->status == 1) {
+                                                    if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                         ?>
-                                                        <a class = "waves-effect waves-light btn <?php if ($tender->is_archived == 1) { echo "orange"; }else{ echo "green"; }?>"><?php
-                                                            if ($tender->is_archived == 1) {
-                                                                echo "Archived";
-                                                            } else {
-                                                                echo "Approved";
-                                                            }
-                                                            ?></a>
-                                                        <?php if ($tender->technical_status == 1) {
-                                                            ?>
-                                                            <!--a class="waves-effect waves-light btn green">Technical</a-->
 
-                                                        <?php } else { ?>
-                                                            <!--a class="waves-effect waves-light btn blue proj-delete">Technical</a-->
-                                                            <?php
-                                                        }
-                                                        if ($tender->financial_status == 1) {
-                                                            ?>
+                                                        <a class="waves-effect waves-light btn green">AOC</a>
 
-                                                            <!--a class="waves-effect waves-light btn green">Financial</a-->
-
-                                                            <?php
-                                                        } else {
-                                                            if ($tender->technical_status == 1) {
-                                                                ?>
-                                                                <!--a class="waves-effect waves-light btn blue proj-delete">Financial</a-->
-                                                            <?php }
-                                                            ?>
-
-                                                            <?php
-                                                        }
-                                                        if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
-                                                            ?>
-
-                                                            <a class="waves-effect waves-light btn green">AOC</a>
-
-                                                            <?php
-                                                        } else {
-                                                            if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
-                                                                ?>
-
-                                                                <a class="waves-effect waves-light btn blue proj-delete">AOC</a>
-                                                                <?php
-                                                            }
-                                                        }
-
-                                                        if ($user->group_id == 1) {
-                                                            ?>
-
-                                                            <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
-                                                            <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
-                                                            <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
-                                                            <?php
-                                                        }
+                                                        <?php
                                                     } else {
+                                                        if ($tender->status == 1 && $tender->is_archived != 1) {
+                                                            ?>
+
+                                                            <a class="waves-effect waves-light btn blue proj-delete">AOC</a>
+                                                            <?php
+                                                        }
+                                                    }
+
+                                                    if ($user->group_id == 1) {
                                                         ?>
-                <!--a class="waves-effect waves-light btn blue" onclick='approvetender(<?php echo $tender->id; ?>)'>Approve</a-->
-                                                        <a class="waves-effect waves-light btn red">Unapproved</a>
 
-                                                    <?php }
-                                                    ?>
-
-                                                <?php }
+                                                        <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
+                                                        <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                        <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
+                                                        <?php
+                                                    }
+                                                }
                                                 ?>
 
                                                 <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
@@ -246,7 +224,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="modal-footer">
                                             <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                            <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id, 'url' => $url]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                         </div>
                                     </div>
 

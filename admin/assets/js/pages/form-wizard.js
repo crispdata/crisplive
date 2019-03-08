@@ -364,60 +364,72 @@ $(document).ready(function () {
     $('.select-wrapper.initialized').prev("input").remove();
     $('.select-wrapper.initialized').prev("span").remove();
 
+    $(".pdatepicker").click(function () {
+        var tid = $(this).attr('data-tid');
+        $('.tender' + tid + ' .picker__holder').css('height', '660px');
+        $('.tender' + tid + ' .picker__select--month.browser-default').css('float', 'left');
+        $('.tender' + tid + ' .picker__select--month.browser-default').css('margin-left', '40px');
+        $('.tender' + tid + ' .picker__select--year.browser-default').css('float', 'left');
+    });
+
     $('.pdatepicker').pickadate({
         format: 'dd-mm-yyyy',
         selectMonths: true, // Creates a dropdown to control month
         selectYears: 15, // Creates a dropdown of 15 years to control year
         onSet: function (ele) {
             if (ele.select) {
+                $('.picker__holder').css('height', '0px');
                 var chosen_date = $('.pdatepicker').val();
-                $('.ddatepicker').pickadate('picker').set('min', chosen_date);
+                //$('.ddatepicker').pickadate('picker').set('min', chosen_date);
                 this.close();
             }
+        },
+        onClose: function (ele) {
+            $('.picker__holder').css('height', '0px');
         }
     });
 
 
     /*$('.ddatepicker').pickadate({
-        format: 'dd-mm-yyyy',
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
-        onSet: function (ele) {
-            if (ele.select) {
-                var chosen_date = $('.ddatepicker').val();
-                $('.bsdatepicker').pickadate('picker').set('min', chosen_date);
-                $('.pdatepicker').pickadate('picker').set('max', chosen_date);
-                this.close();
-            }
-        },
-        onStart: function () {
-            var chosen_date = $('.pdatepicker').val();
-            $('.ddatepicker').pickadate('picker').set('min', chosen_date);
-            //return false;
-        }
-    });*/
+     format: 'dd-mm-yyyy',
+     selectMonths: true, // Creates a dropdown to control month
+     selectYears: 15, // Creates a dropdown of 15 years to control year
+     onSet: function (ele) {
+     if (ele.select) {
+     var chosen_date = $('.ddatepicker').val();
+     $('.bsdatepicker').pickadate('picker').set('min', chosen_date);
+     $('.pdatepicker').pickadate('picker').set('max', chosen_date);
+     this.close();
+     }
+     },
+     onStart: function () {
+     var chosen_date = $('.pdatepicker').val();
+     $('.ddatepicker').pickadate('picker').set('min', chosen_date);
+     //return false;
+     }
+     });*/
 
     /*$('.bsdatepicker').pickadate({
-        format: 'dd-mm-yyyy',
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
-        onSet: function (ele) {
-            if (ele.select) {
-                var chosen_date = $('.bsdatepicker').val();
-                $('.bedatepicker').pickadate('picker').set('min', chosen_date);
-                $('.ddatepicker').pickadate('picker').set('max', chosen_date);
-                this.close();
-            }
-        },
-        onStart: function () {
-            var chosen_date = $('.ddatepicker').val();
-            $('.bsdatepicker').pickadate('picker').set('min', chosen_date);
-            //return false;
-        }
-    });*/
-    
+     format: 'dd-mm-yyyy',
+     selectMonths: true, // Creates a dropdown to control month
+     selectYears: 15, // Creates a dropdown of 15 years to control year
+     onSet: function (ele) {
+     if (ele.select) {
+     var chosen_date = $('.bsdatepicker').val();
+     $('.bedatepicker').pickadate('picker').set('min', chosen_date);
+     $('.ddatepicker').pickadate('picker').set('max', chosen_date);
+     this.close();
+     }
+     },
+     onStart: function () {
+     var chosen_date = $('.ddatepicker').val();
+     $('.bsdatepicker').pickadate('picker').set('min', chosen_date);
+     //return false;
+     }
+     });*/
+
     $('.datepicker').datepicker();
-    
+
     $('.bedatepicker').pickadate({
         format: 'yyyy-mm-dd',
         selectMonths: true, // Creates a dropdown to control month
@@ -431,7 +443,7 @@ $(document).ready(function () {
             }
         }
     });
-    
+
     $('.bodatepicker').pickadate({
         format: 'yyyy-mm-dd',
         selectMonths: true, // Creates a dropdown to control month

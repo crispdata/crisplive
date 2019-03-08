@@ -38,7 +38,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         margin: 10px;
     }
     #contacts_list a{width:100px!important;}
-
+    ::placeholder{color:#9e9e9e;}
 
 </style>
 
@@ -58,7 +58,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <thead>
                         <tr>
 
-                           
+
                             <th data-field="email">Tender Id</th>
                             <th data-field="name" width="150px">Details of Contracting Office</th>
                             <th data-field="email" width="100px">Cost of Tender</th>
@@ -93,6 +93,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $status = 'Unapproved';
                                     $class = 'red';
                                 }
+                                $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
+                                if ($tender->on_hold == 1) {
+                                    $classaoc = 'red';
+                                    $text = 'On Hold';
+                                } else {
+                                    $classaoc = 'green';
+                                    $text = 'Ready';
+                                }
                                 $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                 ?>
                                 <tr data-id = "<?= $tender->tender_id ?>">
@@ -116,23 +124,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             }
                                         } else {
                                             if ($tender->status == 1) {
-                                                ?>
-                                                <a class = "waves-effect waves-light btn <?php
-                                                if ($tender->is_archived == 1) {
-                                                    echo "orange";
-                                                } else {
-                                                    echo "green";
-                                                }
-                                                ?>"><?php
-                                                       if ($tender->is_archived == 1) {
-                                                           echo "Archived";
-                                                       } else {
-                                                           echo "Approved";
-                                                       }
-                                                       ?></a>
-
-
-                                                <?php
                                                 if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                     ?>
 
@@ -147,14 +138,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <?php
                                                     }
                                                 }
-                                            } else {
-                                                ?>
-                                                <a class="waves-effect waves-light btn red">Unapproved</a>
-
-                                                <?php
                                             }
+
                                             if ($tender->status == 1) {
-                                                if ($user->group_id == 1 || $user->group_id == 3) {
+                                                if ($user->group_id == 1) {
                                                     ?>
                                                     <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
                                                     <a onclick="openmodal('modal<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
@@ -176,8 +163,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
 
                                         <a onclick="openmodal('modalfiles<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
-                                        <?php if ($tender->aoc_status == 1) { ?>
+                                        <?php if ($contractor) { ?>
                                             <a onclick="openmodal('modalcont<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
+                                        <?php } ?>
+                                        <?php if ($tender->is_archived != 1 && $contractor) { ?>
+                                            <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                         <?php } ?>
 
                                     </td>
@@ -404,9 +394,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <label for="item">Item description</label-->
                                     </div>
                                     <div class="row">
-                                        <div class="input-field col s12">
-                                            <input id="pdate" type="text" name = "aoc_date" class="pdatepicker required">
-                                            <label for="pdate">AOC Date</label>
+                                        <div class="input-field col s12 tender<?= $tender->id; ?>">
+                                            <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" onclick="updateheight(<?= $tender->id; ?>)" class="pdatepicker required" placeholder="AOC Date">
                                         </div>
                                     </div>
                                     <div class="input-field col s12 row">
@@ -510,6 +499,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             }
         });
     }
+
+    function updateheight(tid) {
+        $('.tender' + tid + ' .picker__holder').css('height', '660px');
+        $('.tender' + tid + ' .picker__select--month.browser-default').css('float', 'left');
+        $('.tender' + tid + ' .picker__select--month.browser-default').css('margin-left', '40px');
+        $('.tender' + tid + ' .picker__select--year.browser-default').css('float', 'left');
+    }
+
 
     function pop_up(url) {
         window.open(url, 'win2', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=1076,height=768,directories=no,location=no')

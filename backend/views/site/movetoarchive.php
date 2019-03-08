@@ -44,6 +44,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 60%;
         z-index: 100000000;
     }
+    .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
+    .modal .modal-content h5{text-align: center;}
 </style>
 
 <main class="mn-inner">
@@ -53,7 +55,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         </div>
 
 
-<?php if (Yii::$app->session->hasFlash('success')): ?>
+        <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
                     title: "<?= Yii::$app->session->getFlash('success'); ?>",
@@ -65,11 +67,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </script>
         <?php endif; ?>
 
-            <?php if (Yii::$app->session->hasFlash('error')): ?>
+        <?php if (Yii::$app->session->hasFlash('error')): ?>
             <div class="alert alert-danger">
-            <?= Yii::$app->session->getFlash('error'); ?>
+                <?= Yii::$app->session->getFlash('error'); ?>
             </div>
-<?php endif; ?>
+        <?php endif; ?>
 
 
         <div class="col s12 m12 l12">
@@ -101,7 +103,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                             <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
                         </form>
-<?php if (isset($tenders) && count($tenders)) { ?>
+                        <?php if (isset($tenders) && count($tenders)) { ?>
 
                             <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/movearchivetenders">
                                 <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
@@ -117,7 +119,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <th data-field="email">Tender Id</th>
                                             <th data-field="name">Details of Contracting Office</th>
                                             <th data-field="email">Awarded Amount</th>
-                                            <th data-field="email">Bid End Date</th>
+                                            <th data-field="email" width="80px">Bid End Date</th>
                                             <th data-field="email">AOC Date</th>
                                             <th data-field="email">Status</th>
                                             <th data-field="email">Actions</th>
@@ -130,7 +132,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             foreach ($tenders as $key => $tender) {
                                                 $tdetails = '';
                                                 $command = Sitecontroller::actionGetcommand($tender->command);
-                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                                } else {
+                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                }
                                                 $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
                                                 $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
                                                 $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
@@ -142,6 +148,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     $class = 'red';
                                                 }
 
+                                                $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                                 if ($tender->on_hold == 1) {
                                                     $classaoc = 'red';
                                                     $text = 'On Hold';
@@ -150,7 +157,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     $text = 'Ready';
                                                 }
                                                 $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
-                                                $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
                                                 ?>
                                                 <tr data-id = "<?= $tender->tender_id ?>">
                                                     <td align="center"><input type="checkbox" name="selected_id[]" class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td> 
@@ -172,7 +178,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         } else {
                                                             if ($tender->status == 1) {
                                                                 ?>
-                                                                <a class = "waves-effect waves-light btn green">Approved</a>
                                                                 <?php if ($tender->technical_status == 1) {
                                                                     ?>
                                                                     <!--a class="waves-effect waves-light btn green">Technical</a-->
@@ -219,15 +224,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                                     <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
                                                                     <?php
                                                                 }
-                                                            } else {
-                                                                ?>
-                    <!--a class="waves-effect waves-light btn blue" onclick='approvetender(<?php echo $tender->id; ?>)'>Approve</a-->
-                                                                <a class="waves-effect waves-light btn red">Unapproved</a>
-
-                                                            <?php }
-                                                            ?>
-
-                                                        <?php }
+                                                            }
+                                                        }
                                                         ?>
 
                                                         <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
@@ -238,7 +236,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <?php } ?>
                                                         <?php if ($user->group_id != 3) { ?>    
                                                             <a onclick="movearchive(<?= $tender->id; ?>)" id="tenderarc<?= $tender->id; ?>" class="waves-effect waves-light btn blue proj-delete">Archive</a>    
-            <?php } ?>
+                                                        <?php } ?>
 
                                                     </td>
 
@@ -250,7 +248,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 </div>
                                                 <div class="modal-footer">
                                                     <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                                    <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
+                                                    <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id, 'url' => $url]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                                 </div>
                                             </div>
 
@@ -269,23 +267,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 foreach ($tenders as $key => $tender) {
                                     ?>
                                     <div id="modalfiles<?= $tender->id; ?>" class="modal">
-            <?php ?>
+                                        <?php ?>
                                         <div class="modal-content">
                                             <h4>View Tender Files</h4>
 
                                             <div class="row">
-                                                    <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
+                                                <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
                                                 <div class="input-field col s6">
                                                     <?php if ($tech->tfile != '') { ?>
                                                         <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
                                                     <?php } else { ?>
                                                         <a class="notavailable">No Tender files yet</a>
-            <?php } ?>
+                                                    <?php } ?>
                                                 </div>
                                             </div>
 
                                             <h4>View BOQ Sheet</h4>
-                                                <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                            <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$finfiles) {
@@ -314,7 +312,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                             </div>
                                             <h4>View AOC Files</h4>
-                                                <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
+                                            <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$aocfiles) {
@@ -363,7 +361,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     </div>
                                     <div id="modalcont<?= $tender->id; ?>" class="modal">
-            <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
+                                        <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
                                         <div class="modal-content"> 
                                             <h5>Contractor Information</h5>
 
@@ -371,31 +369,31 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                 <div class="col s6">
                                                     <h4>Firm Name</h4>
-            <?= $contractor->firm; ?>
+                                                    <?= $contractor->firm; ?>
                                                 </div>
 
                                                 <div class="col s6">
                                                     <h4>Name</h4>
-            <?= $contractor->name; ?>
+                                                    <?= $contractor->name; ?>
                                                 </div>
                                             </div>
                                             <div class="row">
 
                                                 <div class="col s6">
                                                     <h4>Address</h4>
-            <?= $contractor->address; ?>
+                                                    <?= $contractor->address; ?>
                                                 </div>
 
                                                 <div class="col s6">
                                                     <h4>Contact No.</h4>
-            <?= $contractor->contact; ?>
+                                                    <?= $contractor->contact; ?>
                                                 </div>
                                             </div>
                                             <div class="row">
 
                                                 <div class="col s6">
                                                     <h4>Email</h4>
-            <?= $contractor->email; ?>
+                                                    <?= $contractor->email; ?>
                                                 </div>
 
                                             </div>

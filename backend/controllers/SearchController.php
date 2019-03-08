@@ -76,12 +76,33 @@ class SearchController extends Controller {
             $val = @$_REQUEST['sort'];
             $page = @$_REQUEST['page'];
             $filter = @$_REQUEST['filter'];
-            $tenders = \common\models\Tender::find()->where(['status' => '1']);
+            if (isset($_REQUEST['tendertype']) && $_REQUEST['tendertype'] != '') {
+                if ($_REQUEST['tendertype'] == 1) {
+                    $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
+                } elseif ($_REQUEST['tendertype'] == 2) {
+                    $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null]);
+                } elseif ($_REQUEST['tendertype'] == 3) {
+                    $tenders = \common\models\Tender::find()->where(['status' => '0']);
+                } elseif ($_REQUEST['tendertype'] == 4) {
+                    $tenders = \common\models\Tender::find()->where(['aoc_status' => 1]);
+                } elseif ($_REQUEST['tendertype'] == 5) {
+                    $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null]);
+                } elseif ($_REQUEST['tendertype'] == 6) {
+                    $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null]);
+                } else {
+                    $tenders = \common\models\Tender::find()->where(['aoc_status' => 1, 'is_archived' => 1]);
+                }
+            }
             if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
                 $tenders->andWhere(['or',
                     ['like', 'work', '%' . @$_REQUEST['keyword'] . '%', false],
                     ['like', 'reference_no', '%' . @$_REQUEST['keyword'] . '%', false],
                     ['like', 'tender_id', '%' . @$_REQUEST['keyword'] . '%', false]
+                ]);
+            }
+            if (isset($_REQUEST['contype']) && $_REQUEST['contype'] != '') {
+                $tenders->andWhere(['and',
+                    ['contractor' => $_REQUEST['contype']]
                 ]);
             }
             if (isset($_REQUEST['command']) && $_REQUEST['command'] != '') {
@@ -142,7 +163,6 @@ class SearchController extends Controller {
             } else {
                 return $this->render('index', [
                             'tenders' => $models,
-                            'contractors' => $contractors,
                             'pages' => $pages,
                             'total' => $countQuery->count(),
                             'type' => 'All',

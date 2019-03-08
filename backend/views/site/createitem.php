@@ -8,8 +8,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 $rootURL = Yii::$app->params['ROOT_URL'];
 ?>
 <link rel="stylesheet" type="text/css" href="/assets/css/multiselect.css"/>
-<script src = "https://code.jquery.com/jquery-1.10.2.js"></script>
-<script src = "https://code.jquery.com/ui/1.10.4/jquery-ui.js"></script>
 <style>
     .actions{display:none!important;}    
     .steps{display:none!important;}    
@@ -409,13 +407,12 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                 <label for="acctwo0">Model</label>
                                             </div>
                                             <div class="input-field col s1">
-                                                <input id="itemunit" type="text" name = "units[]" required="" class="validate required" value="RM">
-                                                <label for="itemunit">Units</label>
+                                                <input id="itemunit" type="text" name = "units[]" required="" style="pointer-events: none;" class="validate required" value="RM">
                                                 <!--textarea id="item" name="desc" class="materialize-textarea"></textarea>
                                                 <label for="item">Item description</label-->
                                             </div>
                                             <div class="input-field col s1">
-                                                <input id="quantity" type="text" name = "quantity[]" required="" class="validate required" value="">
+                                                <input id="quantity" type="number" name = "quantity[]" min="1" step="1" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required="" class="validate required" value="">
                                                 <label for="quantity">Quantity</label>
                                             </div>
 
