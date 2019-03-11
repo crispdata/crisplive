@@ -22,6 +22,8 @@ if ($model->getErrors()) {
 ?>
 <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
 <script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<script src="//maxcdn.bootstrapcdn.com/bootstrap/3.4.0/js/bootstrap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/sweetalert/1.1.3/sweetalert.min.js"></script>
 <style>
     body{
         background-color: #343a40!important;
@@ -158,6 +160,12 @@ $cookies->add(new \yii\web\Cookie([
         </div>
     </div>
 </div>
+<?php if (Yii::$app->session->hasFlash('error')): ?>
+    <script>
+        swal("", "<?= Yii::$app->session->getFlash('error'); ?>", "error");
+    </script>
+<?php endif; ?>
+
 <div class="mn-content valign-wrapper">
 
     <main class="mn-inner container">
@@ -170,7 +178,7 @@ $cookies->add(new \yii\web\Cookie([
                         <div class="card-content ">
                             <span class="card-title">Sign In</span>
                             <div class="row">
-                                <form method = "post" action = "<?= $baseURL; ?>site/login" class="col s12">
+                                <form id="signup" method = "post" action = "<?= $baseURL; ?>site/login" class="col s12" onsubmit="return checkcookies()">
 
                                     <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
 
@@ -202,8 +210,7 @@ $cookies->add(new \yii\web\Cookie([
 
                                     </div>
                                     <div class="col s6 right-align m-t-sm">
-                                       <button class="waves-effect waves-light btn teal btn-resp">sign in</button>
-
+                                        <button class="waves-effect waves-light btn teal btn-resp" id="sign">sign in</button>
                                     </div>
                                 </form>
                             </div>
@@ -243,4 +250,24 @@ $cookies->add(new \yii\web\Cookie([
             text.style.display = "none"
         }
     });
+
+    function checkcookies() {
+        var cookieEnabled = navigator.cookieEnabled;
+        if (!cookieEnabled) {
+            document.cookie = "testcookie";
+            cookieEnabled = document.cookie.indexOf("testcookie") != -1;
+        }
+        if (cookieEnabled == false) {
+            swal("", "Please enable browser-cookies to use the Crispdata website and refresh the login page after enabling cookies.", "error");
+            return false;
+        }
+
+        var cookie = '<?php echo count($_COOKIE); ?>';
+        if (cookie > 0) {
+            $("#signup").submit();
+        } else {
+            swal("", "Please enable browser-cookies to use the Crispdata website and refresh the login page after enabling cookies.", "error");
+            return false;
+        }
+    }
 </script>

@@ -24,7 +24,7 @@ $(document).ready(function () {
                 type: "post",
                 data: 'val=' + val + '&_csrf-backend=' + csrf_token,
                 beforeSend: function () {
-                    $(".mn-inner .card-content.card-contractors").html('<span class="fetchmess"><p>Fetching Contractor.....</p></span>');
+                    $(".mn-inner .card-content.card-contractors").html('<span class="fetchmess"><div class="loadercolorz"></div><p>Fetching <span class="greencolor">Contractor</span></p></span>');
                 },
                 success: function (data) {
                     if (data) {
@@ -79,7 +79,7 @@ $(document).ready(function () {
                     $(".mn-inner .add-contact").css('display', 'none');
                     $(".mn-inner .card.top").css('background-color', '#fff');
                     $(".mn-inner.inner-active-sidebar").css('display', 'none');
-                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tender.....</p></span>');
+                    $(".mn-inner .card-content").html('<span class="fetchmess"><div class="loadercolorz"></div><p>Fetching <span class="greencolor">Tender</span></p></span>');
                     //$(".mn-inner .card").css('width','1058px');
                     $(".mn-inner form p").css('text-align', 'center');
                 },
@@ -104,7 +104,7 @@ $(document).ready(function () {
                             "deferRender": true
 
                         });
-                        
+
                         $('.pdatepicker').pickadate({
                             format: 'dd-mm-yyyy',
                             selectMonths: true, // Creates a dropdown to control month
@@ -981,7 +981,7 @@ $(document).ready(function () {
                     $(".mn-inner .add-contact").css('display', 'none');
                     $(".mn-inner .card.top").css('background-color', '#fff');
                     $(".mn-inner.inner-active-sidebar").css('display', 'none');
-                    $(".mn-inner .card-content").html('<span class="fetchmess"><p>Fetching Tender.....</p></span>');
+                    $(".mn-inner .card-content").html('<span class="fetchmess"><div class="loadercolorz"></div><p>Fetching <span class="greencolor">Tender</span></p></span>');
                     //$(".mn-inner .card").css('width','1058px');
                     $(".mn-inner form p").css('text-align', 'center');
                 },
@@ -1006,7 +1006,7 @@ $(document).ready(function () {
                             "deferRender": true
 
                         });
-                       
+
                         $('.pdatepicker').pickadate({
                             format: 'dd-mm-yyyy',
                             selectMonths: true, // Creates a dropdown to control month

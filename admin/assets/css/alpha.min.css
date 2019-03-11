@@ -477,9 +477,27 @@ margin-top: -70px;
                                white-space: normal;}
 
 table.dataTable tbody th, table.dataTable tbody td{word-break: break-word;}
-
-
-
+.loadercolorz {
+    border-top: 16px solid #4285F4;
+    border-right: 16px solid #EA4335;
+    border-bottom: 16px solid #FBBC05;
+    border-left: 16px solid #34A853;
+    border-radius: 50%;
+    width: 70px;
+    height: 70px;
+    display:inline-block;
+    -webkit-animation: rotate 2s linear infinite;
+    animation: rotate 2s linear infinite;
+}
+.greencolor{color:green;}
+@keyframes rotate {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+@-webkit-keyframes rotate {
+    0% { -webkit-transform: rotate(0deg); }
+    100% { -webkit-transform: rotate(360deg); }
+}
 
 /** end chat **/
 

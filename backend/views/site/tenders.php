@@ -416,14 +416,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                                                     <div class="input-field col s6">
-                                                        <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate required contact" value="<?= @$contractor->contact; ?>">
+                                                        <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate contact" value="<?= @$contractor->contact; ?>">
                                                         <label for="contact">Contact No.</label>
                                                     </div>
 
                                                 </div>
                                                 <div class="row">
                                                     <div class="input-field col s6">
-                                                        <input id="email<?= $tender->id; ?>" type="email" name = "email" class="validate required email" value="<?= @$contractor->email; ?>">
+                                                        <input id="email<?= $tender->id; ?>" type="email" name = "email" class="validate email" value="<?= @$contractor->email; ?>">
                                                         <label for="email">Email-Id</label>
                                                     </div>
                                                 </div>
@@ -456,15 +456,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 $("#firm" + id + "").attr('required', 'true');
                 $("#name" + id + "").attr('required', 'true');
                 $("#address" + id + "").attr('required', 'true');
-                $("#contact" + id + "").attr('required', 'true');
-                $("#email" + id + "").attr('required', 'true');
+                //$("#contact" + id + "").attr('required', 'true');
+                //$("#email" + id + "").attr('required', 'true');
             } else {
                 $('.cont' + id + '').attr('required', 'true')
                 $("#firm" + id + "").removeAttr('required');
                 $("#name" + id + "").removeAttr('required');
                 $("#address" + id + "").removeAttr('required');
-                $("#contact" + id + "").removeAttr('required');
-                $("#email" + id + "").removeAttr('required');
+                //$("#contact" + id + "").removeAttr('required');
+                //$("#email" + id + "").removeAttr('required');
             }
         });
     }

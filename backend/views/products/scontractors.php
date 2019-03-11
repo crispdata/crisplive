@@ -9,6 +9,29 @@ $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
+<style>
+    .modal-backdrop.in {
+        position: fixed;
+        z-index: 1002;
+        top: -100px;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        height: 125%;
+        width: 100%;
+        background: #000;
+        display: block;
+        opacity: 0.5;
+        will-change: opacity;
+    }
+    button.close {
+        float: right;
+        width: 40px;
+        margin: 10px;
+        padding: 0px;
+        font-size: 30px;
+    }
+</style>
 <div id="tables">
     <table id = "current-project" class="responsive-table">
         <thead>
@@ -39,19 +62,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <a onclick="pop_up('<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
 
 
-                            <a href="#modal<?= $size->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                            <a onclick="openmodal('modal<?= $size->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
 
 
                         </td>
 
                     </tr>
                 <div id="modal<?= $size->id; ?>" class="modal">
+                    <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>
                     <div class="modal-content">
                         <h4>Confirmation Message</h4>
                         <p>Are you sure you want to delete it ?</p>
                     </div>
                     <div class="modal-footer">
-                        <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
+                        <a data-dismiss="modal" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
                         <a href="<?= Url::to(['contractor/delete-contractor', 'id' => $size->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                     </div>
                 </div>
@@ -65,6 +89,18 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     </table>
 </div>
 <script>
+    function openmodal(id) {
+        $('#' + id + '').modal('toggle');
+        $('#' + id + '').css('z-index', '1003');
+        $('#' + id + '').css('opacity', '1');
+        $('#' + id + '').css('transform', 'scaleX(1)');
+        $('#' + id + '').css('top', '10%');
+        $(".modalclose").css('position', 'fixed');
+        $(".modalclose").css('z-index', '1');
+        $(".modalclose").show();
+
+    }
+
     function pop_up(url) {
         window.open(url, 'win2', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=1076,height=768,directories=no,location=no')
     }

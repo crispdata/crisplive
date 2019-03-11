@@ -79,10 +79,14 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
     }
     form.left.search.col.s2.hide-on-small-and-down {
         float: left;
-        margin-left: 150px;
+        margin-left: 200px;
     }
     a#sbutton {
         margin-left: 10px;
+    }
+    .card {
+        float: left;
+        width: 100%;
     }
     .fetchmess p {
         font-size: 35px;
@@ -91,6 +95,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
     }
     span.fetchmess {
         text-align: center;
+        display: table-cell;
+        vertical-align: middle;
+        width: 100%;
+        height: 200px;
+        margin-top: 50px;
+        float: left;
     }
     .select-wrapper span.caret{color:#000!important;}
 
@@ -145,12 +155,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         <span class="material-design-hamburger__layer"></span>
                     </a>
                 </section>
-                <div class="header-title">      
+                <div class="header-title col s3 m3">      
                     <span class="chapter-title"><a href="<?= $baseURL; ?>"><img src='<?= $imageURL; ?>/images/clogo.png'></a></span>
                 </div>
                 <form id="searchform" class="left search col s2 hide-on-small-and-down">
                     <div class="input-field">
-                        <input id="searchdata" type="search" placeholder="Search Tenders By Id" autocomplete="off">
+                        <input id="searchdata" type="search" placeholder="Search Tender By Id" autocomplete="off">
                         <label for="searchdata"><i class="material-icons search-icon">search</i></label>
 
                     </div>
@@ -158,7 +168,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
 
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
-                <a class="btn green" id="sbutton">Search</a>
+                <!--a class="btn green" id="sbutton">Search</a-->
                 <ul class="right col s7 m3 nav-right-menu setting">
                     <li><a href="javascript:void(0)" data-activates="chat-sidebar" class="chat-button show-on-large"><i class="material-icons">more_vert</i></a></li>
                     <?php
@@ -385,4 +395,4 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
             </div>
         </div>
     </aside>
-    <div class="modalclose" style="display: none;"></div>
+   
