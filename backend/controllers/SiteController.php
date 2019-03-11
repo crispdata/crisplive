@@ -2331,11 +2331,25 @@ class SiteController extends Controller {
      * @return string
      */
     public function actionLogin() {
+        $model = new LoginForm();
+        $cookies = Yii::$app->response->cookies;
+// add a new cookie to the response to be sent
+        $cookies->add(new \yii\web\Cookie([
+            'name' => 'cookie',
+            'value' => '1',
+        ]));
+
+        if (count($_COOKIE) <= 0) {
+            Yii::$app->session->setFlash('error', "Please enable browser-cookies to use the Crispdata website and refresh the login page after enabling cookies.");
+            return $this->render('login', [
+                        'model' => $model,
+            ]);
+        }
         if (!Yii::$app->user->isGuest) {
             return $this->goHome();
         }
 
-        $model = new LoginForm();
+
         $model->is_admin = 1;
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
             return $this->goHome();
@@ -2531,23 +2545,12 @@ class SiteController extends Controller {
         $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
         $pages = [];
 
-
-
-
-        /* $tenders = (new \yii\db\Query())
-          ->select('*')
-          ->from('tenders')
-          ->where(['like', 'tender_id', '%'.$val.'%',false])
-          ->orderBy(['id' => SORT_DESC])
-          ->indexBy('tender_id')
-          ->all(); */
-
-
         echo $this->renderPartial('stenders', [
             'tenders' => $tenders,
             'contractors' => $contractors,
             'type' => 'All',
-            'url' => 'tenders'
+            'url' => 'tenders',
+            'aocstatus' => @$tenders[0]->aoc_status
         ]);
         die();
     }
@@ -8231,7 +8234,7 @@ class SiteController extends Controller {
                 if ($querydata) {
                     $contractor = \common\models\Contractor::find()->where(['id' => $lid])->one();
                     $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
-                    if($contractor->contact != ''){
+                    if ($contractor->contact != '') {
                         $tender->on_hold = '';
                     }
                     $tender->aoc_status = 1;
@@ -8374,7 +8377,7 @@ class SiteController extends Controller {
                 if ($querydata) {
                     $contractor = \common\models\Contractor::find()->where(['id' => $lid])->one();
                     $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
-                    if($contractor->contact != ''){
+                    if ($contractor->contact != '') {
                         $tender->on_hold = '';
                     }
                     $tender->aoc_status = 1;

@@ -29,17 +29,32 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .select-wrapper input.select-dropdown:disabled{color:#000;}
     .notavailable{color:red;}
 
-    .card-tenders{padding-bottom: 60px!important;}
-
-
+    .modal-backdrop.in {
+        position: fixed;
+        z-index: 1002;
+        top: -100px;
+        left: 0;
+        bottom: 0;
+        right: 0;
+        height: 125%;
+        width: 100%;
+        background: #000;
+        display: block;
+        opacity: 0.5;
+        will-change: opacity;
+    }
     button.close {
         float: right;
         width: 40px;
         margin: 10px;
+        padding: 0px;
+        font-size: 30px;
     }
+
     #contacts_list a{width:100px!important;}
     ::placeholder{color:#9e9e9e;}
-
+    .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
+    .modal .modal-content h5{text-align: center;}
 </style>
 
 <?php //$contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();   ?>
@@ -54,16 +69,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <div class="card">
             <div class="card-content card-tenders">
 
-                <table id = "current-project" class="responsive-table">
+                <table id = "current-projectz" class="responsive-table bordered">
                     <thead>
                         <tr>
-
-
                             <th data-field="email">Tender Id</th>
                             <th data-field="name" width="150px">Details of Contracting Office</th>
-                            <th data-field="email" width="100px">Cost of Tender</th>
-                            <th data-field="email" width="80px">Bid end date</th>
-                            <th data-field="email" width="80px">Bid open date</th>
+                            <?php if ($aocstatus != 1) { ?>
+                                <th data-field="email" width="100px">Cost of Tender</th>
+                                <th data-field="email" width="80px">Bid end date</th>
+                                <th data-field="email" width="80px">Bid open date</th>
+                            <?php } else { ?>
+                                <th data-field="email">Awarded Amount</th>
+                                <th data-field="email" width="100px">AOC Date</th>
+                            <?php } ?>
                             <th data-field="email">Status</th>
                             <th data-field="email">Actions</th>
                         </tr>
@@ -104,12 +122,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                 ?>
                                 <tr data-id = "<?= $tender->tender_id ?>">
-
                                     <td class = ""><?= $tender->tender_id ?></td>
                                     <td class = ""><?= $tdetails ?></td>
-                                    <td class = ""><?= $tender->cvalue; ?></td>
-                                    <td class = ""><?= $tender->bid_end_date ?></td>
-                                    <td class = ""><?= $tender->bid_opening_date ?></td>
+                                    <?php if ($aocstatus != 1) { ?>
+                                        <td class = ""><?= $tender->cvalue; ?></td>
+                                        <td class = ""><?= $tender->bid_end_date ?></td>
+                                        <td class = ""><?= $tender->bid_opening_date ?></td>
+                                    <?php } else { ?>
+                                        <td class = ""><?= $tender->qvalue ?></td>
+                                        <td class = ""><?= $tender->aoc_date ?></td>
+                                    <?php } ?>
                                     <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                     <td>
                                         <?php
@@ -174,7 +196,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                 </tr>
                             <div id="modal<?= $tender->id; ?>" class="modal">
-                                <button data-dismiss="modal" class="close">×</button>
+                                <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>
                                 <div class="modal-content">
                                     <h4>Confirmation Message</h4>
                                     <p>Are you sure you want to delete it ?</p>
@@ -202,7 +224,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                         <div id="modalcont<?= $tender->id; ?>" class="modal">
-                            <button data-dismiss="modal" class="close">×</button>
+                            <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>
                             <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
                             <div class="modal-content"> 
                                 <h5>Contractor Information</h5>
@@ -255,7 +277,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
 
                         <div id="modalfiles<?= $tender->id; ?>" class="modal">
-                            <button data-dismiss="modal" class="close">×</button>
+                            <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>
                             <?php ?>
                             <div class="modal-content">
                                 <h4>View Tender Files</h4>
@@ -352,7 +374,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
 
                         <div id="modalaoc<?= $tender->id; ?>" class="modal">
-                            <button data-dismiss="modal" class="close">×</button>
+                            <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>
                             <div class="modal-content">
                                 <form id="create-item" method = "post" enctype="multipart/form-data" action = "<?= $baseURL ?>site/aocstatus">
                                     <h4>AOC Bid Opening Summary Upload</h4>
@@ -435,13 +457,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <label for="address">Address</label>
                                             </div>
                                             <div class="input-field col s6">
-                                                <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate required contact" value="<?= @$contractor->contact; ?>">
+                                                <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate contact" value="<?= @$contractor->contact; ?>">
                                                 <label for="contact">Contact No.</label>
                                             </div>
                                         </div>
                                         <div class="row">
                                             <div class="input-field col s6">
-                                                <input id="email<?= $tender->id; ?>" type="text" name = "email" class="validate required email" value="<?= @$contractor->email; ?>">
+                                                <input id="email<?= $tender->id; ?>" type="text" name = "email" class="validate email" value="<?= @$contractor->email; ?>">
                                                 <label for="email">Email-Id</label>
                                             </div>
                                         </div>
@@ -487,15 +509,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 $("#firm" + id + "").attr('required', 'true');
                 $("#name" + id + "").attr('required', 'true');
                 $("#address" + id + "").attr('required', 'true');
-                $("#contact" + id + "").attr('required', 'true');
-                $("#email" + id + "").attr('required', 'true');
+                //$("#contact" + id + "").attr('required', 'true');
+                //$("#email" + id + "").attr('required', 'true');
             } else {
                 $('.cont' + id + '').attr('required', 'true')
                 $("#firm" + id + "").removeAttr('required');
                 $("#name" + id + "").removeAttr('required');
                 $("#address" + id + "").removeAttr('required');
-                $("#contact" + id + "").removeAttr('required');
-                $("#email" + id + "").removeAttr('required');
+                //$("#contact" + id + "").removeAttr('required');
+                //$("#email" + id + "").removeAttr('required');
             }
         });
     }

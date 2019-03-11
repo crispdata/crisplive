@@ -49,6 +49,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
     .firstrow{margin-bottom: 0px!important;}
     label,.select2-selection__placeholder{color:rgba(0,0,0,.6)!important;}
+    .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
+    .modal .modal-content h5{text-align: center;}
 </style>
 <main class="mn-inner">
     <div class="row">

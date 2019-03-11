@@ -4,9 +4,9 @@ return [
     'components' => [
         'db' => [
             'class' => 'yii\db\Connection',
-            'dsn' => 'mysql:host=localhost;dbname=',
+            'dsn' => 'mysql:host=localhost;dbname=crispdata',
             'username' => 'root',
-            'password' => '',
+            'password' => 'WRcqP^UiFk0#k0L',
             'charset' => 'utf8',
             'enableSchemaCache' => false,
         ],
@@ -31,6 +31,7 @@ return [
             'version' => 'latest', //i.e.: 'latest'
         ],
         'user' => [
+            'class' => 'yii\web\User',
             'identityClass' => 'app\models\User',
             'enableAutoLogin' => true,
         ],

@@ -92,9 +92,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 </div>
             <?php endif; ?>
 
-
-
-
             <div class="col s12 m12 l12">
                 <div class="card">
                     <div class="card-content card-tenders">
