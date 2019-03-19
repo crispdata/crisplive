@@ -42,7 +42,7 @@ class ContractorController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'add-contractor', 'delete-contractor'],
+                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -116,7 +116,7 @@ class ContractorController extends Controller {
                     // It reads data after header. In the my excel sheet, 
                     // header is in the first row. 
                     if ($count > 1) {
-                        
+
                         // Data of excel sheet
                         $data['firm'] = @$row[1];
                         $data['name'] = @$row[2];
@@ -150,7 +150,7 @@ class ContractorController extends Controller {
         $filter = @$_GET['filter'];
 
 
-        $contractors = \common\models\Contractor::find()->orderBy(['id' => SORT_DESC]);
+        $contractors = \common\models\Contractor::find()->orderBy(['firmname' => SORT_ASC]);
         $countQuery = clone $contractors;
         if ($val && $page) {
             $items_per_page = $val;
@@ -248,6 +248,18 @@ class ContractorController extends Controller {
         if ($delete) {
             Yii::$app->session->setFlash('success', "Contractor successfully deleted");
             return $this->redirect(array('contractor/allcontractors'));
+        }
+    }
+
+    public function actionGetcontractors() {
+        $contractors = \common\models\Contractor::find()->where(['status' => 1])->all();
+        if ($contractors) {
+            foreach ($contractors as $_contractor) {
+                $fname = str_replace('M/s ', '', $_contractor->firm);
+                $fname = str_replace('M/S ', '', $fname);
+                $_contractor->firmname = trim($fname);
+                $_contractor->save();
+            }
         }
     }
 

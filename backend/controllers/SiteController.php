@@ -134,7 +134,7 @@ class SiteController extends Controller {
 
 
             //dashboatd
-            $finalgraph[] = ['Command', 'Approved Tenders'];
+            $finalgraph[] = ['Command', 'All Tenders'];
             //commands
             $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
             foreach ($comm as $i) {

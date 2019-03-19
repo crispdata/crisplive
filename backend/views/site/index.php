@@ -145,6 +145,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
+    a.btn.tooltipped {
+        float: right;
+        width: 100%;
+        height: auto;
+        padding: 5px;
+        line-height: unset;
+    }
 </style>
 <?php if ($user->group_id == 4) { ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -464,14 +471,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             if (make) {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Command');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addColumn('number', make);
                 data.addColumn({type: 'string', role: 'annotation'});
                 data.addRows(dataz);
             } else {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Command');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addRows(dataz);
             }
 
@@ -583,12 +590,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             if (col == 2) {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Cheif Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addRows(dataz);
             } else {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Cheif Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addColumn('number', make);
                 data.addColumn({type: 'string', role: 'annotation'});
                 data.addRows(dataz);
@@ -718,12 +725,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             if (col == 2) {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Commander Works Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addRows(dataz);
             } else {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Commander Works Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addColumn('number', make);
                 data.addColumn({type: 'string', role: 'annotation'});
                 data.addRows(dataz);
@@ -818,12 +825,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             if (col == 2) {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Garisson Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addRows(dataz);
             } else {
                 var data = new google.visualization.DataTable();
                 data.addColumn('string', 'Garisson Engineers');
-                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', 'All Tenders');
                 data.addColumn('number', make);
                 data.addColumn({type: 'string', role: 'annotation'});
                 data.addRows(dataz);
@@ -982,7 +989,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     <!--option value="2">B/R</option-->
                                 </select>
-                                <div class="input-field col s6">
+                                <div class="input-field col s5">
                                     <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
                                     if (@$_POST['fromdate']) {
                                         echo @$_POST['fromdate'];
@@ -991,7 +998,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <label for="fromdate">From Date</label>
                                 </div>
 
-                                <div class="input-field col s6">
+                                <div class="input-field col s5">
                                     <input id="todate" type="text" name = "todate" disabled="" class="required todatepicker" value="<?php
                                     if (@$_POST['todate']) {
                                         echo @$_POST['todate'];
@@ -999,6 +1006,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="todate">To Date</label>
                                 </div>
+                            <div class="input-field col s2">
+                                <?php
+                                $content = '<h6><b>Data Available From</b></h6>  <br> Northern Command - 20-12-18 <br> Western Command - 20-12-18 <br> South Western Command - 13-02-19 <br> Central Command - 18-02-19 <br> ADG & DGNP - 25-02-19 <br> Eastern Command - 27-02-19 <br> Southern Command - 01-03-19';
+                                ?>
+                                <a class="btn black tooltipped" data-html="true" data-position="bottom" data-delay="50" data-tooltip="<?= nl2br($content) ?>">Date selection guidelines</a>
+                            </div>
 
 
                             </div></div></div></div></main>
