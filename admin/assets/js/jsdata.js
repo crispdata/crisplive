@@ -78,6 +78,9 @@ $(document).ready(function () {
                     $(".mn-inner #sort-data").css('display', 'none');
                     $(".mn-inner .add-contact").css('display', 'none');
                     $(".mn-inner .card.top").css('background-color', '#fff');
+                    $(".mn-inner .row.departmentview").css('background-color', '#fff');
+                    $(".mn-inner .row.departmentview").css('position', 'relative');
+                    $(".mn-inner .row.departmentview").css('box-shadow', '0 2px 2px 0 rgba(0,0,0,.05), 0 3px 1px -2px rgba(0,0,0,.08), 0 1px 5px 0 rgba(0,0,0,.08)');
                     $(".mn-inner.inner-active-sidebar").css('display', 'none');
                     $(".mn-inner .card-content").html('<span class="fetchmess"><div class="loadercolorz"></div><p>Fetching <span class="greencolor">Tender</span></p></span>');
                     //$(".mn-inner .card").css('width','1058px');
@@ -1121,6 +1124,8 @@ function showdivs(val) {
         $("#cables").attr('required', 'true');
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         $("#cementdiv").hide();
         $("#rsteeldiv").hide();
         $("#ssteeldiv").hide();
@@ -1134,6 +1139,8 @@ function showdivs(val) {
         $("#lighting").attr('required', 'true');
         $("#cablesdiv").hide();
         $("#cables").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         $("#cementdiv").hide();
         $("#rsteeldiv").hide();
         $("#ssteeldiv").hide();
@@ -1143,10 +1150,27 @@ function showdivs(val) {
         $("#ssteel").removeAttr('required');
         $("#nsteel").removeAttr('required');
     } else if (val == 3) {
+        $("#lightdiv").hide();
+        $("#lighting").removeAttr('required');
+        $("#cablesdiv").hide();
+        $("#cables").removeAttr('required');
+        $("#wiresdiv").show();
+        $("#wires").attr('required', 'true');
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+        $("#cement").removeAttr('required');
+        $("#rsteel").removeAttr('required');
+        $("#ssteel").removeAttr('required');
+        $("#nsteel").removeAttr('required');
+    } else if (val == 4) {
         $("#cablesdiv").hide();
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
         $("#cables").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         $("#cementdiv").show();
         $("#rsteeldiv").hide();
         $("#ssteeldiv").hide();
@@ -1155,13 +1179,15 @@ function showdivs(val) {
         $("#rsteel").removeAttr('required');
         $("#ssteel").removeAttr('required');
         $("#nsteel").removeAttr('required');
-    } else if (val == 4) {
+    } else if (val == 5) {
         $("#lightdiv").hide();
         $("#cables").removeAttr('required');
         $("#cablesdiv").hide();
         $("#lighting").removeAttr('required');
         $("#cementdiv").hide();
         $("#cement").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         $("#rsteeldiv").show();
         $("#rsteel").attr('required', 'true');
         $("#ssteeldiv").hide();
@@ -1169,9 +1195,11 @@ function showdivs(val) {
         $("#ssteel").removeAttr('required');
         $("#nsteel").removeAttr('required');
         //$("#cables").removeAttr('required');
-    } else if (val == 5) {
+    } else if (val == 6) {
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         //$("#lighting").attr('required', 'true');
         $("#cablesdiv").hide();
         $("#cables").removeAttr('required');
@@ -1184,9 +1212,11 @@ function showdivs(val) {
         $("#nsteeldiv").hide();
         $("#nsteel").removeAttr('required');
         //$("#cables").removeAttr('required');
-    } else if (val == 6) {
+    } else if (val == 7) {
         $("#lightdiv").hide();
         $("#lighting").removeAttr('required');
+        $("#wiresdiv").hide();
+        $("#wires").removeAttr('required');
         //$("#lighting").attr('required', 'true');
         $("#cablesdiv").hide();
         $("#cables").removeAttr('required');
@@ -1202,6 +1232,7 @@ function showdivs(val) {
     } else {
         $("#cablesdiv").hide();
         $("#lightdiv").hide();
+        $("#wiresdiv").hide();
         $("#cementdiv").hide();
         $("#rsteeldiv").hide();
         $("#ssteeldiv").hide();
@@ -2128,20 +2159,9 @@ function getthirddatasub(value, id) {
 }
 
 function getfourdata(value) {
-    //$("#itemdata").show();
-    //$("#itembutton").show();
-    $("#itemdata .added").remove();
-    $("#tendersix").prop('selectedIndex', '');
-    $("#tendersix").material_select();
-    $('#sixth').hide();
-    $("#fifth").show();
-    var subone = $('#tenderfive :selected').val();
-    var subtwo = $('#tendersix :selected').val();
-    var selects = '';
-    var sizes = '';
-    var types = '';
-    var capacities = '';
 
+    $("#itemdata .added").remove();
+    //$("#itemdata").remove();
     if (value == 1) {
         $("#typefit").hide();
         $("#type0").removeAttr('required');
@@ -2162,6 +2182,9 @@ function getfourdata(value) {
         $("#corediv").show();
         $("#core0").attr('required');
         $("#core0").addClass('required');
+        $("#itemdata").hide();
+        $("#makes").hide();
+        $("#itembutton").hide();
     } else if (value == 2) {
         $("#sizesdiv").hide();
         $("#sizesdiv").prop('selectedIndex', '');
@@ -2183,6 +2206,9 @@ function getfourdata(value) {
         $("#text0").attr('required');
         $("#text0").addClass('required');
         $("#itemunit").val('NOS');
+        $("#itemdata").show();
+        $("#makes").show();
+        $("#itembutton").show();
     } else if (value == 4) {
         $("#sizesdiv").hide();
         $("#sizesdiv").prop('selectedIndex', '');
@@ -2204,6 +2230,9 @@ function getfourdata(value) {
         $("#accone0").attr('required');
         $("#accone0").addClass('required');
         $("#itemunit").val('NOS');
+        $("#itemdata").show();
+        $("#makes").show();
+        $("#itembutton").show();
     } else {
         $("#corediv").hide();
         $("#core0").removeAttr('required');
@@ -2224,7 +2253,33 @@ function getfourdata(value) {
         $("#sizes0").attr('required');
         $("#sizes0").addClass('required');
         $("#itemunit").val('RM');
+        $("#itemdata").show();
+        $("#makes").show();
+        $("#itembutton").show();
     }
+
+
+    if (value == 2 || value == 5 || value == 4) {
+        $("#tenderfive").prop('selectedIndex', '');
+        $("#tenderfive").material_select();
+        $("#tendersix").prop('selectedIndex', '');
+        $("#tendersix").material_select();
+        $('#sixth').hide();
+        $("#fifth").hide();
+    } else {
+        $("#tendersix").prop('selectedIndex', '');
+        $("#tendersix").material_select();
+        $('#sixth').hide();
+        $("#fifth").show();
+    }
+    var subone = $('#tenderfive :selected').val();
+    var subtwo = $('#tendersix :selected').val();
+    var selects = '';
+    var sizes = '';
+    var types = '';
+    var capacities = '';
+
+
 
 
     /*if (value != 1) {
@@ -2291,7 +2346,22 @@ function getfourdata(value) {
         url: baseUrl + 'site/getfourdata',
         dataType: "json",
         data: {'value': value, 'subone': subone, 'subtwo': subtwo, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#makes").addClass('makesload');
+            $("#typefit").addClass('makesload');
+            $("#capacityfit").addClass('makesload');
+            $("#sizesdiv").addClass('makesload');
+            $("#corediv").addClass('makesload');
+            $("#accessoryone").addClass('makesload');
+            $(".select2-container").hide();
+        },
         success: function (resultData) {
+             $("#makes").removeClass('makesload');
+             $("#typefit").removeClass('makesload');
+             $("#capacityfit").removeClass('makesload');
+             $("#sizesdiv").removeClass('makesload');
+             $("#corediv").removeClass('makesload');
+             $("#accessoryone").removeClass('makesload');
             if (resultData.item == '0') {
                 $("#tenderfive").html(resultData.data);
                 $("#sixth").hide();

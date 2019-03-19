@@ -318,7 +318,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         </a>
                     </li>
                     <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'tenders' || $action == 'create-tender' || $action == 'aoctenders' || $action == 'utenders' || $action == 'atenders' || $action == 'archivetenders' || $action == 'aocready' || $action == 'aochold' || $action == 'movetoarchive')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= $total; ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'tenders' || $action == 'create-tender' || $action == 'aoctenders' || $action == 'utenders' || $action == 'atenders' || $action == 'archivetenders' || $action == 'aocready' || $action == 'aochold' || $action == 'movetoarchive' || $action == 'searchtenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= $total; ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
                                 <!--li><a href="/site/tenders" class="<?= ($controller == 'site' && $action == 'tenders') ? 'active-page' : '' ?>">All (<?= $total; ?>)</a></li-->
@@ -332,6 +332,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 <li><a href="/site/aochold" class="<?= ($controller == 'site' && $action == 'aochold') ? 'active-page' : '' ?>">AOC OnHold (<?= $aochold; ?>)</a></li>
                                 <li><a href="/site/archivetenders" class="<?= ($controller == 'site' && $action == 'archivetenders') ? 'active-page' : '' ?>">Archived (<?= $archivetenders; ?>)</a></li>
                                 <li><a href="/site/movetoarchive" class="<?= ($controller == 'site' && $action == 'movetoarchive') ? 'active-page' : '' ?>">Move To Archive</a></li>
+                                <li><a href="/site/searchtenders" class="<?= ($controller == 'site' && $action == 'searchtenders') ? 'active-page' : '' ?>">Search By Make</a></li>
                             </ul>
                         </div>
                     </li>
