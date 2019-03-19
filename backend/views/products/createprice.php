@@ -93,7 +93,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <option value="" disabled selected>Select</option>
                                         <option value="1" <?= (@$size->mtypeone == 1) ? 'selected' : '' ?> >Cables</option>
                                         <option value="2" <?= (@$size->mtypeone == 2) ? 'selected' : '' ?>>Lighting</option>
-                                        <!--option value="3" <?= (@$size->mtypeone == 3) ? 'selected' : '' ?>>Fans</option>
+                                        <option value="3" <?= (@$size->mtypeone == 3) ? 'selected' : '' ?>>Fans</option>
                                         <option value="4" <?= (@$size->mtypeone == 4) ? 'selected' : '' ?>>Accessories</option>
                                         <option value="5" <?= (@$size->mtypeone == 5) ? 'selected' : '' ?>>Wire</option>
                                         <option value="6" <?= (@$size->mtypeone == 6) ? 'selected' : '' ?>>DB/MCB/MCCB/Timers</option>

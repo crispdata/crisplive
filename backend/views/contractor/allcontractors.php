@@ -3,7 +3,7 @@
 
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
-
+$user = Yii::$app->user->identity;
 $this->title = 'Manage Contractors';
 
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -64,7 +64,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </div>
         </form>
 
-        <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>contractor/add-contractor"> Add Contractor</a>
+        <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+            <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>contractor/add-contractor"> Add Contractor</a>
+        <?php } ?>
         <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
@@ -97,7 +99,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <th data-field="address">Address</th>
                                     <th data-field="contact">Contact No</th>
                                     <th data-field="email">Email</th>
-                                    <th data-field="actions">Actions</th>
+                                    <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                                        <th data-field="actions">Actions</th>
+                                    <?php } ?>
 
                                 </tr>
                             </thead>
@@ -113,16 +117,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $size->address ?></td>
                                             <td class = ""><?= $size->contact ?></td>
                                             <td class = ""><?= $size->email ?></td>
-                                            <td>
+                                            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                                                <td>
 
-                                                <a href="<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
-
-
-                                                <a href="#modal<?= $size->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                    <a href="<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
 
-                                            </td>
+                                                    <a href="#modal<?= $size->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
 
+
+                                                </td>
+                                            <?php } ?>
                                         </tr>
                                     <div id="modal<?= $size->id; ?>" class="modal">
                                         <div class="modal-content">

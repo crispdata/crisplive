@@ -33,7 +33,9 @@
         "ofat/yii2-yashop-ses": "*",
         "angeljunior/aws-ses": "^1.0",
         "phpmailer/phpmailer": "^6.0",
-        "daniel-zahariev/php-aws-ses": "^0.9.1"
+        "daniel-zahariev/php-aws-ses": "^0.9.1",
+        "algolia/algoliasearch-client-php": "^2.2",
+        "yiisoft/yii2-sphinx": "^2.0"
     },
     "require-dev": {
         "yiisoft/yii2-debug": "~2.0.0",

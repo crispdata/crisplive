@@ -21,7 +21,11 @@ use PhpOffice\PhpSpreadsheet\Style\Border;
 use backend\controllers\SiteController;
 use Twilio\Rest\Client;
 use Aws\S3\S3Client;
+use Aws\Common\Exception\MultipartUploadException;
+use Aws\S3\MultipartUploader;
 use Aws\S3\Exception\S3Exception;
+use yii\web\UploadedFile;
+use app\models\UploadForm;
 
 /**
  * Products controller
@@ -41,7 +45,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'getaccessories', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'files', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -342,7 +346,7 @@ class ProductsController extends Controller {
                                     $model->mtypethree = $_POST['mtypethree'];
                                 }
                                 $model->mtypefour = $_POST['mtypefour'][$k];
-                                $model->mtypefive = $_POST['mtypefive'][$key];
+                                $model->mtypefive = @$_POST['mtypefive'][$key];
                                 $model->price = $_sprice;
                                 $model->user_id = $user->UserId;
                                 $model->createdon = date('Y-m-d h:i:s');
@@ -388,7 +392,11 @@ class ProductsController extends Controller {
         $three = $_REQUEST['three'];
         $sizes = [];
         $allsizes = [];
-        $sizes = \common\models\Size::find()->where(['mtypeone' => $one, 'mtypetwo' => $two, 'mtypethree' => $three])->all();
+        if ($one == 1) {
+            $sizes = \common\models\Size::find()->where(['mtypeone' => $one, 'mtypetwo' => $two, 'mtypethree' => $three])->all();
+        } elseif ($one == 5) {
+            $sizes = \common\models\Size::find()->where(['mtypeone' => $one])->all();
+        }
         if ($sizes) {
             foreach ($sizes as $_size) {
                 $allsizes[$_size->id] = $_size->size;
@@ -535,7 +543,7 @@ class ProductsController extends Controller {
 
     public function actionSearchcontractor() {
         $val = $_REQUEST['val'];
-        $contractors = \common\models\Contractor::find()->where(['like', 'firm', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
+        $contractors = \common\models\Contractor::find()->from([new \yii\db\Expression('{{%contractors}} USE INDEX (firm)')])->where(['like', 'firm', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
 
         echo $this->renderPartial('scontractors', [
             'contractors' => $contractors,
@@ -612,13 +620,252 @@ class ProductsController extends Controller {
 
     public function actionUpdatetend() {
         $approvedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orWhere(['status' => 0])->orderBy(['id' => SORT_DESC])->all();
-        
+
         if ($approvedtenders) {
             foreach ($approvedtenders as $_tender) {
                 $_tender->on_hold = '1';
                 $_tender->save();
             }
         }
+    }
+
+    public function actionUploadfile() {
+
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        try {
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
+            $s3 = S3Client::factory(
+                            array(
+                                'credentials' => array(
+                                    'key' => Yii::$app->params['IAM_KEY'],
+                                    'secret' => Yii::$app->params['IAM_SECRET']
+                                ),
+                                'version' => 'latest',
+                                'region' => 'us-east-2',
+                            )
+            );
+        } catch (Exception $e) {
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
+            die("Error: " . $e->getMessage());
+        }
+
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Files::find()->where(['id' => $_POST['id']])->one();
+                $model->did = @$_POST['did'];
+
+                if ($_FILES['file']['name']) {
+                    $file_name = time() . '-' . $_FILES['file']['name'];
+                    $file_tmp = $_FILES['file']['tmp_name'];
+                    move_uploaded_file($file_tmp, "assets/files/" . $file_name);
+
+                    $keyName = 'files/' . $file_name;
+                    $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
+
+                    $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
+
+                    $uploader = new MultipartUploader($s3, $file, [
+                        'bucket' => Yii::$app->params['bucketName'],
+                        'key' => $keyName,
+                        'ACL' => 'public-read-write'
+                    ]);
+
+                    $fileupload = $uploader->upload();
+
+                    if ($fileupload) {
+                        $model->file = $pathInS3;
+                        unlink('assets/files/' . $file_name);
+                    }
+                }
+
+                $model->save();
+
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "File successfully updated");
+                }
+            } else {
+                $model = new \common\models\Files();
+                $model->did = @$_POST['did'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+
+                if ($_FILES['file']['name']) {
+                    $file_name = time() . '-' . $_FILES['file']['name'];
+                    $file_tmp = $_FILES['file']['tmp_name'];
+                    move_uploaded_file($file_tmp, "assets/files/" . $file_name);
+
+                    $keyName = 'files/' . $file_name;
+                    $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
+
+                    $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
+
+                    $uploader = new MultipartUploader($s3, $file, [
+                        'bucket' => Yii::$app->params['bucketName'],
+                        'key' => $keyName,
+                        'ACL' => 'public-read-write'
+                    ]);
+
+                    $fileupload = $uploader->upload();
+
+                    if ($fileupload) {
+                        $model->file = $pathInS3;
+                        unlink('assets/files/' . $file_name);
+                    }
+                }
+
+                $files = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('files', $model)
+                        ->execute();
+
+                if ($files) {
+                    Yii::$app->session->setFlash('success', "File successfully uploaded");
+                }
+            }
+
+            return $this->redirect(array('products/files'));
+            die();
+        } else {
+            $departments = User::find()->where(['status' => 10, 'group_id' => 5])->orderBy(['name' => SORT_ASC])->all();
+            if ($id) {
+                $file = \common\models\Files::find()->where(['id' => $id])->one();
+            } else {
+                $file = [];
+            }
+            return $this->render('uploadfile', [
+                        'departments' => $departments,
+                        'file' => $file
+            ]);
+        }
+    }
+
+    public function actionFiles() {
+        $files = \common\models\Files::find()->where(['status' => '1'])->all();
+        return $this->render('files', [
+                    'files' => $files
+        ]);
+    }
+
+    public function actionDeleteFile() {
+        $id = $_GET['id'];
+        $delete = \common\models\Files::deleteAll(['id' => $id]);
+        if ($delete) {
+            Yii::$app->session->setFlash('success', "File successfully deleted");
+            return $this->redirect(array('products/files'));
+        }
+    }
+
+    public function actionAllfiles() {
+        $user = Yii::$app->user->identity;
+        $files = \common\models\Files::find()->where(['did' => $user->UserId, 'status' => 1])->all();
+        return $this->render('allfiles', [
+                    'files' => $files
+        ]);
+    }
+
+    public function actionFileimages($path) {
+        $fsize = 90; //icon px width in output
+        $field = 'file';
+
+        $ftype = pathinfo($path);
+        $extension = $ftype['extension'];
+
+        $pdfImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/pdf.png';
+        $jpgImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/jpg.png';
+        $jpegImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/jpeg.png';
+        $zipImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/zip.png';
+        $csvImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/csv.png';
+        $pngImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/iconfinder_png.png';
+        $xlsxImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/xlsx.png';
+        $xlsImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/xls.png';
+        $docxImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/docx.png';
+        $docImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/doc.png';
+        $pptImg = 'http://cdn2.iconfinder.com/data/icons/sleekxp/Microsoft%20Office%202007%20PowerPoint.png';
+        $txtImg = 'http://cdn1.iconfinder.com/data/icons/CrystalClear/128x128/mimetypes/txt2.png';
+        $audioImg = 'http://cdn2.iconfinder.com/data/icons/oxygen/128x128/mimetypes/audio-x-pn-realaudio-plugin.png';
+        $videoImg = 'http://cdn4.iconfinder.com/data/icons/Pretty_office_icon_part_2/128/video-file.png';
+        $htmlImg = 'http://cdn1.iconfinder.com/data/icons/nuove/128x128/mimetypes/html.png';
+        $fileImg = Yii::$app->params['IMAGE_URL'] . 'assets/images/file.png';
+
+        switch ($extension) {
+            case 'pdf':
+                $img = $pdfImg;
+                break;
+            case 'doc':
+                $img = $docImg;
+                break;
+            case 'docx':
+                $img = $docxImg;
+                break;
+            case 'txt':
+                $img = $txtImg;
+                break;
+            case 'xls':
+                $img = $xlsImg;
+                break;
+            case 'xlsx':
+                $img = $xlsxImg;
+                break;
+            case 'xlsm':
+                $img = $xlsImg;
+                break;
+            case 'ppt':
+                $img = $pptImg;
+                break;
+            case 'pptx':
+                $img = $pptImg;
+                break;
+            case 'mp3':
+                $img = $audioImg;
+                break;
+            case 'wmv':
+                $img = $videoImg;
+                break;
+            case 'mp4':
+                $img = $videoImg;
+                break;
+            case 'mpeg':
+                $img = $videoImg;
+                break;
+            case 'html':
+                $img = $htmlImg;
+                break;
+            case 'zip':
+                $img = $zipImg;
+                break;
+            case 'csv':
+                $img = $csvImg;
+                break;
+            case 'png':
+                $img = $pngImg;
+                break;
+            case 'PNG':
+                $img = $pngImg;
+                break;
+            case 'jpg':
+                $img = $jpgImg;
+                break;
+            case 'JPG':
+                $img = $jpgImg;
+                break;
+            case 'jpeg':
+                $img = $jpegImg;
+                break;
+            case 'JPEG':
+                $img = $jpegImg;
+                break;
+            default:
+                $img = $fileImg;
+                break;
+        }
+        return $img;
     }
 
 }

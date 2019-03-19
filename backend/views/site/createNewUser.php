@@ -31,12 +31,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <form id="create-project-form" class="col s12" method = "post" action = "<?= $baseURL ?>site/create-user">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <div class="row">
-                                <div class="input-field col s6">
+                                <div class="input-field col s4">
                                     <input id="FirstName" type="text" maxlength="50" name = "CreateUser[username]" class="validate required" value="">
                                     <label for="FirstName">Username</label>
                                 </div>
+                                <div class="input-field col s4">
+                                    <input id="Name" type="text" name = "CreateUser[name]" class="validate required" value="">
+                                    <label for="Name">Name</label>
+                                </div>
 
-                                <div class="input-field col s6">
+                                <div class="input-field col s4">
                                     <input id="Email" type="email" autocomplete="off" maxlength="100" size="30" name = "CreateUser[Email]" class="validate required" value="">
                                     <label for="Email">Email</label>
                                 </div>
@@ -47,9 +51,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s6">
                                     <select class="validate required" required="" name="CreateUser[group_id]" id="group">
                                         <option value="" disabled selected>Select Group</option>
-                                        <option value="2" >Admin</option>
-                                        <option value="3" >User</option>
-                                        <option value="4" >Sales</option>
+                                        <?php
+                                        if (isset($groups) && count($groups)) {
+                                            foreach ($groups as $_group) {
+                                                ?>
+                                                <option value="<?= $_group->id ?>" ><?= ucfirst($_group->name); ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+
                                     </select>
                                 </div>
 

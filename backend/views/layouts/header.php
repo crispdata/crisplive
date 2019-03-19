@@ -103,7 +103,10 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         float: left;
     }
     .select-wrapper span.caret{color:#000!important;}
-
+    .notender {
+        text-align: center;
+        font-size: 30px;
+    }
 </style>
 <div class="loader-bg"></div>
 <div class="loader">
@@ -162,10 +165,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     <div class="input-field">
                         <input id="searchdata" type="search" placeholder="Search Tender By Id" autocomplete="off">
                         <label for="searchdata"><i class="material-icons search-icon">search</i></label>
-
                     </div>
-
-
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
                 <!--a class="btn green" id="sbutton">Search</a-->
@@ -180,7 +180,6 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     ?>
                     <!--li class="hide-on-small-and-down"><a href="javascript:void(0)" id="messagebuttons" class="dropdown-button dropdown-right show-on-large"><img src="<?= $logo; ?>" class="circle" alt=""><span class="badge"></span></a></li-->
                     <li class="hide-on-med-and-up"><a href="javascript:void(0)" class="search-toggle"><i class="material-icons">search</i></a></li>
-
                 </ul>
 
                 <ul id="dropdown1" class="dropdown-content notifications-dropdown">
@@ -192,7 +191,6 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         </ul>
                     </li>
                 </ul>
-
 
             </div>
         </nav>
@@ -242,7 +240,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                 </div>
                 <div class="sidebar-profile-info">
                     <a>
-                        <p><?= ucfirst($user->username); ?></p>
+                        <p><?= ucfirst($user->name); ?></p>
                         <span><?= $user->email ?></span>
                     </a>
                 </div>
@@ -265,16 +263,50 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             </ul>
                         </div>
                     </li>
-                    <!--li class="no-padding <?= ($controller == 'products' && $action == 'category-em') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'products' && ($action == 'category-em' || $action == 'category-civil')) ? 'active' : '' ?>"><i class="material-icons">store</i>Products<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+
+                </ul>
+            <?php } elseif ($user->group_id == 5) { ?>
+                <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/">
+                            <i class="material-icons">dashboard</i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'approvedtenders') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'archivetenders' || $action == 'approvedtenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= $atenders + $archivetenders ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <li><a href="/products/category-em" class="<?= ($controller == 'products' && $action == 'category-em') ? 'active-page' : '' ?>">E/M</a></li>
-                                <li><a href="/products/category-civil" class="<?= ($controller == 'products' && $action == 'category-civil') ? 'active-page' : '' ?>">Civil</a></li>
-
+                                <li><a href="/site/approvedtenders" class="<?= ($controller == 'site' && $action == 'approvedtenders') ? 'active-page' : '' ?>">Approved (<?= $atenders; ?>)</a></li>
+                                <li><a href="/site/archivetenders" class="<?= ($controller == 'site' && $action == 'archivetenders') ? 'active-page' : '' ?>">Archived (<?= $archivetenders; ?>)</a></li>
                             </ul>
                         </div>
-                    </li-->
+                    </li>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'makes') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'e-m' || $action == 'civil')) ? 'active' : '' ?>"><i class="material-icons">store</i>Makes<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="/site/e-m" class="<?= ($controller == 'site' && $action == 'e-m') ? 'active-page' : '' ?>">E/M</a></li>
+                                <li><a href="/site/civil" class="<?= ($controller == 'site' && $action == 'civil') ? 'active-page' : '' ?>">Civil</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="no-padding <?= ($controller == 'contractor' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'contractor' && ($action == 'index' || $action == 'allcontractors')) ? 'active' : '' ?>"><i class="material-icons">perm_identity</i>Contractors<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="/contractor/allcontractors" class="<?= ($controller == 'contractor' && $action == 'allcontractors') ? 'active-page' : '' ?>">All Contractors</a></li>
+                            </ul>
+                        </div>
+                    </li>
+
+                    <li class="no-padding <?= ($controller == 'search' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/search/index">
+                            <i class="material-icons">search</i>
+                            Advanced search
+                        </a>
+                    </li>
 
                 </ul>
             <?php } else { ?>
@@ -303,18 +335,14 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             </ul>
                         </div>
                     </li>
-                    <!--li class="no-padding <?= ($controller == 'site' && $action == 'upcomingtenders') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey" href="/site/upcomingtenders">
-                            <i class="material-icons">assignment</i>
-                            Upcoming Tenders
-                        </a>
-                    </li>
-                    <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
-                        <a class="waves-effect waves-grey" href="/site/tenders">
-                            <i class="material-icons">assignment</i>
-                            All Tenders
-                        </a>
-                    </li-->
+                    <?php if ($user->group_id != 3) { ?>
+                        <li class="no-padding <?= ($controller == 'search' && $action == 'stats') ? 'active' : '' ?>">
+                            <a class="waves-effect waves-grey" href="/search/stats">
+                                <i class="material-icons">graphic_eq</i>
+                                Tender stats
+                            </a>
+                        </li>
+                    <?php } ?>
                     <li class="no-padding <?= ($controller == 'site' && $action == 'makes') ? 'active' : '' ?>">
                         <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'e-m' || $action == 'civil')) ? 'active' : '' ?>"><i class="material-icons">store</i>Makes<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
@@ -366,7 +394,16 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                     <li><a href="/mail/index" class="<?= ($controller == 'mail' && $action == 'index') ? 'active-page' : '' ?>">Send Mail</a></li>
                                     <li><a href="/mail/clogs" class="<?= ($controller == 'mail' && $action == 'clogs') ? 'active-page' : '' ?>">Clients Logs</a></li>
                                     <li><a href="/mail/mlogs" class="<?= ($controller == 'mail' && $action == 'mlogs') ? 'active-page' : '' ?>">Manufacturers Logs</a></li>
-                                    <li><a href="/mail/data" class="<?= ($controller == 'mail' && $action == 'data') ? 'active-page' : '' ?>">Get Data</a></li>
+                                    <!--li><a href="/mail/data" class="<?= ($controller == 'mail' && $action == 'data') ? 'active-page' : '' ?>">Get Data</a></li-->
+                                </ul>
+                            </div>
+                        </li>
+                        <li class="no-padding <?= ($controller == 'products' && $action == 'files') ? 'active' : '' ?>">
+                            <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'products' && ($action == 'files' || $action == 'uploadfile')) ? 'active' : '' ?>"><i class="material-icons">file_copy</i>Files<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                            <div class="collapsible-body">
+                                <ul>
+                                    <li><a href="/products/uploadfile" class="<?= ($controller == 'products' && $action == 'uploadfile') ? 'active-page' : '' ?>">Upload New File</a></li>
+                                    <li><a href="/products/files" class="<?= ($controller == 'products' && $action == 'files') ? 'active-page' : '' ?>">All Files</a></li>
                                 </ul>
                             </div>
                         </li>
@@ -395,4 +432,4 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
             </div>
         </div>
     </aside>
-   
+

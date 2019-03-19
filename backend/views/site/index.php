@@ -2,6 +2,7 @@
 /* @var $this yii\web\View */
 
 use yii\helpers\Url;
+use backend\controllers\SiteController;
 
 $this->title = 'Dashboard';
 $user = Yii::$app->user->identity;
@@ -23,10 +24,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .select-wrapper.validate.required.materialSelecttypecapacity.lights.initialized {
         float: left;
     }
-    .card {
-        float: left;
-        width: 100%;
-    }
     .quantity{margin-bottom: 20px!important;}
     .stats-card .makes{overflow: initial!important;}
     .mn-inner{min-height: 0px!important;}
@@ -36,6 +33,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .belowgraphs{float: left;width:100%}
     svg > g > g:last-child { pointer-events: none }
     #value img,#total img,#quantity img,.boxzz img,.upper img{width:20px;}
+    #curve_chart_ce img{width:50px;}
     span.stats-counter.quantitys {
         margin-bottom: 30px!important;
     }
@@ -58,7 +56,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .make .counter{color:#ff6666;}
     label{color:#000!important;}
     label[for="quotedvalue"] {
-       color:#9e9e9e!important;
+        color:#9e9e9e!important;
     }
     .piechart {
         background-color: lightblue;
@@ -72,6 +70,81 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 50%;
     }
     #fromdate,#todate{border-bottom:1px solid #365264;}
+    .row.departmentview {
+        float: left;
+        width: 100%;
+        margin-top: 25px;
+    }
+    .departmentview .card-content{text-align: center;}
+    .departmentview .card{float:none;}
+    .departmentview .counter{font-weight:bold;}
+    .departmentview a{color:rgba(0,0,0,.6);}
+    .dview{text-align: center;}
+    .input-field.dview.col.s5 {
+        border: 1px solid rgba(0,0,0,.6);
+        border-radius: 10px;
+        padding: 10px;
+        margin-right: 30px;
+        margin-left: 28px;
+    }
+    i.material-icons {
+        line-height: inherit;
+        width: auto;
+        margin: 0px 5px 0px 0px;
+    }
+    #curve_chart_ce img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 150px;
+    }
+    div#curve_chart_ce {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #curve_chart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 150px;
+    }
+    div#curve_chart {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #curve_chart_cwe img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 150px;
+    }
+    div#curve_chart_cwe {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #curve_chart_ge img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 150px;
+    }
+    div#curve_chart_ge {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #piechart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 20px;
+    }
+    div#piechart {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #chief:focus{outline: 0px solid transparent;}
+    #cwengg:focus{outline: 0px solid transparent;}
+    #gengg:focus{outline: 0px solid transparent;}
 </style>
 <?php if ($user->group_id == 4) { ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -81,7 +154,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     <?php if (isset($details) && count($details)) { ?>
             google.charts.setOnLoadCallback(drawChartpie);
             google.charts.setOnLoadCallback(drawChart);
-            google.charts.setOnLoadCallback(drawChartce);
+            //google.charts.setOnLoadCallback(drawChartce);
     <?php } ?>
 
         function drawPieChart(labels, values, id) {
@@ -191,6 +264,75 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
 
             chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var command = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    rownum = item.row;
+                }
+                if (rownum >= 0 && rownum !== '') {
+                    if (rownum == 2) {
+                        command = 6;
+                    } else if (rownum == 3) {
+                        command = 7;
+                    } else if (rownum == 4) {
+                        command = 8;
+                    } else if (rownum == 5) {
+                        command = 9;
+                    } else if (rownum == 6) {
+                        command = 10;
+                    } else if (rownum == 7) {
+                        command = 11;
+                    } else if (rownum == 8) {
+                        command = 12;
+                    } else if (rownum == 1) {
+                        command = 2;
+                    } else {
+                        command = 1;
+                    }
+                    $("#commandid").val(command);
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#chief").show();
+                            $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#chief').focus();
+                            $('#cwengg').hide();
+                            $('#gengg').hide();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (command == 2 || command == 12) {
+                                    $("#curve_chart_ce").html('');
+                                    $("#chief").hide();
+                                } else {
+                                    $("#chief").show();
+                                    drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
+                                }
+                            }
+
+                        }
+                    });
+                }
+
+            }
         }
 
         function drawChartce() {
@@ -228,10 +370,110 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ce'));
 
             chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                var cengg = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    rownum = item.row;
+                }
+                var command = $("#commandid").val();
+                if (command == 6) {
+                    cengg = parseInt(rownum) + parseInt(1);
+                } else if (command == 7) {
+                    cengg = parseInt(rownum) + parseInt(5);
+                } else if (command == 8) {
+                    cengg = parseInt(rownum) + parseInt(15);
+                } else if (command == 9) {
+                    cengg = parseInt(rownum) + parseInt(19);
+                } else if (command == 10) {
+                    cengg = parseInt(rownum) + parseInt(28);
+                } else if (command == 11) {
+                    cengg = parseInt(rownum) + parseInt(31);
+                } else if (command == 1) {
+                    cengg = 0;
+                }
+                if (cengg >= 0) {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    $("#ceid").val(cengg);
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcwegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            if (cengg == 0) {
+                                $("#cwengg").hide();
+                                $("#gengg").show();
+                                $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#gengg').focus();
+                            } else {
+                                $("#cwengg").show();
+                                $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#cwengg').focus();
+                                $('#gengg').hide();
+                            }
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphcwe[1] != 0) {
+                                    if (cengg == 0) {
+                                        $("#gengg").show();
+                                        drawLineChartge(myJSON.graphcwe, "curve_chart_ge");
+                                    } else {
+                                        $("#cwengg").show();
+                                        drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe");
+                                    }
+
+                                } else {
+                                    if (cengg == 0) {
+                                        $("#gengg").hide();
+                                        $("#curve_chart_ge").html('');
+                                    } else {
+                                        $("#cwengg").hide();
+                                        $("#curve_chart_cwe").html('');
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    });
+                }
+
+            }
         }
 
-        function drawLineChart(data, id) {
-            var data = google.visualization.arrayToDataTable((data));
+        function drawLineChart(dataz, id, make) {
+            //var data = google.visualization.arrayToDataTable((data));
+
+            if (make) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Command');
+                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Command');
+                data.addColumn('number', 'Approved Tenders');
+                data.addRows(dataz);
+            }
 
             var options = {
                 title: '',
@@ -265,10 +507,92 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             var chart = new google.visualization.ColumnChart(document.getElementById(id));
 
             chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var command = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    rownum = item.row;
+                }
+                if (rownum >= 0 && rownum !== '') {
+                    if (rownum == 2) {
+                        command = 6;
+                    } else if (rownum == 3) {
+                        command = 7;
+                    } else if (rownum == 4) {
+                        command = 8;
+                    } else if (rownum == 5) {
+                        command = 9;
+                    } else if (rownum == 6) {
+                        command = 10;
+                    } else if (rownum == 7) {
+                        command = 11;
+                    } else if (rownum == 8) {
+                        command = 12;
+                    } else if (rownum == 1) {
+                        command = 2;
+                    } else {
+                        command = 1;
+                    }
+                    $("#commandid").val(command);
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#chief").show();
+                            $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#chief').focus();
+                            $('#cwengg').hide();
+                            $('#gengg').hide();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (command == 2 || command == 12) {
+                                    $("#curve_chart_ce").html('');
+                                    $("#chief").hide();
+                                } else {
+                                    $("#chief").show();
+                                    drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
+                                }
+                            }
+
+                        }
+                    });
+                }
+
+            }
         }
 
-        function drawLineChartce(data, id) {
-            var data = google.visualization.arrayToDataTable((data));
+        function drawLineChartce(dataz, id, make, col) {
+
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Cheif Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Cheif Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            }
 
             var options = {
                 title: '',
@@ -302,6 +626,242 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             var chart = new google.visualization.ColumnChart(document.getElementById(id));
 
             chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                var cengg = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    if (item.row != null) {
+                        rownum = item.row;
+                    }
+                }
+                var command = $("#commandid").val();
+                if (command == 6) {
+                    cengg = parseInt(rownum) + parseInt(1);
+                } else if (command == 7) {
+                    cengg = parseInt(rownum) + parseInt(5);
+                } else if (command == 8) {
+                    cengg = parseInt(rownum) + parseInt(15);
+                } else if (command == 9) {
+                    cengg = parseInt(rownum) + parseInt(19);
+                } else if (command == 10) {
+                    cengg = parseInt(rownum) + parseInt(28);
+                } else if (command == 11) {
+                    cengg = parseInt(rownum) + parseInt(31);
+                } else if (command == 1) {
+                    cengg = 0;
+                }
+                if (cengg >= 0) {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    $("#ceid").val(cengg);
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcwegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            if (cengg == 0) {
+                                $("#cwengg").hide();
+                                $("#gengg").show();
+                                $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#gengg').focus();
+                            } else {
+                                $("#cwengg").show();
+                                $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#cwengg').focus();
+                                $('#gengg').hide();
+                            }
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphcwe[1] != 0) {
+                                    if (cengg == 0) {
+                                        $("#gengg").show();
+                                        drawLineChartge(myJSON.graphcwe, "curve_chart_ge", myJSON.makename, myJSON.col);
+                                    } else {
+                                        $("#cwengg").show();
+                                        drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe", myJSON.makename, myJSON.col);
+                                    }
+
+                                } else {
+                                    if (cengg == 0) {
+                                        $("#gengg").hide();
+                                        $("#curve_chart_ge").html('');
+                                    } else {
+                                        $("#cwengg").hide();
+                                        $("#curve_chart_cwe").html('');
+                                    }
+
+                                }
+                            }
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function drawLineChartcwe(dataz, id, make, col) {
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Commander Works Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Commander Works Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            }
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: 'lightgoldenrodyellow',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Commander Works Engineers',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_cwe'));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    if (item.row != null) {
+                        rownum = item.row;
+                    }
+                }
+                var cenggid = $("#ceid").val();
+                var command = $("#commandid").val();
+                if (rownum >= 0 && rownum !== '') {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getgegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cenggid + '&fromdate=' + fromdate + '&todate=' + todate + '&rownum=' + rownum + '&command=' + command + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#gengg").show();
+                            $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#gengg').focus();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphge[1] != 0) {
+                                    $("#gengg").show();
+                                    drawLineChartge(myJSON.graphge, "curve_chart_ge", myJSON.makename, myJSON.col);
+                                } else {
+                                    $("#gengg").hide();
+                                    $("#curve_chart_ge").html('');
+                                }
+                            }
+
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function drawLineChartge(dataz, id, make, col) {
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Garisson Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Garisson Engineers');
+                data.addColumn('number', 'Approved Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            }
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: 'lightgoldenrodyellow',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Garrison Engineers',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ge'));
+
+            chart.draw(data, options);
+
         }
 
 
@@ -320,9 +880,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     </script>
 <?php endif; ?>
 
-    <?php if (Yii::$app->session->hasFlash('error')): ?>
+<?php if (Yii::$app->session->hasFlash('error')): ?>
     <div class="alert alert-danger">
-    <?= Yii::$app->session->getFlash('error'); ?>
+        <?= Yii::$app->session->getFlash('error'); ?>
     </div>
 <?php endif; ?>
 
@@ -341,10 +901,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <option value="" disabled selected>Select Product</option>
                                     <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
                                     <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
+                                    <option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option>
                                 </select>
                             </form>
 
-    <?php if (isset($details) && count($details)) { ?>
+                            <?php if (isset($details) && count($details)) { ?>
 
                                 <select class="validate required materialSelect" name="command" id="command" required="">
                                     <option value="">Select Command</option>
@@ -452,11 +1013,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 0) {
+                                                if (@$_POST['type'] == 1) {
+                                                    $value = 'Value in Rs.';
+                                                } else {
+                                                    $value = 'Approx avg value in Rs.';
+                                                }
                                                 ?>
                                                 <span class="card-title leftside"><?= $_log['title']; ?></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                                <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= $_log['value']; ?></span><small>Value in Rs.</small></span>
+                                                <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value ?></small></span>
                                                 <?php
                                             }
                                             $i++;
@@ -480,11 +1046,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 1) {
+                                                if (@$_POST['type'] == 1) {
+                                                    $value = 'Value in Rs.';
+                                                } else {
+                                                    $value = 'Approx avg value in Rs.';
+                                                }
                                                 ?>
                                                 <span class="card-title leftside"><?= $_log['title']; ?></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                                <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= $_log['value']; ?></span><small>Value in Rs.</small></span>
+                                                <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value ?></small></span>
                                                 <?php
                                             }
                                             $i++;
@@ -504,11 +1075,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 2) {
+                                                if (@$_POST['type'] == 1) {
+                                                    $value = 'Value in Rs.';
+                                                } else {
+                                                    $value = 'Approx avg value in Rs.';
+                                                }
                                                 ?>
                                                 <span class="card-title leftside"><?= $_log['title']; ?></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                                 <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                                <span class="stats-counter quantitys"><span class="counter upper leftside" id="u3<?= $key ?>"><?= $_log['value']; ?></span><small>Value in Rs.</small></span>
+                                                <span class="stats-counter quantitys"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value; ?></small></span>
                                                 <?php
                                             }
                                             $i++;
@@ -536,10 +1112,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         }
                                         ?>
                                     </select>
+                                    <?php
+                                    if (@$_POST['type'] == 1) {
+                                        $value = 'Value in Rs.';
+                                    } else {
+                                        $value = 'Approx avg value in Rs.';
+                                    }
+                                    ?>
                                     <div class="numbers">
                                         <span class="stats-counter quantity total"><span class="counter" id="total">0</span><small>Tenders</small></span>
                                         <span class="stats-counter quantity quantity"><span class="counter" id="quantity">0</span><small><?= $head ?></small></span>
-                                        <span class="stats-counter quantity quantity"><span class="counter" id="value">0</span><small>Value in Rs.</small></span>
+                                        <span class="stats-counter quantity quantity"><span class="counter" id="value">0</span><small><?= $value ?></small></span>
                                     </div>
                                 </div>
                             </div>
@@ -561,12 +1144,30 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
                             </div>
                         </div>
-                        <div class="col s12 m12 l12" id='chief'>
+                        <input type='hidden' value='' id='commandid' name='commandid'>
+                        <div class="col s12 m12 l12" tabindex='1' id='chief' style='display:none;'>
                             <div class="card visitors-card chart">
                                 <div class="card-content">
 
                                     <span class="card-title">Comparison between all chief engineers<span class="secondary-title">Stats of all tenders</span></span>
-                                    <div id="curve_chart_ce" style="width: 100%; height: 500px"></div>
+                                    <div id="curve_chart_ce" style="width: 100%; height: 400px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <input type='hidden' value='' id='ceid' name='ceid'>
+                        <div class="col s12 m12 l12" tabindex='1' id='cwengg' style='display:none;'>
+                            <div class="card visitors-card chart">
+                                <div class="card-content">
+                                    <span class="card-title">Comparison between all commander works engineers<span class="secondary-title">Stats of all tenders</span></span>
+                                    <div id="curve_chart_cwe" style="width: 100%; height: 400px;"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col s12 m12 l12" tabindex='1' id='gengg' style='display:none;'>
+                            <div class="card visitors-card chart">
+                                <div class="card-content">
+                                    <span class="card-title">Comparison between all garrison engineers<span class="secondary-title">Stats of all tenders</span></span>
+                                    <div id="curve_chart_ge" style="width: 100%; height: 400px;"></div>
                                 </div>
                             </div>
                         </div>
@@ -720,7 +1321,63 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
         <?php
     }
-} else {
+} elseif ($user->group_id == 5) {
+    ?>
+    <main class="mn-inner inner-active-sidebar">
+        <div class="middle-content">
+            <div class="row departmentview">
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <span class="card-title"></span>
+                            <span class="stats-counter"><span class="counter"><a href="#modal" class="modal-trigger">Tenders</a></span><small></small></span>
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <span class="card-title"></span>
+                            <span class="stats-counter"><span class="counter"><a href="/site/e-m">Products</a></span><small></small></span>
+
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <span class="card-title"></span>
+                            <span class="stats-counter"><span class="counter"><a href="/contractor/allcontractors">Contractors</a></span><small></small></span>
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div></div></main>
+    <div id="modal" class="modal dview">
+        <div class="modal-content">
+            <h4>Choose an option</h4>
+            <div class="row">
+                <div class="input-field dview col s5">
+                    <a href="/search/index">
+                        Advanced search</a>
+                </div>
+                <div class="input-field dview col s5">
+                    <a href="/search/stats">Tender stats</a>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+<?php } else {
     ?>
     <main class="mn-inner">
         <div class="row">

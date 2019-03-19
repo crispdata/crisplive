@@ -8,8 +8,8 @@ $config = [
         ],
         'session' => [
             'class' => 'yii\web\Session',
-            'timeout' => 3600*3600,
-            'cookieParams' => ['lifetime' => 7 * 24 *60 * 60]
+            'timeout' => 3600 * 3600,
+            'cookieParams' => ['lifetime' => 7 * 24 * 60 * 60]
         ],
         'assetManager' => [
             'appendTimestamp' => true,
@@ -110,6 +110,10 @@ $config = [
                 [
                     'pattern' => 'site/approvetenders/<c:\d+>',
                     'route' => 'site/approvetenders'
+                ],
+                [
+                    'pattern' => 'products/uploadfile/<id:\d+>',
+                    'route' => 'products/uploadfile'
                 ]
             ]
         ],
