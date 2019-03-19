@@ -1323,7 +1323,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     }
 } elseif ($user->group_id == 5) {
     ?>
-    <main class="mn-inner inner-active-sidebar">
+    <main class="mn-inner">
         <div class="middle-content">
             <div class="row departmentview">
                 <div class="col s12 m12 l4">
@@ -1379,7 +1379,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     </div>
 <?php } else {
     ?>
-    <main class="mn-inner">
+    <!--main class="mn-inner">
         <div class="row">
             <div class="col s6">
                 <div class="page-title">Dashboard</div>
@@ -1403,7 +1403,115 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '12']) ?>">DGNP MUMBAI - MES</a>
 
 
-                    </div></div></div></div></main>
+                    </div></div></div></div></main-->
+    <main class="mn-inner">
+        <div class="middle-content">
+            <div class="row departmentview card-content">
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="javascript:void(0)">
+                                <span class="card-title leftside">All Tenders</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $alltenders; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/atenders">
+                                <span class="card-title leftside">Approved Tenders</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $approvedtenders; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/archivetenders">
+                                <span class="card-title leftside">Archived Tenders</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $archivedtenders; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress green">
+                            <div class="determinate green" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="contractor/allcontractors">
+                                <span class="card-title leftside">All Contractors</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dcontractors; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 70%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="<?= ($user->group_id != 3) ? 'mail/clogs' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Mails Sent</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dlogs; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="<?= ($user->group_id != 3) ? 'site/manufacturers' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Manufacturers </span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress green">
+                            <div class="determinate green" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="<?= ($user->group_id != 3) ? 'site/contractors' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Contractors/Clients</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dcons; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Dealers</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $ddeals; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress">
+                            <div class="determinate" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+            </div></div></main>
 <?php } ?>
 
 

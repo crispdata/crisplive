@@ -62,10 +62,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <option value=''>Select Product</option>
                                     <option value='1' <?= (@$_POST['authtype'] == 1) ? 'selected' : '' ?>>Cables</option>
                                     <option value='2' <?= (@$_POST['authtype'] == 2) ? 'selected' : '' ?>>Lighting</option>
-                                    <option value='3' <?= (@$_POST['authtype'] == 3) ? 'selected' : '' ?>>Cement</option>
-                                    <option value='4' <?= (@$_POST['authtype'] == 4) ? 'selected' : '' ?>>Reinforcement Steel</option>
-                                    <option value='5' <?= (@$_POST['authtype'] == 5) ? 'selected' : '' ?>>Structural Steel</option>
-                                    <option value='6' <?= (@$_POST['authtype'] == 6) ? 'selected' : '' ?>>Non Structural Steel</option>
+                                    <option value='3' <?= (@$_POST['authtype'] == 3) ? 'selected' : '' ?>>Wires</option>
+                                    <option value='4' <?= (@$_POST['authtype'] == 4) ? 'selected' : '' ?>>Cement</option>
+                                    <option value='5' <?= (@$_POST['authtype'] == 5) ? 'selected' : '' ?>>Reinforcement Steel</option>
+                                    <option value='6' <?= (@$_POST['authtype'] == 6) ? 'selected' : '' ?>>Structural Steel</option>
+                                    <option value='7' <?= (@$_POST['authtype'] == 7) ? 'selected' : '' ?>>Non Structural Steel</option>
                                 </select>
                             </div>
                             <div class="input-field col s12" id="cablesdiv" <?= (@$_POST['authtype'] == 1) ? '' : 'style="display: none;"' ?> >
@@ -96,7 +97,21 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                 </select>
                             </div>
-                            <div class="input-field col s12" id="cementdiv" <?= (@$_POST['authtype'] == 3) ? '' : 'style="display: none;"' ?>>
+                            <div class="input-field col s12" id="wiresdiv" <?= (@$_POST['authtype'] == 3) ? '' : 'style="display: none;"' ?>>
+                                <select name='wires' class="wmakes browser-default" id="wires">
+                                    <option value="">Select</option>
+                                    <?php
+                                    if (@$wires) {
+                                        foreach ($wires as $wire_) {
+                                            ?>
+                                            <option value="<?= $wire_->id ?>" <?= (@$_POST['wires'] == $wire_->id) ? 'selected' : '' ?>><?= $wire_->make ?></option>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
+                                </select>
+                            </div>
+                            <div class="input-field col s12" id="cementdiv" <?= (@$_POST['authtype'] == 4) ? '' : 'style="display: none;"' ?>>
                                 <select name='cement' class="cementmakes browser-default" id="cement">
                                     <option value="">Select</option>
                                     <?php
@@ -110,7 +125,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                 </select>
                             </div>
-                            <div class="input-field col s12" id="rsteeldiv" <?= (@$_POST['authtype'] == 4) ? '' : 'style="display: none;"' ?>>
+                            <div class="input-field col s12" id="rsteeldiv" <?= (@$_POST['authtype'] == 5) ? '' : 'style="display: none;"' ?>>
                                 <select name='rsteel' class="rmakes browser-default" id="rsteel">
                                     <option value="">Select</option>
                                     <?php
@@ -124,7 +139,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                 </select>
                             </div>
-                            <div class="input-field col s12" id="ssteeldiv" <?= (@$_POST['authtype'] == 5) ? '' : 'style="display: none;"' ?>>
+                            <div class="input-field col s12" id="ssteeldiv" <?= (@$_POST['authtype'] == 6) ? '' : 'style="display: none;"' ?>>
                                 <select name='ssteel' class="smakes browser-default" id="ssteel">
                                     <option value="">Select</option>
                                     <?php
@@ -138,7 +153,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                 </select>
                             </div>
-                            <div class="input-field col s12" id="nsteeldiv" <?= (@$_POST['authtype'] == 6) ? '' : 'style="display: none;"' ?>>
+                            <div class="input-field col s12" id="nsteeldiv" <?= (@$_POST['authtype'] == 7) ? '' : 'style="display: none;"' ?>>
                                 <select name='nsteel' class="nmakes browser-default" id="nsteel">
                                     <option value="">Select</option>
                                     <?php

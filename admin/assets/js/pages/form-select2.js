@@ -4,6 +4,7 @@ $(document).ready(function () {
     $('select.materialSelectcon').select2({closeOnSelect: true, placeholder: 'All Contractors'});
     $('select.cmakes').select2({closeOnSelect: true, placeholder: 'Select Cables Makes'});
     $('select.lmakes').select2({closeOnSelect: true, placeholder: 'Select Lighting Makes'});
+    $('select.wmakes').select2({closeOnSelect: true, placeholder: 'Select Wire Makes'});
     $('select.cementmakes').select2({closeOnSelect: true, placeholder: 'Select Cement Makes'});
     $('select.rmakes').select2({closeOnSelect: true, placeholder: 'Select Reinforcement Steel Makes'});
     $('select.smakes').select2({closeOnSelect: true, placeholder: 'Select Structural Steel Makes'});

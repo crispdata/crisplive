@@ -447,7 +447,19 @@ span.cross {
     width: 100px;
 }
 
+.select2-search img {
+    width: 25px;
+}
 
+.makesload {
+    float: left;
+    width: 100%;
+    background: url(/assets/images/loading.gif);
+    background-size: contain;
+    background-repeat: no-repeat;
+    height: 35px!important;
+    background-position: center;
+}
 
 .col.s12.m12.l6.leftlist {
     float: left;
