@@ -206,7 +206,7 @@ class SearchController extends Controller {
         $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
         $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
 
-        $finalgraph[] = ['Command', 'Approved Tenders'];
+        $finalgraph[] = ['Command', 'All Tenders'];
         //commands
         $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
         foreach ($comm as $i) {
