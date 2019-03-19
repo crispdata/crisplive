@@ -49,6 +49,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <input id="username" type="text" maxlength="50" name = "username" class="validate required" value="<?= $user->username; ?>">
                                     <label for="username">Username</label>
                                 </div>
+                               
+                                <div class="input-field col s12">
+                                    <input id="name" type="text" name = "name" class="validate required" value="<?= $user->name; ?>">
+                                    <label for="name">Name</label>
+                                </div>
 
                                 <div class="input-field col s12">
                                     <input id="email" type="text" maxlength="50" name = "email" class="validate required" value="<?= $user->email; ?>">

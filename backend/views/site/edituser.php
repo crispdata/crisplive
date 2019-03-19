@@ -54,6 +54,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <input id="username" type="text" maxlength="50" name = "username" class="validate required" value="<?= $user->username; ?>">
                                 <label for="username">Username</label>
                             </div>
+                            <div class="input-field col s12">
+                                <input id="name" type="text" name = "name" class="validate required" value="<?= $user->name; ?>">
+                                <label for="name">Name</label>
+                            </div>
 
                             <div class="input-field col s12">
                                 <input id="email" type="text" maxlength="50" name = "email" class="validate required" value="<?= $user->email; ?>">
@@ -63,21 +67,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="input-field col s12">
                                 <select class="validate required" required="" name="group_id" id="group">
                                     <option value="" disabled selected>Select Group</option>
-                                    <option value="3" <?php
-                                    if ($user->group_id == 3) {
-                                        echo "selected";
+                                    <?php
+                                    if (isset($groups) && count($groups)) {
+                                        foreach ($groups as $_group) {
+                                            ?>
+                                            <option value="<?= $_group->id ?>" <?= ($user->group_id == $_group->id) ? 'selected' : '' ?> ><?= ucfirst($_group->name); ?></option>
+                                            <?php
+                                        }
                                     }
-                                    ?> >User</option>
-                                    <option value="2" <?php
-                                    if ($user->group_id == 2) {
-                                        echo "selected";
-                                    }
-                                    ?>>Admin</option>
-                                    <option value="4" <?php
-                                    if ($user->group_id == 4) {
-                                        echo "selected";
-                                    }
-                                    ?>>Sales</option>
+                                    ?>
                                 </select>
                             </div>
 

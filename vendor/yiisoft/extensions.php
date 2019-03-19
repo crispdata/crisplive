@@ -113,4 +113,13 @@ return array (
       '@yashop/ses' => $vendorDir . '/ofat/yii2-yashop-ses',
     ),
   ),
+  'yiisoft/yii2-sphinx' => 
+  array (
+    'name' => 'yiisoft/yii2-sphinx',
+    'version' => '2.0.11.0',
+    'alias' => 
+    array (
+      '@yii/sphinx' => $vendorDir . '/yiisoft/yii2-sphinx/src',
+    ),
+  ),
 );

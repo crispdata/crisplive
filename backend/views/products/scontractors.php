@@ -41,8 +41,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <th data-field="address">Address</th>
                 <th data-field="contact">Contact No</th>
                 <th data-field="email">Email</th>
-                <th data-field="actions">Actions</th>
-
+                <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                    <th data-field="actions">Actions</th>
+                <?php } ?>
             </tr>
         </thead>
         <tbody id="contacts_list">
@@ -57,16 +58,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <td class = ""><?= $size->address ?></td>
                         <td class = ""><?= $size->contact ?></td>
                         <td class = ""><?= $size->email ?></td>
-                        <td>
+                        <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                            <td>
 
-                            <a onclick="pop_up('<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
-
-
-                            <a onclick="openmodal('modal<?= $size->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                <a onclick="pop_up('<?= Url::to(['contractor/add-contractor', 'id' => $size->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
 
 
-                        </td>
+                                <a onclick="openmodal('modal<?= $size->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
 
+
+                            </td>
+                        <?php } ?>
                     </tr>
                 <div id="modal<?= $size->id; ?>" class="modal">
                     <button data-dismiss="modal" class="close waves-effect waves-light btn red">×</button>

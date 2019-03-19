@@ -5,7 +5,7 @@ use backend\controllers\SiteController;
 use yii\widgets\LinkPager;
 use yii\helpers\Url;
 
-$this->title = 'Advanced search';
+$this->title = 'Advanced search of Tenders';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
@@ -30,7 +30,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     ul.pagination {
         float: right;
     }
-    .card-tenders{padding-bottom: 60px!important;}
     .pagination li.active {
         background-color: #2196F3!important;
     }
@@ -38,6 +37,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         float: left;
         width: 50%;
         margin-top: 20px;
+        margin-bottom: 20px;
     }
     form#sort-data {
         float: left;
@@ -89,45 +89,45 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <input id="keyword" type="text" name = "keyword" class="validate required" value="<?= @$_GET['keyword']; ?>">
                                     <label for="keyword">Search Keyword</label>
                                 </div>
-                                <div class="input-fields col s4 row">
+                                <!--div class="input-fields col s4 row">
                                     <select class="validate required materialSelect" name="tendertype" id="tendertype">
                                         <option value="1" <?php
-                                        if (@$_GET['tendertype'] == 1) {
-                                            echo "selected";
-                                        }
-                                        ?>>All Tenders</option>
+                                if (@$_GET['tendertype'] == 1) {
+                                    echo "selected";
+                                }
+                                ?>>All Tenders</option>
                                         <option value="2" <?php
-                                        if (@$_GET['tendertype'] == 2) {
-                                            echo "selected";
-                                        }
-                                        ?>>Approved (Without AOC) Tenders</option>
+                                if (@$_GET['tendertype'] == 2) {
+                                    echo "selected";
+                                }
+                                ?>>Approved (Without AOC) Tenders</option>
                                         <option value="3" <?php
-                                        if (@$_GET['tendertype'] == 3) {
-                                            echo "selected";
-                                        }
-                                        ?>>Unapproved Tenders</option>
+                                if (@$_GET['tendertype'] == 3) {
+                                    echo "selected";
+                                }
+                                ?>>Unapproved Tenders</option>
                                         <option value="4" <?php
-                                        if (@$_GET['tendertype'] == 4) {
-                                            echo "selected";
-                                        }
-                                        ?>>AOC Tenders</option>
+                                if (@$_GET['tendertype'] == 4) {
+                                    echo "selected";
+                                }
+                                ?>>AOC Tenders</option>
                                         <option value="5" <?php
-                                        if (@$_GET['tendertype'] == 5) {
-                                            echo "selected";
-                                        }
-                                        ?>>AOC Ready Tenders</option>
+                                if (@$_GET['tendertype'] == 5) {
+                                    echo "selected";
+                                }
+                                ?>>AOC Ready Tenders</option>
                                         <option value="6" <?php
-                                        if (@$_GET['tendertype'] == 6) {
-                                            echo "selected";
-                                        }
-                                        ?>>AOC OnHold Tenders</option>
+                                if (@$_GET['tendertype'] == 6) {
+                                    echo "selected";
+                                }
+                                ?>>AOC OnHold Tenders</option>
                                         <option value="7" <?php
-                                        if (@$_GET['tendertype'] == 7) {
-                                            echo "selected";
-                                        }
-                                        ?>>Archived Tenders</option>
+                                if (@$_GET['tendertype'] == 7) {
+                                    echo "selected";
+                                }
+                                ?>>Archived Tenders</option>
                                     </select>
-                                </div>
+                                </div-->
                                 <div class="input-fields col s4 row">
                                     <select class="validate required materialSelectcon browser-default" name="contype" id="contype">
                                         <option value="">All Contractors</option>
@@ -142,81 +142,109 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
+                                <div class="input-fields col s4 row">
+                                    <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
+                                        <option value="">ALL COMMANDS</option>
+                                        <option value="1" <?php
+                                        if (@$_GET['command'] == 1) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
+                                        <option value="2" <?php
+                                        if (@$_GET['command'] == 2) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
+                                        <option value="3" <?php
+                                        if (@$_GET['command'] == 3) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
+                                        <option value="4" <?php
+                                        if (@$_GET['command'] == 4) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
+                                        <option value="5" <?php
+                                        if (@$_GET['command'] == 5) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
+                                        <option value="13" <?php
+                                        if (@$_GET['command'] == 13) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                                        <option value="6" <?php
+                                        if (@$_GET['command'] == 6) {
+                                            echo "selected";
+                                        }
+                                        ?>>CENTRAL COMMAND</option>
+                                        <option value="7" <?php
+                                        if (@$_GET['command'] == 7) {
+                                            echo "selected";
+                                        }
+                                        ?>>EASTERN COMMAND</option>
+                                        <option value="8" <?php
+                                        if (@$_GET['command'] == 8) {
+                                            echo "selected";
+                                        }
+                                        ?>>NORTHERN COMMAND</option>
+                                        <option value="9" <?php
+                                        if (@$_GET['command'] == 9) {
+                                            echo "selected";
+                                        }
+                                        ?>>SOUTHERN COMMAND</option>
+                                        <option value="10" <?php
+                                        if (@$_GET['command'] == 10) {
+                                            echo "selected";
+                                        }
+                                        ?>>SOUTH WESTERN COMMAND</option>
+                                        <option value="11" <?php
+                                        if (@$_GET['command'] == 11) {
+                                            echo "selected";
+                                        }
+                                        ?>>WESTERN COMMAND</option>
+                                        <option value="12" <?php
+                                        if (@$_GET['command'] == 12) {
+                                            echo "selected";
+                                        }
+                                        ?>>DGNP MUMBAI - MES</option>
+                                        <!--option value="2">B/R</option-->
+                                    </select>
+                                </div>
                             </div>
-                            <div class="input-fields col s4 row">
-                                <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
-                                    <option value="">ALL COMMANDS</option>
-                                    <option value="1" <?php
-                                    if (@$_GET['command'] == 1) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
-                                    <option value="2" <?php
-                                    if (@$_GET['command'] == 2) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
-                                    <option value="3" <?php
-                                    if (@$_GET['command'] == 3) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
-                                    <option value="4" <?php
-                                    if (@$_GET['command'] == 4) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
-                                    <option value="5" <?php
-                                    if (@$_GET['command'] == 5) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
-                                    <option value="13" <?php
-                                    if (@$_GET['command'] == 13) {
-                                        echo "selected";
-                                    }
-                                    ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
-                                    <option value="6" <?php
-                                    if (@$_GET['command'] == 6) {
-                                        echo "selected";
-                                    }
-                                    ?>>CENTRAL COMMAND</option>
-                                    <option value="7" <?php
-                                    if (@$_GET['command'] == 7) {
-                                        echo "selected";
-                                    }
-                                    ?>>EASTERN COMMAND</option>
-                                    <option value="8" <?php
-                                    if (@$_GET['command'] == 8) {
-                                        echo "selected";
-                                    }
-                                    ?>>NORTHERN COMMAND</option>
-                                    <option value="9" <?php
-                                    if (@$_GET['command'] == 9) {
-                                        echo "selected";
-                                    }
-                                    ?>>SOUTHERN COMMAND</option>
-                                    <option value="10" <?php
-                                    if (@$_GET['command'] == 10) {
-                                        echo "selected";
-                                    }
-                                    ?>>SOUTH WESTERN COMMAND</option>
-                                    <option value="11" <?php
-                                    if (@$_GET['command'] == 11) {
-                                        echo "selected";
-                                    }
-                                    ?>>WESTERN COMMAND</option>
-                                    <option value="12" <?php
-                                    if (@$_GET['command'] == 12) {
-                                        echo "selected";
-                                    }
-                                    ?>>DGNP MUMBAI - MES</option>
-                                    <!--option value="2">B/R</option-->
-                                </select>
-                            </div>
+
 
                             <?php
                             if (isset($_GET['submit'])) {
+                                if ((@$_GET['cengineer'] == 0 || @$_GET['cengineer'] == null) && (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null)) {
+                                    $arrcommands = [1, 2, 3, 4, 5, 13];
+                                    $getcengineers = \common\models\Cengineer::find()->where(['command' => $_GET['command']])->all();
+                                    if (@$getcengineers && (!in_array($_GET['command'], $arrcommands))) {
+                                        ?>
+                                        <div id="ce">
+                                            <div class="input-fields col s4 row">
+                                                <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                    <option value="">Select CE</option>
+                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    } elseif(@$getcengineers && (in_array($_GET['command'], $arrcommands))) {
+                                        ?>
+                                        <div id="ge">
+                                            <div class="input-fields col s4 row">
+                                                <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                    <option value="">Select GE</option>
+                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
+                                                </select>
+                                            </div>
+                                        </div>  
+                                        <?php
+                                    }
+                                }
                                 if (@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) {
                                     ?>
                                     <div id="ce">
@@ -227,6 +255,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
                                     </div>
+                                    <?php
+                                    if (@$_GET['cwengineer'] == 0 || @$_GET['cwengineer'] == null) {
+                                        $getcwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $_GET['cengineer']])->all();
+                                        ?>
+                                        <?php if (@$getcwengineers) { ?>            
+                                            <div id="cwe">
+                                                <div class="input-fields col s4 row">
+                                                    <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                        <option value="">Select CWE</option>
+                                                        <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], ''); ?>
+                                                    </select>
+                                                </div>
+                                            </div>
+                                            <?php
+                                        }
+                                    }
+                                    ?>
                                 <?php } elseif (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) { ?>
                                     <div id="cwe">
                                         <div class="input-fields col s4 row">
@@ -266,7 +311,24 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
                                     </div>
-                                <?php } else { ?>
+                                    <?php
+                                    if (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null) {
+                                        $getgengineers = \common\models\Gengineer::find()->where(['cwengineer' => $_GET['cwengineer']])->all();
+                                        ?>
+                                        <?php if (@$getgengineers) { ?>
+                                            <div id="ge">
+                                                <div class="input-fields col s4 row">
+                                                    <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                        <option value="">Select GE</option>
+                                                        <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], ''); ?>
+                                                    </select>
+                                                </div>
+                                            </div>  
+                                            <?php
+                                        }
+                                    }
+                                } else {
+                                    ?>
                                     <div id="cwe" style="display: none;">
                                         <div class="input-fields col s4 row">
                                             <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
@@ -414,7 +476,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     }
                                                 } else {
                                                     if ($tender->status == 1) {
-                                                        
+
                                                         if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                             ?>
 
@@ -422,9 +484,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                             <?php
                                                         } else {
-                                                            if ($tender->status == 1 && $tender->is_archived != 1) {
-                                                                ?>
-
+                                                            if ($user->group_id == 4 || $user->group_id == 5) {
+                                                                if ($tender->status == 1 && $tender->is_archived != 1) {
+                                                                    ?>
+                                                                    <a class="waves-effect waves-light btn blue">AOC</a>
+                                                                <?php } ?>
+                                                            <?php } else { ?>
                                                                 <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
                                                                 <?php
                                                             }
@@ -460,7 +525,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <?php if ($contractor) { ?>
                                                     <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
                                                 <?php } ?>
-                                                <?php if ($tender->is_archived != 1 && $contractor) { ?>
+                                                <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5)) { ?>
                                                     <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                 <?php } ?>
 
@@ -637,17 +702,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 </div>
 
                                             </div>
-                                            <?php if ($tender->is_archived != 1) { ?>
-                                                <div class="row">
-
-                                                    <div class="col s6">
-                                                        <a target="_blank" class="waves-effect waves-light btn blue proj-delete" href="<?= Url::to(['contractor/add-contractor', 'id' => $contractor->id]) ?>">Edit</a>
-                                                    </div>
-
-                                                </div>
-                                            <?php } ?>
-
-
 
                                         </div>
                                     </div>

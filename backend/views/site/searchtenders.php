@@ -29,7 +29,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     ul.pagination {
         float: right;
     }
-    .card-tenders{padding-bottom: 60px!important;}
     .pagination li.active {
         background-color: #2196F3!important;
     }
@@ -238,16 +237,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                             <td>
 
-                                                <?php
-                                                if ($tender->aoc_status == 1) {
+                                                <?php if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                     ?>
 
                                                     <a class="waves-effect waves-light btn green">AOC</a>
 
-                                                <?php } else {
-                                                    ?>
-                                                    <a class="waves-effect waves-light btn blue">AOC</a>
-                                                <?php }
+                                                    <?php
+                                                } else {
+                                                    if ($tender->status == 1 && $tender->is_archived != 1) {
+                                                        ?>
+
+                                                        <a class="waves-effect waves-light btn blue proj-delete">AOC</a>
+                                                        <?php
+                                                    }
+                                                }
                                                 ?>
                                                 <a href="<?= $baseURL ?>site/view-items?id=<?= $tender->id; ?>" class="waves-effect waves-light btn blue">View Items</a>
 
@@ -258,23 +261,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </tr>
 
                                     <div id="modalfiles<?= $tender->id; ?>" class="modal">
-                                        <?php ?>
+            <?php ?>
                                         <div class="modal-content">
                                             <h4>View Tender Files</h4>
 
                                             <div class="row">
-                                                <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
+                                                    <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
                                                 <div class="input-field col s6">
                                                     <?php if ($tech->tfile != '') { ?>
                                                         <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
                                                     <?php } else { ?>
                                                         <a class="notavailable">No Tender files yet</a>
-                                                    <?php } ?>
+            <?php } ?>
                                                 </div>
                                             </div>
 
                                             <h4>View BOQ Sheet</h4>
-                                            <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                                <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$finfiles) {
@@ -303,7 +306,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                             </div>
                                             <h4>View AOC Files</h4>
-                                            <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
+                                                <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$aocfiles) {
@@ -364,7 +367,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     </div>
                 </div>
             </div>
-        <?php } ?>
+<?php } ?>
     </div>
 </main>
 <script>

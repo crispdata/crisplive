@@ -2,7 +2,9 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Create New Item';
+
 use yii\helpers\Url;
+
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 $rootURL = Yii::$app->params['ROOT_URL'];
@@ -128,6 +130,15 @@ $rootURL = Yii::$app->params['ROOT_URL'];
         margin-bottom: 5px;
         width: 80%;
         float: left;
+    }
+    #submitbutton {
+        float: left;
+        width: 100%;
+    }
+    input#itemsubmit {
+        float: left;
+        width: 100%;
+        padding: 11px;
     }
 </style>
 <script>
@@ -259,7 +270,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                         <h6><?= $tender->work; ?></h6>
                     <?php } ?>
                     <div class="row">
-                        <form id="create-item" class="col s12" method = "post" onsubmit="return getmakesids();" action = "<?= $baseURL ?>site/create-item">
+                        <form id="create-item" class="col s12" method = "post" action = "<?= $baseURL ?>site/create-item">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <?php if ((isset($_GET['id'])) && (@$_GET['id'] != '') && (@$_GET['id'] != 0)) { ?>
                                 <input type="hidden" name="tender_id" value="<?= @$_GET['id']; ?>" />
@@ -432,8 +443,9 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                 <a class="waves-effect waves-light btn blue m-b-xs" id="addrow" onclick="addrow('0')" >Add Row</a>
                             </div>
 
-                            <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
-
+                            <div id="submitbutton">
+                                <input class="waves-effect waves-light btn blue m-b-xs" id="itemsubmit" name="submit" type="submit" value="Submit">
+                            </div>
                         </form>
 
                     </div>

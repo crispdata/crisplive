@@ -1917,7 +1917,7 @@ class MailController extends Controller {
             $m->addTo('sajstyles21@gmail.com');
         }
         //$m->addTo('sajstyles21@gmail.com');
-        $m->addCC('mail@crispdata.co.in');
+        $m->addBCC('mail@crispdata.co.in');
         $m->setFrom("Crispdata <info@crispdata.co.in>");
         $m->setSubject('Tender Details By Crispdata');
         $m->setMessageFromFile($textfilepath, $htmlfilepath);

@@ -162,6 +162,10 @@ $(document).ready(function () {
                 $(".todatepicker").removeAttr('disabled');
                 this.close();
             }
+        },
+        onClose: function () {
+            //$('.datepicker').blur();
+            $(document.activeElement).blur()
         }
     });
 
@@ -194,11 +198,15 @@ $(document).ready(function () {
                         $("#light-type").hide();
                         var ext = 'RM';
                         //$("#light-capacity").hide();
-                    } else {
+                    } else if (product == 2) {
                         $("#cable-size").hide();
                         $("#light-type").show();
                         var ext = 'NOS';
                         //$("#light-capacity").show();
+                    } else {
+                        $("#cable-size").hide();
+                        $("#light-type").hide();
+                        var ext = 'RM';
                     }
 
                 }
@@ -220,12 +228,16 @@ $(document).ready(function () {
                         $("#u12").html('<img src="/assets/images/loading.gif" alt="">');
                         $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
                         $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#chief").hide();
+                        $("#cwengg").hide();
+                        $("#gengg").hide();
+                        $("#curve_chart").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
                         if (make != '') {
                             $("#total").html('<img src="/assets/images/loading.gif" alt="">');
                             $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
                             $("#value").html('<img src="/assets/images/loading.gif" alt="">');
                             $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
-                            //$("#piechart").hide();
                             $("#p2").hide();
                             $("#p3").hide();
                             $("#p4").hide();
@@ -241,14 +253,13 @@ $(document).ready(function () {
                                 $("#total").html(myJSON.first.total);
                                 $("#quantity").html(myJSON.first.quantity);
                                 $("#value").html(myJSON.first.value);
-                                var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
-                                if (checkone != 0) {
-                                    $("#piechart").show();
-                                    drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
-                                } else {
-                                    $("#piechart").html('No Data Available');
-                                }
-
+                            }
+                            var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+                            if (checkone != 0) {
+                                $("#piechart").show();
+                                drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+                            } else {
+                                $("#piechart").html('No Data Available');
                             }
                             $("#u10").html(myJSON.first.aptenderstotal);
                             $("#u20").html(myJSON.first.aptendersquantity);
@@ -338,20 +349,55 @@ $(document).ready(function () {
                                  );
                                  $("#capacitylights").html(ctypes);
                                  $("#capacitylights").trigger('contentChanged');*/
-                            }
-                            if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
-                                $("#curve_chart_ce").html('');
-                                $("#chief").hide();
+                                drawLineChart(myJSON.graph, "curve_chart", myJSON.makename);
                             } else {
-                                $("#chief").show();
-                                drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                                drawLineChart(myJSON.graph, "curve_chart");
                             }
+
+                            /*if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
+                             $("#curve_chart_ce").html('');
+                             $("#chief").hide();
+                             } else {
+                             $("#chief").show();
+                             drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                             }*/
                         }
 
                     }
                 });
             }
+        },
+        onClose: function () {
+            //$('.datepicker').blur();
+            $(document.activeElement).blur()
         }
+    });
+
+    $("#makes0").on('change', function () {
+        var make = $(this).children("option:selected").val();
+        if (make == 0) {
+            $(this).prop('selected', false);
+            $('#makes0 > option').prop("selected", true);
+        }
+    });
+
+    $(".singlemake").on('click', function () {
+        var itemid = $(this).attr("itemid");
+        var mid = $(this).attr("mid");
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/unselectmake',
+            dataType: "json",
+            data: {'itemid': itemid, mid: mid, '_csrf-backend': csrf_token},
+            beforeSend: function () {
+                $("#inner" + itemid + mid + "").html('<img src="/assets/images/loading.gif" alt="">');
+            },
+            success: function (data) {
+                if (data.success == 1) {
+                    $("#" + itemid + mid + "").remove();
+                }
+            }
+        });
     });
 
     $("#dashmake").on('change', function () {
@@ -374,11 +420,15 @@ $(document).ready(function () {
             $("#light-type").hide();
             var ext = 'RM';
             //$("#light-capacity").hide();
-        } else {
+        } else if (product == 2) {
             $("#cable-size").hide();
             $("#light-type").show();
             var ext = 'NOS';
             //$("#light-capacity").show();
+        } else {
+            $("#cable-size").hide();
+            $("#light-type").hide();
+            var ext = 'RM';
         }
 
         var sizes = '';
@@ -393,12 +443,16 @@ $(document).ready(function () {
                 $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#value").html('<img src="/assets/images/loading.gif" alt="">');
                 $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
-                //$("#piechart").hide();
+                $("#curve_chart").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#p2").hide();
                 $("#p3").hide();
                 $("#p4").hide();
                 $("#p5").hide();
                 $("#l2").hide();
+                $("#chief").hide();
+                $("#cwengg").hide();
+                $("#gengg").hide();
                 //$("#p22").html('<img src="/assets/images/loading.gif" alt="">');
             },
             success: function (response) {
@@ -489,14 +543,14 @@ $(document).ready(function () {
                     } else {
                         $("#piechart").html('No Data Available');
                     }
-                    drawLineChart(myJSON.graph, "curve_chart");
-                    if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12) {
-                        $("#curve_chart_ce").html('');
-                        $("#chief").hide();
-                    } else {
-                        $("#chief").show();
-                        drawLineChartce(myJSON.graphce, "curve_chart_ce");
-                    }
+                    drawLineChart(myJSON.graph, "curve_chart", myJSON.makename);
+                    /*if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12) {
+                     $("#curve_chart_ce").html('');
+                     $("#chief").hide();
+                     } else {
+                     $("#chief").show();
+                     drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                     }*/
 
                 }
 
@@ -526,11 +580,15 @@ $(document).ready(function () {
                 $("#light-type").hide();
                 var ext = 'RM';
                 //$("#light-capacity").hide();
-            } else {
+            } else if (product == 2) {
                 $("#cable-size").hide();
                 $("#light-type").show();
                 var ext = 'NOS';
                 //$("#light-capacity").show();
+            } else {
+                $("#cable-size").hide();
+                $("#light-type").hide();
+                var ext = 'RM';
             }
 
         }
@@ -552,12 +610,15 @@ $(document).ready(function () {
                 $("#u12").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#chief").hide();
+                $("#cwengg").hide();
+                $("#gengg").hide();
                 if (make != '') {
                     $("#total").html('<img src="/assets/images/loading.gif" alt="">');
                     $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
                     $("#value").html('<img src="/assets/images/loading.gif" alt="">');
                     $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
-                    //$("#piechart").hide();
                     $("#p2").hide();
                     $("#p3").hide();
                     $("#p4").hide();
@@ -573,14 +634,13 @@ $(document).ready(function () {
                         $("#total").html(myJSON.first.total);
                         $("#quantity").html(myJSON.first.quantity);
                         $("#value").html(myJSON.first.value);
-                        var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
-                        if (checkone != 0) {
-                            $("#piechart").show();
-                            drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
-                        } else {
-                            $("#piechart").html('No Data Available');
-                        }
-
+                    }
+                    var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+                    if (checkone != 0) {
+                        $("#piechart").show();
+                        drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+                    } else {
+                        $("#piechart").html('No Data Available');
                     }
                     $("#u10").html(myJSON.first.aptenderstotal);
                     $("#u20").html(myJSON.first.aptendersquantity);
@@ -670,14 +730,19 @@ $(document).ready(function () {
                          );
                          $("#capacitylights").html(ctypes);
                          $("#capacitylights").trigger('contentChanged');*/
-                    }
-                    if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
-                        $("#curve_chart_ce").html('');
-                        $("#chief").hide();
+                        drawLineChart(myJSON.graph, "curve_chart", myJSON.makename);
                     } else {
-                        $("#chief").show();
-                        drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                        drawLineChart(myJSON.graph, "curve_chart");
                     }
+
+                    //drawChart();
+                    /*if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
+                     $("#curve_chart_ce").html('');
+                     $("#chief").hide();
+                     } else {
+                     $("#chief").show();
+                     drawLineChartce(myJSON.graphce, "curve_chart_ce");
+                     }*/
                 }
 
             }
@@ -1188,8 +1253,11 @@ function getsubpricetypes(value) {
     if (value == 1) {
         $("#second").show();
         $("#third").show();
-    } else {
+    } else if (value == 2) {
         $("#second").hide();
+        $("#third").hide();
+    } else {
+        $("#second").show();
         $("#third").hide();
     }
 }
@@ -1198,8 +1266,13 @@ function getparentonetypes(value) {
     var one = $('#mtypeone :selected').val();
     var three = $('#mtypethree :selected').val();
     var two = value;
-    if (three != '') {
+    if (one == 1) {
+        if (three != '') {
+            $("#fourth").show();
+        }
+    } else if (one == 5) {
         $("#fourth").show();
+        $("#prices").show();
     }
     var selects = '';
     $.ajax({
@@ -1279,7 +1352,7 @@ function addrow(num) {
     var rand = Math.floor((Math.random() * 100) + 1);
     var id = rand + time;
     //var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + "' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s2' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>Core 1</option><option value='2'>Core 2</option><option value='3'>Core 3</option><option value='4'>Core 3.5</option><option value='5'>Core 4</option></select></div><div class='input-field col s2' id='typefit" + id + "'><select class='validate required materialSelecttypefit' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' required='' class='validate required' value='RM'><label for='itemunit" + id + "'>Units</label><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='text' name = 'quantity[]' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s3'><select class='validate required materialSelect" + id + " browser-default' required='' name='makes[]' multiple id='makes" + newnum + "'></select></div><div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
-    var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' style='pointer-events:none;' required='' class='validate required' value='RM'><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
+    var rowitems = "<div class='row added iteminfo' id='inforows" + newnum + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' style='pointer-events:none;' required='' class='validate required' value='RM'><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
     var row = "<div id=info" + id + "><div class='col s12'><div class='input-fields col s2 row'><label>Select type of work</label><select class='validate required materialSelect' name='tenderone[]' id='tenderone" + id + "' onchange='getdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option><option value='1'>E/M</option></select></div><div id='second" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendertwo[]' id='tendertwo" + id + "' onchange='getseconddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='third" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderthree[]' id='tenderthree" + id + "' onchange='getthirddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fourth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfour[]' id='tenderfour" + id + "' onchange='getfourdatasub(this.value," + id + "," + newnum + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fifth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfive[]' id='tenderfive" + id + "' onchange='getfivedatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='sixth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendersix[]' id='tendersix" + id + "' onchange='getsixdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div></div>" + rowitems + '</div>';
     $("#itemdata").append(rowitems);
     $("#itemtender" + id + "").focus();
@@ -1662,12 +1735,21 @@ function getgengineer(value) {
 }
 
 function getdata(value) {
-    $("#tenderthree").prop('selectedIndex', '');
-    $("#tenderthree").material_select();
-    $('#third').hide();
-    $("#tenderfour").prop('selectedIndex', '');
-    $("#tenderfour").material_select();
-    $('#fourth').hide();
+    if (value == 1) {
+        $("#tenderthree").prop('selectedIndex', '');
+        $("#tenderthree").material_select();
+        $('#third').show();
+        $("#tenderfour").prop('selectedIndex', '');
+        $("#tenderfour").material_select();
+        $('#fourth').show();
+    } else {
+        $("#tenderthree").prop('selectedIndex', '');
+        $("#tenderthree").material_select();
+        $('#third').hide();
+        $("#tenderfour").prop('selectedIndex', '');
+        $("#tenderfour").material_select();
+        $('#fourth').hide();
+    }
     $("#tenderfive").prop('selectedIndex', '');
     $("#tenderfive").material_select();
     $('#fifth').hide();
@@ -1682,8 +1764,14 @@ function getdata(value) {
         data: {'value': value, '_csrf-backend': csrf_token},
         success: function (resultData) {
             $("#tendertwo").html(resultData.data);
-            $("#third").hide();
-            $("#fourth").hide();
+            if (value == 1) {
+                getseconddata(1);
+                $("#third").show();
+                $("#fourth").show();
+            } else {
+                $("#third").hide();
+                $("#fourth").hide();
+            }
             $("#fifth").hide();
             $("#sixth").hide();
             //$("#itemdata .added").remove();
@@ -1842,7 +1930,7 @@ function getseconddata(value) {
     var selects = '';
     $("#tenderfour").prop('selectedIndex', '');
     $("#tenderfour").material_select();
-    $('#fourth').hide();
+    $('#fourth').show();
     $("#tenderfive").prop('selectedIndex', '');
     $("#tenderfive").material_select();
     $('#fifth').hide();
@@ -1858,7 +1946,8 @@ function getseconddata(value) {
         success: function (resultData) {
             if (resultData.item == '0') {
                 $("#tenderthree").html(resultData.data);
-                $("#fourth").hide();
+                getthirddata(1);
+                $("#fourth").show();
                 $("#fifth").hide();
                 $("#sixth").hide();
                 //$("#itemdata .added").remove();
@@ -1994,9 +2083,11 @@ function getthirddata(value) {
                 $("#fourth").hide();
                 $("#fifth").hide();
                 $("#sixth").hide();
-                $("#itemdata").show();
-                $("#makes").show();
-                $("#itembutton").show();
+                if (value == 1 || value == 2) {
+                    $("#itemdata").show();
+                    $("#makes").show();
+                    $("#itembutton").show();
+                }
             }
         }
     });
@@ -2228,7 +2319,7 @@ function getfourdata(value) {
             });
 
             $.each(resultData.select, function (key, value) {
-                if (key != 0) {
+                if (key != 01) {
                     selects += '<option value="' + key + '">' + value + '</option>';
                 } else {
                     selects += '<option value="" disabled required>No Makes</option>';
@@ -2452,12 +2543,12 @@ function getsixdatasub(value, id) {
 
 
 
-function deletebutton(id) {
+function deletebutton(id, num) {
     if (id) {
-        $('#inforows' + id + '').remove();
-        document.getElementById('itemunit' + id + '').reset();
-        document.getElementById('quantity' + id + '').reset();
-        document.getElementById('makeid' + id + '').reset();
+        $('#inforows' + num + id + '').remove();
+        //document.getElementById('itemunit' + id + '').reset();
+        //document.getElementById('quantity' + id + '').reset();
+        //document.getElementById('makeid' + id + '').reset();
         $('.materialSelect' + id + '').prop('selectedIndex', 0);
         $('.materialSelectsize' + id + '').prop('selectedIndex', 0);
         $('.materialSelectcore' + id + '').prop('selectedIndex', 0);
@@ -2502,6 +2593,8 @@ function showCheckboxesAfter(id) {
 }
 
 function getmakesids() {
+    $("#itemsubmit").css('pointer-events', 'none');
+    //$("#submitbutton").html('<img src="/assets/images/loading.gif" alt="">');
     var arr = [];
     var num = $('.iteminfo').length;
     var i;

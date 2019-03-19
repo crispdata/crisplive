@@ -702,7 +702,7 @@ function getfourdata(value) {
                 $("#type0").trigger('contentChanged');
 
                 $('.materialSelectcapacityfit').on('contentChanged', function () {
-                     $(this).select2({closeOnSelect: true, placeholder: 'Select Capacity'});
+                    $(this).select2({closeOnSelect: true, placeholder: 'Select Capacity'});
                 });
 
                 $.each(resultData.capacities, function (key, value) {
@@ -913,6 +913,7 @@ function showCheckboxesAfter(id) {
 }
 
 function getmakesids() {
+    $("#itemsubmit").attr('disabled', true);
     var arr = [];
     var num = $('.iteminfo').length;
     var i;

@@ -30,7 +30,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     ul.pagination {
         float: right;
     }
-    .card-tenders{padding-bottom: 60px!important;}
     .pagination li.active {
         background-color: #2196F3!important;
     }

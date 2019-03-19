@@ -30,7 +30,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     ul.pagination {
         float: right;
     }
-    .card-tenders{padding-bottom: 60px!important;}
     .pagination li.active {
         background-color: #2196F3!important;
     }
@@ -67,7 +66,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-tenders">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
             <input type="hidden" name="url" value="<?= $url; ?>" />
-            <?php if ($user->group_id != 4) { ?>
+            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
                 <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
                 <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
             <?php } ?>
@@ -99,7 +98,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table class="responsive-table bordered">
                             <thead>
                                 <tr>
-                                    <?php if ($user->group_id != 4) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
+                                    <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
                                     <th data-field="email" width="120px">Cost of Tender</th>
@@ -134,7 +133,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
-                                            <?php if ($user->group_id != 4) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
+                                            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->cvalue ?></td>
@@ -161,7 +160,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                             <?php
                                                         } else {
-                                                            if ($user->group_id == 4) {
+                                                            if ($user->group_id == 4 || $user->group_id == 5) {
                                                                 ?>
                                                                 <a class="waves-effect waves-light btn blue">AOC</a>
                                                             <?php } else { ?>

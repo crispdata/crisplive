@@ -2,9 +2,12 @@
 /* @var $this yii\web\View */
 
 $this->title = 'Manage Makes';
+
 use yii\helpers\Url;
+
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
+$user = Yii::$app->user->identity;
 ?>
 <style>
     .add-contact{    float: right;
@@ -17,8 +20,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <div class="col s6">
             <div class="page-title">Manage Makes</div>
         </div>
-
-        <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-make-em"> Add Make</a>
+        <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+            <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-make-em"> Add Make</a>
+        <?php } ?>
         <?php if (Yii::$app->session->hasFlash('success')): ?>
             <script>
                 swal({
@@ -64,14 +68,16 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <?php
                     if (@$makes) {
                         ?>
-                        
+
                         <table id = "current-project" class="responsive-table">
                             <thead>
                                 <tr>
                                     <th data-field="name">Sr. No.</th>
                                     <th data-field="name">Make Type</th>
-                                    <th data-field="email">Make</th>
-                                    <th data-field="email">Email</th>
+                                    <th data-field="email" width='250px'>Make</th>
+                                    <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                                        <th data-field="email">Email</th>
+                                    <?php } ?>
                                     <th data-field="email">Actions</th>
 
                                 </tr>
@@ -113,14 +119,18 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $key + 1 ?></td>
                                             <td class = ""><?= $mtype ?></td>
                                             <td class = ""><?= $make->make ?></td>
-                                            <td class = ""><?= $make->email ?></td>
+                                            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                                                <td class = ""><?= $make->email ?></td>
+                                            <?php } ?>
                                             <td>
+                                                <?php if ($user->group_id != 4 && $user->group_id != 5) { ?>
+                                                    <a href="<?= Url::to(['site/create-make-em', 'id' => $make->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
-                                                <a href="<?= Url::to(['site/create-make-em', 'id' => $make->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
 
-
-                                                <a href="#modal<?= $make->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
-
+                                                    <a href="#modal<?= $make->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                <?php } else { ?>
+                                                    <a class="waves-effect waves-light btn blue proj-delete">Files</a>
+                                                <?php } ?>
 
                                             </td>
 
