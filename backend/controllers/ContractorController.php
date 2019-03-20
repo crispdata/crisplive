@@ -252,15 +252,31 @@ class ContractorController extends Controller {
     }
 
     public function actionGetcontractors() {
-        $contractors = \common\models\Contractor::find()->where(['status' => 1])->all();
+        $page = $_REQUEST['page'];
+        $resultCount = 25;
+        @$allcon = [];
+        $offset = ($page - 1) * $resultCount;
+
+        $contractors = \common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->orWhere(['like', 'address', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->orderBy(['firmname' => SORT_ASC])->offset($offset)->limit($resultCount)->all();
+
         if ($contractors) {
             foreach ($contractors as $_contractor) {
-                $fname = str_replace('M/s ', '', $_contractor->firm);
-                $fname = str_replace('M/S ', '', $fname);
-                $_contractor->firmname = trim($fname);
-                $_contractor->save();
+                @$allcon[] = ['id' => $_contractor->id, 'text' => $_contractor->firm . ' - ' . $_contractor->address];
             }
         }
+        $count = count(\common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->orWhere(['like', 'address', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->all());
+        $endCount = $offset + $resultCount;
+        $morePages = $count > $endCount;
+
+        $results = array(
+            "results" => $allcon,
+            "pagination" => array(
+                "more" => $morePages
+            )
+        );
+
+        echo json_encode($results);
+        die();
     }
 
 }

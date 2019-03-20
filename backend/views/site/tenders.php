@@ -377,15 +377,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </div>
                                             <div class="input-field col s12 row">
                                                 <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
-                                                    <option value="">Select Contractor</option>
-                                                    <?php
+                                                    <?php /*
                                                     if ($contractors) {
                                                         foreach ($contractors as $contract) {
                                                             ?>
                                                             <option value="<?= $contract->id; ?>"><?= $contract->firm . ' - ' . $contract->address; ?></option>
                                                             <?php
                                                         }
-                                                    }
+                                                    }*/
                                                     ?>
 
                                                 </select>

@@ -51,6 +51,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     label,.select2-selection__placeholder{color:rgba(0,0,0,.6)!important;}
     .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
     .modal .modal-content h5{text-align: center;}
+    #showcont {
+        background-color: #E4E4E4;
+        border-radius: 15px;
+        padding: 10px;
+        margin-top: 5px;
+        width: 100%;
+        float: left;
+    }
 </style>
 <main class="mn-inner">
     <div class="row">
@@ -81,7 +89,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="card">
                 <div class="card-content card-tenders">
                     <div class="row">
-                        <?php $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all(); ?>
+                        <?php $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firmname' => SORT_ASC])->all(); ?>
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/index">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <div class="row firstrow">
@@ -130,18 +138,25 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div-->
                                 <div class="input-fields col s4 row">
                                     <select class="validate required materialSelectcon browser-default" name="contype" id="contype">
-                                        <option value="">All Contractors</option>
-                                        <?php
-                                        if (@$contractors) {
-                                            foreach ($contractors as $k => $_con) {
-                                                ?>
-                                                <option value="<?= $_con->id ?>" <?= (@$_GET['contype'] == $_con->id) ? 'selected' : '' ?>><?= $_con->firm . ' - ' . $_con->address ?></option>
-                                                <?php
-                                            }
-                                        }
-                                        ?>
+                                        <!--option value="">All Contractors</option-->
+
                                     </select>
+                                    <?php
+                                    $cont = \common\models\Contractor::find()->where(['id' => @$_GET['contype']])->one();
+                                    if (@$cont) {
+                                        ?>
+                                        <div id="showcont">
+                                            <?php echo $cont->firm . ' - ' . $cont->address; ?>
+                                        </div>
+                                    <?php }
+                                    ?>
                                 </div>
+                                <?php if (@$cont) { ?>
+                                    <div id="conextra">
+                                        <input type="hidden" name="contype" value="<?= $cont->id ?>">
+                                    </div>
+                                <?php }
+                                ?>
                                 <div class="input-fields col s4 row">
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
                                         <option value="">ALL COMMANDS</option>
@@ -232,7 +247,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </div>
                                         </div>
                                         <?php
-                                    } elseif(@$getcengineers && (in_array($_GET['command'], $arrcommands))) {
+                                    } elseif (@$getcengineers && (in_array($_GET['command'], $arrcommands))) {
                                         ?>
                                         <div id="ge">
                                             <div class="input-fields col s4 row">

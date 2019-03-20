@@ -180,7 +180,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 }
 
                                                 if ($tender->status == 1) {
-                                                    if ($user->group_id == 1 || $user->group_id == 2) {
+                                                    if ($user->group_id == 1 || $user->group_id == 2 || $user->group_id == 3) {
                                                         ?>
                                                         <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
                                                         <a onclick="openmodal('modal<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
@@ -439,15 +439,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                         <div class="input-field col s12 row">
                                             <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
-                                                <option value="">Select Contractor</option>
-                                                <?php
+                                                <?php /*
                                                 if ($contractors) {
                                                     foreach ($contractors as $contract) {
                                                         ?>
                                                         <option value="<?= $contract->id; ?>"><?= $contract->firm . ' - ' . $contract->address; ?></option>
                                                         <?php
                                                     }
-                                                }
+                                                }*/
                                                 ?>
 
                                             </select>

@@ -45,7 +45,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'files', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'files', 'addaddress', 'addresses', 'deleteaddress', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -866,6 +866,130 @@ class ProductsController extends Controller {
                 break;
         }
         return $img;
+    }
+
+    public function actionAddaddress() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Addresses::find()->where(['id' => $_POST['id']])->one();
+                $model->command = @$_POST['command'];
+                $model->cengineer = @$_POST['cengineer'];
+                $model->cwengineer = @$_POST['cwengineer'];
+                $model->gengineer = @$_POST['gengineer'];
+                $model->contact = @$_POST['contact'];
+                $model->email = @$_POST['email'];
+
+                $address = \common\models\Addresses::find()->where(['status' => 1])->andWhere(['!=', 'id', $_POST['id']]);
+                if (isset($_REQUEST['command']) && $_REQUEST['command'] != '') {
+                    $address->andWhere(['and',
+                        ['command' => $_REQUEST['command']]
+                    ]);
+                }
+                if (isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']]
+                    ]);
+                }
+                if (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['cwengineer' => $_REQUEST['cwengineer']]
+                    ]);
+                }
+                if (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+                $addressavailable = $address->one();
+                if ($addressavailable) {
+                    Yii::$app->session->setFlash('error', "Address already existed");
+                } else {
+                    if ($model->save()) {
+                        Yii::$app->session->setFlash('success', "Address successfully updated");
+                    }
+                }
+                return $this->redirect(array('products/addresses'));
+            } else {
+                $model = new \common\models\Addresses();
+                $model->command = @$_POST['command'];
+                $model->cengineer = @$_POST['cengineer'];
+                $model->cwengineer = @$_POST['cwengineer'];
+                $model->gengineer = @$_POST['gengineer'];
+                $model->contact = @$_POST['contact'];
+                $model->email = @$_POST['email'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+
+                $address = \common\models\Addresses::find()->where(['status' => 1]);
+                if (isset($_REQUEST['command']) && $_REQUEST['command'] != '') {
+                    $address->where(['and',
+                        ['command' => $_REQUEST['command']]
+                    ]);
+                }
+                if (isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']]
+                    ]);
+                }
+                if (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['cwengineer' => $_REQUEST['cwengineer']]
+                    ]);
+                }
+                if (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '') {
+                    $address->andWhere(['and',
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+                $addressavailable = $address->one();
+
+                if ($addressavailable) {
+                    Yii::$app->session->setFlash('error', "Address already existed");
+                } else {
+                    $files = \Yii::$app
+                            ->db
+                            ->createCommand()
+                            ->insert('addresses', $model)
+                            ->execute();
+
+                    if ($files) {
+                        Yii::$app->session->setFlash('success', "Address successfully added");
+                    }
+                }
+            }
+            return $this->redirect(array('products/addaddress'));
+            die();
+        } else {
+            if ($id) {
+                $address = \common\models\Addresses::find()->where(['id' => $id])->one();
+            } else {
+                $address = [];
+            }
+            return $this->render('addaddress', [
+                        'address' => $address
+            ]);
+        }
+    }
+
+    public function actionAddresses() {
+        $addresses = \common\models\Addresses::find()->where(['status' => 1])->all();
+        return $this->render('addresses', [
+                    'addresses' => $addresses
+        ]);
+    }
+
+    public function actionDeleteaddress() {
+        $id = $_GET['id'];
+        $addresses = \common\models\Addresses::deleteAll(['id' => $id]);
+        if ($addresses) {
+            Yii::$app->session->setFlash('success', "Address successfully deleted");
+            return $this->redirect(array('products/addresses'));
+        }
     }
 
 }

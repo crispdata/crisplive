@@ -107,17 +107,25 @@ class SiteController extends Controller {
         $dmans = [];
         $dcons = [];
         $ddeals = [];
+        $emakes = [];
+        $civilmakes = [];
+        $dunapprovedtenders = [];
+        $daoctenders = [];
 
         if ($user->group_id != 4) {
             //dashboard
             $dapprovedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC])->count();
             $dalltenders = \common\models\Tender::find()->where(['status' => 1])->orWhere(['status' => 0])->count();
+            $dunapprovedtenders = \common\models\Tender::find()->where(['status' => 0])->orderBy(['id' => SORT_DESC])->count();
+            $daoctenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC])->count();
             $darchivedtenders = \common\models\Tender::find()->where(['aoc_status' => 1, 'is_archived' => 1])->orderBy(['id' => SORT_DESC])->count();
             $dcontractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['id' => SORT_DESC])->count();
             $dlogs = \common\models\Logs::find()->where(['status' => 1])->orderBy(['id' => SORT_DESC])->count();
             $dmans = \common\models\Clients::find()->where(['status' => 1, 'type' => 1])->orderBy(['id' => SORT_DESC])->count();
             $dcons = \common\models\Clients::find()->where(['status' => 1, 'type' => 2])->orderBy(['id' => SORT_DESC])->count();
             $ddeals = \common\models\Clients::find()->where(['status' => 1, 'type' => 3])->orderBy(['id' => SORT_DESC])->count();
+            $emmakes = \common\models\Make::find()->where(['status' => 1, 'mtype' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]])->orderBy(['id' => SORT_DESC])->count();
+            $civilmakes = \common\models\Make::find()->where(['status' => 1, 'mtype' => [14, 15, 16, 17]])->orderBy(['id' => SORT_DESC])->count();
         }
 
         if ($user->group_id == 4 || $user->group_id == 5) {
@@ -645,11 +653,15 @@ class SiteController extends Controller {
                     'alltenders' => $dalltenders,
                     'approvedtenders' => $dapprovedtenders,
                     'archivedtenders' => $darchivedtenders,
+                    'unapprovedtenders' => $dunapprovedtenders,
+                    'aoctenders' => $daoctenders,
                     'dcontractors' => $dcontractors,
                     'dlogs' => $dlogs,
                     'dmans' => $dmans,
                     'dcons' => $dcons,
                     'ddeals' => $ddeals,
+                    'emmakes' => $emmakes,
+                    'civilmakes' => $civilmakes,
                     'graphsce' => ''
         ]);
     }
@@ -3390,7 +3402,7 @@ class SiteController extends Controller {
         } else {
             $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->andWhere(['status' => 1])->orderBy(['id' => SORT_DESC])->all();
         }
-        $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
+        $contractors = [];
         $pages = [];
 
         echo $this->renderPartial('stenders', [
@@ -3660,7 +3672,7 @@ class SiteController extends Controller {
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
 //$tenders=[];
-        $contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();
+        $contractors = \common\models\Contractor::find()->orderBy(['firmname' => SORT_ASC])->all();
 
         if ($val) {
             return $this->redirect(array('site/financialtenders?filter=' . $val . ''));
@@ -3997,12 +4009,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-//$tenders=[];
-        if ($user->group_id != 4 && $user->group_id != 5) {
-            $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all();
-        } else {
-            $contractors = [];
-        }
+        $contractors = [];
 
         if ($val) {
             return $this->redirect(array('site/atenders?filter=' . $val . ''));
@@ -4103,7 +4110,7 @@ class SiteController extends Controller {
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
 //$tenders=[];
-        $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firm' => SORT_ASC])->all();
+        $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firmname' => SORT_ASC])->all();
         $commandname = $this->actionGetcommand($command);
 
         if ($val) {

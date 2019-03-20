@@ -90,7 +90,27 @@ $(document).ready(function () {
                     if (data) {
                         $('.mn-inner').html(data);
                         $(".modalclose").css('z-index', '1');
-                        $('select.materialSelectcontractor').select2({closeOnSelect: true, placeholder: 'Select Contractor'});
+                        $('select.materialSelectcontractor').select2({
+                            closeOnSelect: true,
+                            placeholder: 'Select Contractor',
+                            allowClear: true,
+                            ajax: {
+                                headers: {
+                                    "Authorization": "Bearer " + csrf_token,
+                                    "Content-Type": "application/json",
+                                },
+                                type: 'get',
+                                url: baseUrl + 'contractor/getcontractors',
+                                dataType: 'json',
+                                data: function (params) {
+                                    return {
+                                        term: params.term || '',
+                                        page: params.page || 1
+                                    }
+                                },
+                                cache: true,
+                            }
+                        });
                         $('#current-project').DataTable({
                             language: {
                                 searchPlaceholder: 'Search records',
@@ -2356,12 +2376,12 @@ function getfourdata(value) {
             $(".select2-container").hide();
         },
         success: function (resultData) {
-             $("#makes").removeClass('makesload');
-             $("#typefit").removeClass('makesload');
-             $("#capacityfit").removeClass('makesload');
-             $("#sizesdiv").removeClass('makesload');
-             $("#corediv").removeClass('makesload');
-             $("#accessoryone").removeClass('makesload');
+            $("#makes").removeClass('makesload');
+            $("#typefit").removeClass('makesload');
+            $("#capacityfit").removeClass('makesload');
+            $("#sizesdiv").removeClass('makesload');
+            $("#corediv").removeClass('makesload');
+            $("#accessoryone").removeClass('makesload');
             if (resultData.item == '0') {
                 $("#tenderfive").html(resultData.data);
                 $("#sixth").hide();

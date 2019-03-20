@@ -114,6 +114,10 @@ $config = [
                 [
                     'pattern' => 'products/uploadfile/<id:\d+>',
                     'route' => 'products/uploadfile'
+                ],
+                [
+                    'pattern' => 'products/addaddress/<id:\d+>',
+                    'route' => 'products/addaddress'
                 ]
             ]
         ],
