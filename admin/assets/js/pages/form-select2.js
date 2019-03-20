@@ -1,7 +1,53 @@
+var baseUrl = $('#base_url').val();
+var csrf_token = $('meta[name="csrf-token"]').attr('content');
 $(document).ready(function () {
     $('select.materialSelectmake').select2({closeOnSelect: true, placeholder: 'Select Makes'});
-    $('select.materialSelectcontractor').select2({closeOnSelect: true, placeholder: 'Select Contractor'});
-    $('select.materialSelectcon').select2({closeOnSelect: true, placeholder: 'All Contractors'});
+    $('select.materialSelectcontractor').select2({
+        closeOnSelect: true,
+        placeholder: 'Select Contractor',
+        allowClear: true,
+        ajax: {
+            headers: {
+                "Authorization": "Bearer " + csrf_token,
+                "Content-Type": "application/json",
+            },
+            type: 'get',
+            url: baseUrl + 'contractor/getcontractors',
+            dataType: 'json',
+            data: function (params) {
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true,
+        }
+    });
+    
+    $('select.materialSelectcon').select2({
+        closeOnSelect: true,
+        placeholder: 'All Contractors',
+        allowClear: true,
+        ajax: {
+            headers: {
+                "Authorization": "Bearer " + csrf_token,
+                "Content-Type": "application/json",
+            },
+            type: 'get',
+            url: baseUrl + 'contractor/getcontractors',
+            dataType: 'json',
+            data: function (params) {
+                $("#conextra").remove();
+                $("#showcont").remove();
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true,
+        }
+    }
+    );
     $('select.cmakes').select2({closeOnSelect: true, placeholder: 'Select Cables Makes'});
     $('select.lmakes').select2({closeOnSelect: true, placeholder: 'Select Lighting Makes'});
     $('select.wmakes').select2({closeOnSelect: true, placeholder: 'Select Wire Makes'});
@@ -18,24 +64,17 @@ $(document).ready(function () {
     $('#multiple').select2({
         placeholder: 'Select Multiple States'
     });
-
     $(".js-example-basic-multiple-limit").select2({
         maximumSelectionLength: 2,
         placeholder: 'Limited Selection'
     });
-
     $(".js-example-tokenizer").select2({
         tags: true,
         tokenSeparators: [',', ' '],
         placeholder: 'With Tokenization'
     });
-
     var data = [{id: 0, text: 'enhancement'}, {id: 1, text: 'bug'}, {id: 2, text: 'duplicate'}, {id: 3, text: 'invalid'}, {id: 4, text: 'wontfix'}];
-
     $(".js-example-data-array").select2({
         data: data
     });
-
-    
-
 });

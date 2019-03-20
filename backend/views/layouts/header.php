@@ -408,6 +408,15 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 </ul>
                             </div>
                         </li>
+                        <li class="no-padding <?= ($controller == 'products' && $action == 'addresses') ? 'active' : '' ?>">
+                            <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'products' && ($action == 'addresses' || $action == 'addaddress')) ? 'active' : '' ?>"><i class="material-icons">perm_contact_calendar</i>Addresses<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                            <div class="collapsible-body">
+                                <ul>
+                                    <li><a href="/products/addaddress" class="<?= ($controller == 'products' && $action == 'addaddress') ? 'active-page' : '' ?>">Add Address</a></li>
+                                    <li><a href="/products/addresses" class="<?= ($controller == 'products' && $action == 'addresses') ? 'active-page' : '' ?>">All Addresses</a></li>
+                                </ul>
+                            </div>
+                        </li>
                     <?php } ?>
                     <?php if ($user->group_id == 1) { ?>
                         <li class="no-padding <?= ($controller == 'site' && $action == 'users') ? 'active' : '' ?>">

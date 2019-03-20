@@ -76,28 +76,33 @@ class SearchController extends Controller {
             $val = @$_REQUEST['sort'];
             $page = @$_REQUEST['page'];
             $filter = @$_REQUEST['filter'];
-            if (isset($_REQUEST['tendertype']) && $_REQUEST['tendertype'] != '') {
-                if ($_REQUEST['tendertype'] == 1) {
-                    $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
-                } elseif ($_REQUEST['tendertype'] == 2) {
-                    $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null]);
-                } elseif ($_REQUEST['tendertype'] == 3) {
-                    $tenders = \common\models\Tender::find()->where(['status' => '0']);
-                } elseif ($_REQUEST['tendertype'] == 4) {
-                    $tenders = \common\models\Tender::find()->where(['aoc_status' => 1]);
-                } elseif ($_REQUEST['tendertype'] == 5) {
-                    $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null]);
-                } elseif ($_REQUEST['tendertype'] == 6) {
-                    $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null]);
-                } else {
-                    $tenders = \common\models\Tender::find()->where(['aoc_status' => 1, 'is_archived' => 1]);
-                }
+            /* if (isset($_REQUEST['tendertype']) && $_REQUEST['tendertype'] != '') {
+              if ($_REQUEST['tendertype'] == 1) {
+              $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
+              } elseif ($_REQUEST['tendertype'] == 2) {
+              $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null]);
+              } elseif ($_REQUEST['tendertype'] == 3) {
+              $tenders = \common\models\Tender::find()->where(['status' => '0']);
+              } elseif ($_REQUEST['tendertype'] == 4) {
+              $tenders = \common\models\Tender::find()->where(['aoc_status' => 1]);
+              } elseif ($_REQUEST['tendertype'] == 5) {
+              $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null]);
+              } elseif ($_REQUEST['tendertype'] == 6) {
+              $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null]);
+              } else {
+              $tenders = \common\models\Tender::find()->where(['aoc_status' => 1, 'is_archived' => 1]);
+              }
+              } else {
+              if ($user->group_id != 4 && $user->group_id != 5) {
+              $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
+              } else {
+              $tenders = \common\models\Tender::find()->where(['status' => '1']);
+              }
+              } */
+            if ($user->group_id != 4 && $user->group_id != 5) {
+                $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
             } else {
-                if ($user->group_id != 4 && $user->group_id != 5) {
-                    $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
-                } else {
-                    $tenders = \common\models\Tender::find()->where(['status' => '1']);
-                }
+                $tenders = \common\models\Tender::find()->where(['status' => '1']);
             }
             if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
                 $tenders->andWhere(['or',
@@ -692,7 +697,7 @@ class SearchController extends Controller {
                 $epriceone = $twoquantity * 500;
                 $balancedprice = ($eprice - $epriceone);
             }
-           
+
             $labelsone = 'ALL MAKES';
             $valuesone = $onequantity;
 

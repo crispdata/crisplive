@@ -908,7 +908,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <option value="" disabled selected>Select Product</option>
                                     <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
                                     <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
-                                    <option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option>
+                                    <!--option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option-->
                                 </select>
                             </form>
 
@@ -1006,12 +1006,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="todate">To Date</label>
                                 </div>
-                            <div class="input-field col s2">
-                                <?php
-                                $content = '<h6><b>Data Available From</b></h6>  <br> Northern Command - 20-12-18 <br> Western Command - 20-12-18 <br> South Western Command - 13-02-19 <br> Central Command - 18-02-19 <br> ADG & DGNP - 25-02-19 <br> Eastern Command - 27-02-19 <br> Southern Command - 01-03-19';
-                                ?>
-                                <a class="btn black tooltipped" data-html="true" data-position="bottom" data-delay="50" data-tooltip="<?= nl2br($content) ?>">Date selection guidelines</a>
-                            </div>
+                                <div class="input-field col s2">
+                                    <?php
+                                    $content = '<h6><b>Data Available From</b></h6>  <br> Northern Command - 20-12-18 <br> Western Command - 20-12-18 <br> South Western Command - 13-02-19 <br> Central Command - 18-02-19 <br> ADG & DGNP - 25-02-19 <br> Eastern Command - 27-02-19 <br> Southern Command - 01-03-19';
+                                    ?>
+                                    <a class="btn black tooltipped" data-html="true" data-position="bottom" data-delay="50" data-tooltip="<?= nl2br($content) ?>">Date selection guidelines</a>
+                                </div>
 
 
                             </div></div></div></div></main>
@@ -1423,7 +1423,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">
-                            <a href="javascript:void(0)">
+                            <a href="site/tenders">
                                 <span class="card-title leftside">All Tenders</span>
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $alltenders; ?></span></span>
                             </a>
@@ -1441,8 +1441,34 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $approvedtenders; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 100%"></div>
+                        <div class="progress stats-card-progress green">
+                            <div class="determinate green" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/utenders">
+                                <span class="card-title leftside">Unapproved Tenders</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $unapprovedtenders; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress red">
+                            <div class="determinate red" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/aoctenders">
+                                <span class="card-title leftside">AOC Tenders</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $aoctenders; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 100%"></div>
                         </div>
                     </div>
                 </div>
@@ -1467,8 +1493,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $dcontractors; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 70%"></div>
+                        <div class="progress stats-card-progress red">
+                            <div class="determinate red" style="width: 70%"></div>
                         </div>
                     </div>
                 </div>
@@ -1480,8 +1506,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $dlogs; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 100%"></div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 100%"></div>
                         </div>
                     </div>
                 </div>
@@ -1489,7 +1515,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <div class="card stats-card">
                         <div class="card-content">
                             <a href="<?= ($user->group_id != 3) ? 'site/manufacturers' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Manufacturers </span>
+                                <span class="card-title leftside">All Manufacturers/Clients </span>
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $dmans; ?></span></span>
                             </a>
                         </div>
@@ -1506,6 +1532,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $dcons; ?></span></span>
                             </a>
                         </div>
+                        <div class="progress stats-card-progress red">
+                            <div class="determinate red" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Dealers/Clients</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $ddeals; ?></span></span>
+                            </a>
+                        </div>
                         <div class="progress stats-card-progress blue">
                             <div class="determinate blue" style="width: 100%"></div>
                         </div>
@@ -1514,13 +1553,26 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Dealers</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $ddeals; ?></span></span>
+                            <a href="site/e-m">
+                                <span class="card-title leftside">All E/M Makes</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $emmakes; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 100%"></div>
+                        <div class="progress stats-card-progress green">
+                            <div class="determinate green" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/civil">
+                                <span class="card-title leftside">All Civil Makes</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $civilmakes; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress red">
+                            <div class="determinate red" style="width: 100%"></div>
                         </div>
                     </div>
                 </div>

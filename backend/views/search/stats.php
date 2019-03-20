@@ -884,7 +884,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <option value="" disabled selected>Select Product</option>
                                 <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
                                 <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
-                                <option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option>
+                                <!--option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option-->
                             </select>
                         </form>
 
