@@ -59,6 +59,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 100%;
         float: left;
     }
+    ::placeholder{color:rgba(0,0,0,.6)!important;}
 </style>
 <main class="mn-inner">
     <div class="row">
@@ -89,7 +90,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="card">
                 <div class="card-content card-tenders">
                     <div class="row">
-                        <?php $contractors = \common\models\Contractor::find()->where(['status' => 1])->orderBy(['firmname' => SORT_ASC])->all(); ?>
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/index">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <div class="row firstrow">
@@ -152,7 +152,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                 </div>
                                 <div class="input-fields col s4 row">
-                                    <select name='authtype' id="authtype" class="contact-authtypes browser-default" onchange="showdivssearch(this.value)" required="">
+                                    <select name='authtype' id="authtype" class="contact-authtypes browser-default" onchange="showdivssearch(this.value)">
                                         <option value=''>Select Product</option>
                                         <option value='1' <?= (@$_GET['authtype'] == 1) ? 'selected' : '' ?>>Cables</option>
                                         <option value='2' <?= (@$_GET['authtype'] == 2) ? 'selected' : '' ?>>Lighting</option>
@@ -541,6 +541,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <input type="hidden" name="page" value="<?= @$_GET['page'] ?>">
                             <div class="col s2">
                                 <select class="validate required" name="sort" onchange="submitform()" id="sort">
+                                    <option value="5" <?= (@$_GET['filter'] == 5) ? 'selected' : '' ?>>5</option>
                                     <option value="10" <?= (@$_GET['filter'] == 10) ? 'selected' : '' ?>>10</option>
                                     <option value="25" <?= (@$_GET['filter'] == 25) ? 'selected' : '' ?>>25</option>
                                     <option value="50" <?= (@$_GET['filter'] == 50) ? 'selected' : '' ?>>50</option>
@@ -892,9 +893,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <label for="item">Item description</label-->
                                             </div>
                                             <div class="row">
-                                                <div class="input-field col s12">
-                                                    <input id="pdate" type="text" name = "aoc_date" class="pdatepicker required">
-                                                    <label for="pdate">AOC Date</label>
+                                                <div class="input-field col s12 tender<?= $tender->id; ?>">
+                                                    <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" class="pdatepicker required" placeholder="AOC Date">
                                                 </div>
                                             </div>
                                             <div class="input-field col s12 row">
@@ -905,35 +905,35 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <a class="waves-effect waves-light btn blue" onclick="showform('<?= $tender->id; ?>')">Add Contractor</a>
                                             <div class="row contractform<?= $tender->id; ?>" style="display: none;">
                                                 <div class="row">
-                                                    <div class="input-field col s4">
+                                                    <div class="input-field col s6">
                                                         <input id="firm<?= $tender->id; ?>" type="text" name = "firm" class="validate required firm" value="<?= @$contractor->firm; ?>">
                                                         <label for="firm">Name of Firm/CO</label>
                                                     </div>
 
 
 
-                                                    <div class="input-field col s4">
+                                                    <div class="input-field col s6">
                                                         <input id="name<?= $tender->id; ?>" type="text" name = "name" class="validate required name" value="<?= @$contractor->name; ?>">
                                                         <label for="name">Name</label>
                                                     </div>
 
                                                 </div>
                                                 <div class="row">
-                                                    <div class="input-field col s4">
+                                                    <div class="input-field col s6">
                                                         <textarea id="address<?= $tender->id; ?>" name="address" class="materialize-textarea required address"><?= @$contractor->address; ?></textarea>
                                                         <label for="address">Address</label>
                                                     </div>
 
 
 
-                                                    <div class="input-field col s4">
+                                                    <div class="input-field col s6">
                                                         <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate required contact" value="<?= @$contractor->contact; ?>">
                                                         <label for="contact">Contact No.</label>
                                                     </div>
 
                                                 </div>
                                                 <div class="row">
-                                                    <div class="input-field col s4">
+                                                    <div class="input-field col s6">
                                                         <input id="email<?= $tender->id; ?>" type="email" name = "email" class="validate required email" value="<?= @$contractor->email; ?>">
                                                         <label for="email">Email-Id</label>
                                                     </div>
@@ -962,3 +962,30 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
 </main>
+<script>
+    function showform(id) {
+        $('.contractform' + id + '').toggle(function () {
+            var $this = $(this);
+            if ($this.is(":visible")) {
+                $('.cont' + id + '').removeAttr('required')
+                $("#firm" + id + "").attr('required', 'true');
+                $("#name" + id + "").attr('required', 'true');
+                $("#address" + id + "").attr('required', 'true');
+                //$("#contact" + id + "").attr('required', 'true');
+                //$("#email" + id + "").attr('required', 'true');
+            } else {
+                $('.cont' + id + '').attr('required', 'true')
+                $("#firm" + id + "").removeAttr('required');
+                $("#name" + id + "").removeAttr('required');
+                $("#address" + id + "").removeAttr('required');
+                //$("#contact" + id + "").removeAttr('required');
+                //$("#email" + id + "").removeAttr('required');
+            }
+        });
+    }
+
+    function pop_up(url) {
+        window.open(url, 'win2', 'status=no,toolbar=no,scrollbars=yes,titlebar=no,menubar=no,resizable=yes,width=1076,height=768,directories=no,location=no')
+    }
+
+</script>

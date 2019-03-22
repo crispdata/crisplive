@@ -68,12 +68,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </div>
         <?php endif; ?>
 
-
-
         <div class="col s12 m12 l12">
             <div class="card">
                 <div class="card-content">
-
                     <div class="row">
                         <form id="create-project-form" class="col s12" method = "post" action = "<?= $baseURL ?>contractor/add-contractor">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
@@ -83,45 +80,33 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <input id="firm" type="text" name = "firm" class="validate required" value="<?= @$contractor->firm; ?>">
                                     <label for="firm">Name of Firm/CO</label>
                                 </div>
-                               
-                              
 
                                 <div class="input-field col s6">
                                     <input id="name" type="text" name = "name" class="validate required" value="<?= @$contractor->name; ?>">
                                     <label for="name">Name</label>
                                 </div>
-
                             </div>
                             <div class="row">
                                 <div class="input-field col s6">
                                     <textarea id="address" name="address" class="materialize-textarea required"><?= @$contractor->address; ?></textarea>
                                     <label for="address">Address</label>
                                 </div>
-                               
-                              
 
                                 <div class="input-field col s6">
                                     <input id="contact" type="text" name = "contact" class="validate required" value="<?= @$contractor->contact; ?>">
                                     <label for="contact">Contact No.</label>
                                 </div>
-
                             </div>
                             <div class="row">
                                 <div class="input-field col s6">
                                     <input id="email" type="text" name = "email" class="validate required" value="<?= @$contractor->email; ?>">
                                     <label for="email">Email-Id</label>
                                 </div>
-                               
-                              
-
                             </div>
-
-
 
                             <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
 
                         </form>
-
                     </div>
                 </div>
             </div>

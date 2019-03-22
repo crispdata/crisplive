@@ -107,7 +107,7 @@ class SiteController extends Controller {
         $dmans = [];
         $dcons = [];
         $ddeals = [];
-        $emakes = [];
+        $emmakes = [];
         $civilmakes = [];
         $dunapprovedtenders = [];
         $daoctenders = [];

@@ -54,7 +54,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         border:5px solid #ff6666;
     }
     .make .counter{color:#ff6666;}
-    label{color:#000!important;}
+    .input-field label{color:#4c4c4c;}
     label[for="quotedvalue"] {
         color:#9e9e9e!important;
     }
@@ -123,13 +123,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
-    a.btn.tooltipped {
+    /*a.btn.tooltipped {
         float: right;
         width: 100%;
         height: auto;
         padding: 5px;
         line-height: unset;
-    }
+    }*/
 </style>
 
 <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
@@ -877,74 +877,76 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="col s12 m12 l12">
                 <div class="card top">
                     <div class="card-content">
-                        <form id="product-types" method = "post" action = "<?= $baseURL . 'search/stats' ?>">
-                            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-                            <label>Select Product</label>
-                            <select class="validate required materialSelect" id="product" name='type'>
-                                <option value="" disabled selected>Select Product</option>
-                                <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
-                                <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
-                                <!--option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option-->
-                            </select>
-                        </form>
+                        <div class="input-field col s12">
+                            <form id="product-types" method = "post" action = "<?= $baseURL . 'search/stats' ?>">
+                                <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                                <select class="validate required materialSelect" id="product" name='type'>
+                                    <option value="" disabled selected>Select Product</option>
+                                    <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
+                                    <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
+                                    <!--option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option-->
+                                </select>
+                            </form>
+                        </div>
 
                         <?php if (isset($details) && count($details)) { ?>
+                            <div class="input-field col s12">
+                                <select class="validate required materialSelect" name="command" id="command" required="">
+                                    <option value="">Select Command</option>
+                                    <option value="14" selected <?php
+                                    if (@$_POST['command'] == 14) {
+                                        echo "selected";
+                                    }
+                                    ?>>ALL COMMANDS</option>
+                                    <option value="1" <?php
+                                    if (@$_POST['command'] == 1) {
+                                        echo "selected";
+                                    }
+                                    ?>>ADG (CG AND PROJECT) CHENNAI</option>
+                                    <option value="2" <?php
+                                    if (@$_POST['command'] == 2) {
+                                        echo "selected";
+                                    }
+                                    ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
+                                    <option value="6" <?php
+                                    if (@$_POST['command'] == 6) {
+                                        echo "selected";
+                                    }
+                                    ?>>CENTRAL COMMAND</option>
+                                    <option value="7" <?php
+                                    if (@$_POST['command'] == 7) {
+                                        echo "selected";
+                                    }
+                                    ?>>EASTERN COMMAND</option>
+                                    <option value="8" <?php
+                                    if (@$_POST['command'] == 8) {
+                                        echo "selected";
+                                    }
+                                    ?>>NORTHERN COMMAND</option>
+                                    <option value="9" <?php
+                                    if (@$_POST['command'] == 9) {
+                                        echo "selected";
+                                    }
+                                    ?>>SOUTHERN COMMAND</option>
+                                    <option value="10" <?php
+                                    if (@$_POST['command'] == 10) {
+                                        echo "selected";
+                                    }
+                                    ?>>SOUTH WESTERN COMMAND</option>
+                                    <option value="11" <?php
+                                    if (@$_POST['command'] == 11) {
+                                        echo "selected";
+                                    }
+                                    ?>>WESTERN COMMAND</option>
+                                    <option value="12" <?php
+                                    if (@$_POST['command'] == 12) {
+                                        echo "selected";
+                                    }
+                                    ?>>DGNP MUMBAI - MES</option>
 
-                            <select class="validate required materialSelect" name="command" id="command" required="">
-                                <option value="">Select Command</option>
-                                <option value="14" selected <?php
-                                if (@$_POST['command'] == 14) {
-                                    echo "selected";
-                                }
-                                ?>>ALL COMMANDS</option>
-                                <option value="1" <?php
-                                if (@$_POST['command'] == 1) {
-                                    echo "selected";
-                                }
-                                ?>>ADG (CG AND PROJECT) CHENNAI</option>
-                                <option value="2" <?php
-                                if (@$_POST['command'] == 2) {
-                                    echo "selected";
-                                }
-                                ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
-                                <option value="6" <?php
-                                if (@$_POST['command'] == 6) {
-                                    echo "selected";
-                                }
-                                ?>>CENTRAL COMMAND</option>
-                                <option value="7" <?php
-                                if (@$_POST['command'] == 7) {
-                                    echo "selected";
-                                }
-                                ?>>EASTERN COMMAND</option>
-                                <option value="8" <?php
-                                if (@$_POST['command'] == 8) {
-                                    echo "selected";
-                                }
-                                ?>>NORTHERN COMMAND</option>
-                                <option value="9" <?php
-                                if (@$_POST['command'] == 9) {
-                                    echo "selected";
-                                }
-                                ?>>SOUTHERN COMMAND</option>
-                                <option value="10" <?php
-                                if (@$_POST['command'] == 10) {
-                                    echo "selected";
-                                }
-                                ?>>SOUTH WESTERN COMMAND</option>
-                                <option value="11" <?php
-                                if (@$_POST['command'] == 11) {
-                                    echo "selected";
-                                }
-                                ?>>WESTERN COMMAND</option>
-                                <option value="12" <?php
-                                if (@$_POST['command'] == 12) {
-                                    echo "selected";
-                                }
-                                ?>>DGNP MUMBAI - MES</option>
-
-                                <!--option value="2">B/R</option-->
-                            </select>
+                                    <!--option value="2">B/R</option-->
+                                </select>
+                            </div>
                             <div class="input-field col s5">
                                 <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
                                 if (@$_POST['fromdate']) {
@@ -966,7 +968,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php
                                 $content = '<h6><b>Data Available From</b></h6>  <br> Northern Command - 20-12-18 <br> Western Command - 20-12-18 <br> South Western Command - 13-02-19 <br> Central Command - 18-02-19 <br> ADG & DGNP - 25-02-19 <br> Eastern Command - 27-02-19 <br> Southern Command - 01-03-19';
                                 ?>
-                                <a class="btn black tooltipped" data-html="true" data-position="bottom" data-delay="50" data-tooltip="<?= nl2br($content) ?>">Date selection guidelines</a>
+                                <a class="btn black tooltipped" data-html="true" data-position="bottom" data-delay="50" data-tooltip="<?= nl2br($content) ?>"><i class="material-icons">info</i></a>
                             </div>
 
 
