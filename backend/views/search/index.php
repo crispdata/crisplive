@@ -151,13 +151,143 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <?php }
                                     ?>
                                 </div>
+                                <div class="input-fields col s4 row">
+                                    <select name='authtype' id="authtype" class="contact-authtypes browser-default" onchange="showdivssearch(this.value)" required="">
+                                        <option value=''>Select Product</option>
+                                        <option value='1' <?= (@$_GET['authtype'] == 1) ? 'selected' : '' ?>>Cables</option>
+                                        <option value='2' <?= (@$_GET['authtype'] == 2) ? 'selected' : '' ?>>Lighting</option>
+                                        <option value='3' <?= (@$_GET['authtype'] == 3) ? 'selected' : '' ?>>Wires</option>
+                                        <option value='4' <?= (@$_GET['authtype'] == 4) ? 'selected' : '' ?>>Cement</option>
+                                        <option value='5' <?= (@$_GET['authtype'] == 5) ? 'selected' : '' ?>>Reinforcement Steel</option>
+                                        <option value='6' <?= (@$_GET['authtype'] == 6) ? 'selected' : '' ?>>Structural Steel</option>
+                                        <option value='7' <?= (@$_GET['authtype'] == 7) ? 'selected' : '' ?>>Non Structural Steel</option>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="cablesdiv" <?= (@$_GET['authtype'] == 1) ? '' : 'style="display: none;"' ?> >
+                                    <select name='cables' class="cmakes browser-default" id="cables">
+                                        <option value="0">Select Cables Makes</option>
+                                        <?php
+                                        if (@$cables) {
+                                            foreach ($cables as $cable_) {
+                                                ?>
+                                                <option value="<?= $cable_->id ?>" <?= (@$_GET['cables'] == $cable_->id) ? 'selected' : '' ?>><?= $cable_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="lightdiv" <?= (@$_GET['authtype'] == 2) ? '' : 'style="display: none;"' ?>>
+                                    <select name='lighting' class="lmakes browser-default" id="lighting">
+                                        <option value="0">Select Lighting Makes</option>
+                                        <?php
+                                        if (@$lights) {
+                                            foreach ($lights as $light_) {
+                                                ?>
+                                                <option value="<?= $light_->id ?>" <?= (@$_GET['lighting'] == $light_->id) ? 'selected' : '' ?>><?= $light_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="wiresdiv" <?= (@$_GET['authtype'] == 3) ? '' : 'style="display: none;"' ?>>
+                                    <select name='wires' class="wmakes browser-default" id="wires">
+                                        <option value="0">Select Wire Makes</option>
+                                        <?php
+                                        if (@$wires) {
+                                            foreach ($wires as $wire_) {
+                                                ?>
+                                                <option value="<?= $wire_->id ?>" <?= (@$_GET['wires'] == $wire_->id) ? 'selected' : '' ?>><?= $wire_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="cementdiv" <?= (@$_GET['authtype'] == 4) ? '' : 'style="display: none;"' ?>>
+                                    <select name='cement' class="cementmakes browser-default" id="cement">
+                                        <option value="0">Select Cement Makes</option>
+                                        <?php
+                                        if (@$cements) {
+                                            foreach ($cements as $cement_) {
+                                                ?>
+                                                <option value="<?= $cement_->id ?>" <?= (@$_GET['cement'] == $cement_->id) ? 'selected' : '' ?>><?= $cement_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="rsteeldiv" <?= (@$_GET['authtype'] == 5) ? '' : 'style="display: none;"' ?>>
+                                    <select name='rsteel' class="rmakes browser-default" id="rsteel">
+                                        <option value="0">Select Reinforcement Steel Makes</option>
+                                        <?php
+                                        if (@$rsteel) {
+                                            foreach ($rsteel as $rsteel_) {
+                                                ?>
+                                                <option value="<?= $rsteel_->id ?>" <?= (@$_GET['rsteel'] == $rsteel_->id) ? 'selected' : '' ?>><?= $rsteel_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="ssteeldiv" <?= (@$_GET['authtype'] == 6) ? '' : 'style="display: none;"' ?>>
+                                    <select name='ssteel' class="smakes browser-default" id="ssteel">
+                                        <option value="0">Select Structural Steel Makes</option>
+                                        <?php
+                                        if (@$ssteel) {
+                                            foreach ($ssteel as $ssteel_) {
+                                                ?>
+                                                <option value="<?= $ssteel_->id ?>" <?= (@$_GET['ssteel'] == $ssteel_->id) ? 'selected' : '' ?>><?= $ssteel_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-fields col s4 row" id="nsteeldiv" <?= (@$_GET['authtype'] == 7) ? '' : 'style="display: none;"' ?>>
+                                    <select name='nsteel' class="nmakes browser-default" id="nsteel">
+                                        <option value="0">Select Non Structural Steel Makes</option>
+                                        <?php
+                                        if (@$nsteel) {
+                                            foreach ($nsteel as $nsteel_) {
+                                                ?>
+                                                <option value="<?= $nsteel_->id ?>" <?= (@$_GET['nsteel'] == $nsteel_->id) ? 'selected' : '' ?>><?= $nsteel_->make ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
+                                <div class="input-field col s4 row">
+                                    <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
+                                    if (@$_GET['fromdate']) {
+                                        echo @$_GET['fromdate'];
+                                    }
+                                    ?>">
+                                    <label for="fromdate">From Date</label>
+                                </div>
+
+                                <div class="input-field col s4 row">
+                                    <input id="todate" type="text" name = "todate" class="required todatepicker" value="<?php
+                                    if (@$_GET['todate']) {
+                                        echo @$_GET['todate'];
+                                    }
+                                    ?>">
+                                    <label for="todate">To Date</label>
+                                </div>
                                 <?php if (@$cont) { ?>
                                     <div id="conextra">
                                         <input type="hidden" name="contype" value="<?= $cont->id ?>">
                                     </div>
                                 <?php }
                                 ?>
-                                <div class="input-fields col s4 row">
+                                
+                            </div>
+                            <div style='text-align:center;'><h5><b>Search By Offices</b></h5></div>
+                            <div class="input-fields col s4 row">
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
                                         <option value="">ALL COMMANDS</option>
                                         <option value="1" <?php
@@ -228,9 +358,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <!--option value="2">B/R</option-->
                                     </select>
                                 </div>
-                            </div>
-
-
                             <?php
                             if (isset($_GET['submit'])) {
                                 if ((@$_GET['cengineer'] == 0 || @$_GET['cengineer'] == null) && (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null)) {
@@ -407,7 +534,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                         </form>
                     </div>
-                    <?php if (@$tenders) { ?>
+                    <?php if (@$tenders) {
+                        ?>
                         <form id="sort-data" method = "post" action = "<?= str_replace('/admin', '', Yii::$app->request->url) ?>">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <input type="hidden" name="page" value="<?= @$_GET['page'] ?>">
@@ -771,16 +899,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </div>
                                             <div class="input-field col s12 row">
                                                 <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
-                                                    <option value="">Select Contractor</option>
-                                                    <?php
-                                                    if ($contractors) {
-                                                        foreach ($contractors as $contract) {
-                                                            ?>
-                                                            <option value="<?= $contract->id; ?>"><?= $contract->firm . ' - ' . $contract->address; ?></option>
-                                                            <?php
-                                                        }
-                                                    }
-                                                    ?>
 
                                                 </select>
                                             </div>

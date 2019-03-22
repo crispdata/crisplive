@@ -99,11 +99,88 @@ class SearchController extends Controller {
               $tenders = \common\models\Tender::find()->where(['status' => '1']);
               }
               } */
-            if ($user->group_id != 4 && $user->group_id != 5) {
-                $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => '0']);
+            $authtype = @$_REQUEST['authtype'];
+            if (@$authtype) {
+                if ($authtype == 1) {
+                    $make = $_REQUEST['cables'];
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype]);
+                    }
+                } elseif ($authtype == 2) {
+                    $make = $_REQUEST['lighting'];
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype]);
+                    }
+                } elseif ($authtype == 3) {
+                    $make = $_REQUEST['wires'];
+                    $authtype = 5;
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $authtype]);
+                    }
+                } elseif ($authtype == 4) {
+                    $make = $_REQUEST['cement'];
+                    $authtype = 14;
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype]);
+                    }
+                } elseif ($authtype == 5) {
+                    $make = $_REQUEST['rsteel'];
+                    $authtype = 15;
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype]);
+                    }
+                } elseif ($authtype == 6) {
+                    $make = $_REQUEST['ssteel'];
+                    $authtype = 16;
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype]);
+                    }
+                } elseif ($authtype == 7) {
+                    $make = $_REQUEST['nsteel'];
+                    $authtype = 17;
+                    if (@$make) {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                    } else {
+                        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tendertwo' => $authtype]);
+                    }
+                }
             } else {
-                $tenders = \common\models\Tender::find()->where(['status' => '1']);
+                if ($user->group_id != 4 && $user->group_id != 5) {
+                    $tenders = \common\models\Tender::find()->where(['status' => '1']);
+                } else {
+                    $tenders = \common\models\Tender::find()->where(['status' => '1']);
+                }
             }
+
+            $fromdate = @$_REQUEST['fromdate'];
+            $todate = @$_REQUEST['todate'];
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $tenders->andWhere(['and',
+                    ['>=', 'tenders.bid_end_date', $fromdate],
+                    ['<=', 'tenders.bid_end_date', $todate],
+                ]);
+            } elseif (isset($fromdate) && $fromdate != '') {
+                $tenders->andWhere(['and',
+                    ['>=', 'tenders.bid_end_date', $fromdate],
+                ]);
+            } elseif (isset($todate) && $todate != '') {
+                $tenders->andWhere(['and',
+                    ['<=', 'tenders.bid_end_date', $todate],
+                ]);
+            }
+
             if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
                 $tenders->andWhere(['or',
                     ['like', 'work', '%' . @$_REQUEST['keyword'] . '%', false],
@@ -149,22 +226,20 @@ class SearchController extends Controller {
                     ['gengineer' => $_REQUEST['gengineer']]
                 ]);
             }
-            $tenders->orderBy(['id' => SORT_DESC]);
+
+            $tenders->orderBy(['id' => SORT_DESC])->groupBy(['id']);
+
             $countQuery = clone $tenders;
+
             if ($val && $page) {
                 $items_per_page = $val;
                 $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
-                /* if ($page) {
-                  $offset = ($page - 1) * $items_per_page;
-                  } else {
-                  $offset = 0;
-                  } */
                 $offset = $pages->offset;
             } else {
                 if ($filter) {
                     $fval = $filter;
                 } else {
-                    $fval = '10';
+                    $fval = '5';
                 }
                 $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
                 $offset = $pages->offset;
@@ -185,16 +260,44 @@ class SearchController extends Controller {
                 $string = http_build_query($params);
                 return $this->redirect(array('/search/index?' . $string . '&filter=' . $val . ''));
             } else {
+                $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $wires = \common\models\Make::find()->where(['mtype' => 5])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+                $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
                 return $this->render('index', [
                             'tenders' => $models,
                             'pages' => $pages,
                             'total' => $countQuery->count(),
                             'type' => 'All',
-                            'url' => 'index'
+                            'url' => 'index',
+                            'cables' => $cables,
+                            'lights' => $lights,
+                            'wires' => $wires,
+                            'cements' => $cements,
+                            'rsteel' => $rsteel,
+                            'ssteel' => $ssteel,
+                            'nsteel' => $nsteel,
                 ]);
             }
         } else {
+            $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $lights = \common\models\Make::find()->where(['mtype' => 2])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $wires = \common\models\Make::find()->where(['mtype' => 5])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $cements = \common\models\Make::find()->where(['mtype' => 14])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $rsteel = \common\models\Make::find()->where(['mtype' => 15])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $ssteel = \common\models\Make::find()->where(['mtype' => 16])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
+            $nsteel = \common\models\Make::find()->where(['mtype' => 17])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
             return $this->render('index', [
+                        'cables' => $cables,
+                        'lights' => $lights,
+                        'wires' => $wires,
+                        'cements' => $cements,
+                        'rsteel' => $rsteel,
+                        'ssteel' => $ssteel,
+                        'nsteel' => $nsteel,
             ]);
         }
     }

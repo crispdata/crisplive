@@ -55,6 +55,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <th data-field="name">Details of Contracting Office</th>
                                 <th data-field="name" width="100px">Contact No.</th>
                                 <th data-field="name" width="100px">Email ID</th>
+                                <th data-field="name" width="200px">Address</th>
                                 <th data-field="email">Actions</th>
 
                             </tr>
@@ -80,6 +81,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <td class = ""><?= $tdetails ?></td>
                                         <td class = ""><?= $user->contact ?></td>
                                         <td class = ""><?= $user->email ?></td>
+                                        <td class = ""><?= $user->address ?></td>
                                         <td>
                                             <a href="<?= Url::to(['products/addaddress', 'id' => $user->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                             <a href="#modal<?= $user->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>

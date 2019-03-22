@@ -21,6 +21,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         var com = document.forms["myform"]["command"].value;
         var con = document.forms["myform"]["contact"].value;
         var email = document.forms["myform"]["email"].value;
+        var address = document.forms["myform"]["address"].value;
         if (com == "") {
             swal("", "Please select Command", "warning");
             return false;
@@ -29,8 +30,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             swal("", "Please enter Contact No.", "warning");
             return false;
         }
-        if (email == "") {
-            swal("", "Please enter Email ID", "warning");
+        if (address == "") {
+            swal("", "Please enter Address", "warning");
             return false;
         }
          $("#create-project-form-tender").submit();
@@ -271,6 +272,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s6">
                                     <input id="email" type="email" name = "email" class="validate required" value="<?= @$address->email; ?>">
                                     <label for="email">Email ID</label>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="input-field col s6">
+                                    <textarea name="address" id="address" class="materialize-textarea validate required" required=""><?= @$address->address; ?></textarea>
+                                    <label for="address">Address</label>
                                 </div>
                             </div>
 

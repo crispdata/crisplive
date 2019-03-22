@@ -1262,6 +1262,74 @@ function showdivs(val) {
     }
 }
 
+function showdivssearch(val) {
+    if (val == 1) {
+        $("#cablesdiv").show();
+        $("#lightdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    } else if (val == 2) {
+        $("#lightdiv").show();
+        $("#cablesdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    } else if (val == 3) {
+        $("#lightdiv").hide();
+        $("#cablesdiv").hide();
+        $("#wiresdiv").show();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    } else if (val == 4) {
+        $("#cablesdiv").hide();
+        $("#lightdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cementdiv").show();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    } else if (val == 5) {
+        $("#lightdiv").hide();
+        $("#cablesdiv").hide();
+        $("#cementdiv").hide();
+        $("#wiresdiv").hide();
+        $("#rsteeldiv").show();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    } else if (val == 6) {
+        $("#lightdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cablesdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").show();
+        $("#nsteeldiv").hide();
+    } else if (val == 7) {
+        $("#lightdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cablesdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").show();
+    } else {
+        $("#cablesdiv").hide();
+        $("#lightdiv").hide();
+        $("#wiresdiv").hide();
+        $("#cementdiv").hide();
+        $("#rsteeldiv").hide();
+        $("#ssteeldiv").hide();
+        $("#nsteeldiv").hide();
+    }
+}
+
 function getcity(val) {
 
     var selects = '';
