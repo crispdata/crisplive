@@ -42,7 +42,7 @@ class ContractorController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
+                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'updatecontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -194,6 +194,7 @@ class ContractorController extends Controller {
             if ($_POST['id']) {
                 $model = \common\models\Contractor::find()->where(['id' => $_POST['id']])->one();
                 $model->firm = @$_POST['firm'];
+                $model->firmname = str_replace('M/s ', '', @$_POST['firm']);
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
@@ -206,6 +207,7 @@ class ContractorController extends Controller {
             } else {
                 $model = new \common\models\Contractor();
                 $model->firm = @$_POST['firm'];
+                $model->firmname = str_replace('M/s ', '', @$_POST['firm']);
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
@@ -277,6 +279,18 @@ class ContractorController extends Controller {
 
         echo json_encode($results);
         die();
+    }
+
+    public function actionUpdatecontractors() {
+        $contractors = \common\models\Contractor::find()->where(['status' => 1])->all();
+        if ($contractors) {
+            foreach ($contractors as $_contractor) {
+                $fname = str_replace('M/s ', '', $_contractor->firm);
+                $fname = str_replace('M/S ', '', $fname);
+                $_contractor->firmname = trim($fname);
+                $_contractor->save();
+            }
+        }
     }
 
 }

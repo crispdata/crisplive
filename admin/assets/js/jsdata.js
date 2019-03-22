@@ -430,6 +430,7 @@ $(document).ready(function () {
         var command = $("#command option:selected").val();
         var fromdate = $("#fromdate").val();
         var todate = $("#todate").val();
+        var cquantity = $('#u20').text();
         $("#typeone").prop('selectedIndex', 0);
         $("#typeone").material_select();
         $("#typetwo").prop('selectedIndex', 0);
@@ -460,7 +461,7 @@ $(document).ready(function () {
         $.ajax({
             type: 'post',
             url: baseUrl + 'site/getmakedetails',
-            data: 'type=2&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+            data: 'type=2&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&cquantity=' + cquantity + '&_csrf-backend=' + csrf_token,
             beforeSend: function () {
                 $("#total").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
