@@ -98,7 +98,6 @@ class ProductsController extends Controller {
                 $archivetenders = \common\models\Tender::find()->where(['is_archived' => 1])->all();
             }
 
-
             if (isset($tenders) && count($tenders)) {
                 foreach ($tenders as $_tender) {
                     $tids[] = $_tender->id;
@@ -420,7 +419,6 @@ class ProductsController extends Controller {
 
     public function actionAccessories() {
         $user = Yii::$app->user->identity;
-
         $accessories = \common\models\Accessories::find()->where(['status' => 1])->orderBy(['text' => SORT_ASC])->all();
         return $this->render('accessories', [
                     'accessories' => $accessories
@@ -529,13 +527,10 @@ class ProductsController extends Controller {
     }
 
     public function actionUpdatedetailsitems() {
-        $tenders = \common\models\ItemDetails::find()->where(['typefitting' => 1])->all();
-        echo "<pre/>";
-        print_r($tenders);
-        die();
+        $tenders = \common\models\ItemDetails::find()->where(['typefitting' => 49])->all();
         if ($tenders) {
             foreach ($tenders as $_ten) {
-                $_ten->typefitting = 6;
+                $_ten->typefitting = 7;
                 $_ten->save();
             }
         }
@@ -882,6 +877,7 @@ class ProductsController extends Controller {
                 $model->gengineer = @$_POST['gengineer'];
                 $model->contact = @$_POST['contact'];
                 $model->email = @$_POST['email'];
+                $model->address = @$_POST['address'];
 
                 $address = \common\models\Addresses::find()->where(['status' => 1])->andWhere(['!=', 'id', $_POST['id']]);
                 if (isset($_REQUEST['command']) && $_REQUEST['command'] != '') {
@@ -921,6 +917,7 @@ class ProductsController extends Controller {
                 $model->gengineer = @$_POST['gengineer'];
                 $model->contact = @$_POST['contact'];
                 $model->email = @$_POST['email'];
+                $model->address = @$_POST['address'];
                 $model->user_id = $user->UserId;
                 $model->createdon = date('Y-m-d h:i:s');
                 $model->status = 1;
