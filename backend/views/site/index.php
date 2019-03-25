@@ -1509,9 +1509,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'site/manufacturers' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Manufacturers/Clients </span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans; ?></span></span>
+                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
+                                <span class="card-title leftside">All Clients</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans+$dcons+$ddeals; ?></span></span>
                             </a>
                         </div>
                         <div class="progress stats-card-progress green">
@@ -1519,42 +1519,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
                     </div>
                 </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'site/contractors' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Contractors/Clients</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dcons; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress red">
-                            <div class="determinate red" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Dealers/Clients</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $ddeals; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
+                
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">
                             <a href="site/e-m">
-                                <span class="card-title leftside">All E/M Makes</span>
+                                <span class="card-title leftside">E/M Makes</span>
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $emmakes; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress green">
-                            <div class="determinate green" style="width: 100%"></div>
+                        <div class="progress stats-card-progress red">
+                            <div class="determinate red" style="width: 100%"></div>
                         </div>
                     </div>
                 </div>
@@ -1562,12 +1537,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <div class="card stats-card">
                         <div class="card-content">
                             <a href="site/civil">
-                                <span class="card-title leftside">All Civil Makes</span>
+                                <span class="card-title leftside">Civil Makes</span>
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $civilmakes; ?></span></span>
                             </a>
                         </div>
-                        <div class="progress stats-card-progress red">
-                            <div class="determinate red" style="width: 100%"></div>
+                        <div class="progress stats-card-progress blue">
+                            <div class="determinate blue" style="width: 100%"></div>
                         </div>
                     </div>
                 </div>

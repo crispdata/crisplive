@@ -15,7 +15,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .add-contact{    float: right;
                      margin-right: 15px;}    
     .btn, .btn-flat {
-        font-size: 11px;
+        font-size: 13px;
     }
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
         border-color: unset;
@@ -73,14 +73,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <thead>
                             <tr>
                                 <th data-field = "email">Tender Id</th>
-                                <th data-field = "name" width = "200px">Details of Contracting Office</th>
+                                <th data-field = "name" width = "250px">Details of Contracting Office</th>
                                 <?php if ($aocstatus != 1) {
                                     ?>
                                     <th data-field="email" width="120px">Cost of Tender</th>
                                     <th data-field="email" width="100px">Bid end date</th>
                                     <th data-field="email" width="100px">Bid open date</th>
                                 <?php } else { ?>
-                                    <th data-field="email">Awarded Amount</th>
+                                    <th data-field="email" width="130px">Awarded Amount</th>
                                     <th data-field="email" width="100px">AOC Date</th>
                                 <?php } ?>
                                 <th data-field="email">Status</th>

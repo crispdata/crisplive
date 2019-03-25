@@ -107,6 +107,10 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         text-align: center;
         font-size: 30px;
     }
+    a.btn.green.asearch {
+        /* float: left; */
+        margin-left: 15px;
+    }
 </style>
 <div class="loader-bg"></div>
 <div class="loader">
@@ -168,6 +172,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     </div>
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
+                <a href="/search/index" class="btn green asearch">Advanced Search</a>
                 <!--a class="btn green" id="sbutton">Search</a-->
                 <ul class="right col s7 m3 nav-right-menu setting">
                     <li><a href="javascript:void(0)" data-activates="chat-sidebar" class="chat-button show-on-large"><i class="material-icons">more_vert</i></a></li>

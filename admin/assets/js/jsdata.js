@@ -1765,7 +1765,7 @@ function getcengineer(value) {
     $("#gengineer").material_select();
     $("#ge").hide();
 
-    var arr = ['2', '12'];
+    var arr = ['0', '2', '12'];
     if (arr.indexOf(value) < 0) {
         $("#ce").show();
         $.ajax({

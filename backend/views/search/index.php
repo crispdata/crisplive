@@ -47,7 +47,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .input-fields.col.s4.row {
         margin-top: 13px;
     }
-    .firstrow{margin-bottom: 0px!important;}
+    .firstrow{float:left; width:33%;}
     label,.select2-selection__placeholder{color:rgba(0,0,0,.6)!important;}
     .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
     .modal .modal-content h5{text-align: center;}
@@ -60,6 +60,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         float: left;
     }
     ::placeholder{color:rgba(0,0,0,.6)!important;}
+    input#keyword,#fromdate,#todate {
+        margin-bottom: 0px;
+    }
+    .row.fullrow {
+        margin-bottom: 0px;
+    }   
 </style>
 <main class="mn-inner">
     <div class="row">
@@ -89,14 +95,39 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <div class="col s12 m12 l12">
             <div class="card">
                 <div class="card-content card-tenders">
-                    <div class="row">
+                    <div class="row fullrow">
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/index">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <div class="row firstrow">
-                                <div class="input-field col s4">
+                                <div style="text-align: center;"><h5><b>Search By Keyword</b></h5></div>
+                                <div class="input-field col s12">
                                     <input id="keyword" type="text" name = "keyword" class="validate required" value="<?= @$_GET['keyword']; ?>">
                                     <label for="keyword">Search Keyword</label>
                                 </div>
+                            </div>
+                            <div class="row firstrow">
+                                <div style="text-align: center;"><h5><b>Search By Dates</b></h5></div>
+                                <div class="input-field col s6">
+                                    <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
+                                    if (@$_GET['fromdate']) {
+                                        echo @$_GET['fromdate'];
+                                    }
+                                    ?>">
+                                    <label for="fromdate">From Date</label>
+                                </div>
+
+                                <div class="input-field col s6">
+                                    <input id="todate" type="text" name = "todate" class="required todatepicker" value="<?php
+                                    if (@$_GET['todate']) {
+                                        echo @$_GET['todate'];
+                                    }
+                                    ?>">
+                                    <label for="todate">To Date</label>
+                                </div>
+
+
+                            </div>
+                            <div class="row firstrow">
                                 <!--div class="input-fields col s4 row">
                                     <select class="validate required materialSelect" name="tendertype" id="tendertype">
                                         <option value="1" <?php
@@ -136,7 +167,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 ?>>Archived Tenders</option>
                                     </select>
                                 </div-->
-                                <div class="input-fields col s4 row">
+                                <div style="text-align: center;"><h5><b>Search By Contractor</b></h5></div>
+                                <div class="input-field col s12">
                                     <select class="validate required materialSelectcon browser-default" name="contype" id="contype">
                                         <!--option value="">All Contractors</option-->
 
@@ -151,7 +183,17 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <?php }
                                     ?>
                                 </div>
-                                <div class="input-fields col s4 row">
+                                <?php if (@$cont) { ?>
+                                    <div id="conextra">
+                                        <input type="hidden" name="contype" value="<?= $cont->id ?>">
+                                    </div>
+                                <?php }
+                                ?>
+                            </div>
+
+                            <div class="row firstrow">
+                                <div style="text-align: center;"><h5><b>Search By Product</b></h5></div>
+                                <div class="input-field col s12">
                                     <select name='authtype' id="authtype" class="contact-authtypes browser-default" onchange="showdivssearch(this.value)">
                                         <option value=''>Select Product</option>
                                         <option value='1' <?= (@$_GET['authtype'] == 1) ? 'selected' : '' ?>>Cables</option>
@@ -163,7 +205,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <option value='7' <?= (@$_GET['authtype'] == 7) ? 'selected' : '' ?>>Non Structural Steel</option>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="cablesdiv" <?= (@$_GET['authtype'] == 1) ? '' : 'style="display: none;"' ?> >
+                                <div class="input-field col s12" id="cablesdiv" <?= (@$_GET['authtype'] == 1) ? '' : 'style="display: none;"' ?> >
                                     <select name='cables' class="cmakes browser-default" id="cables">
                                         <option value="0">Select Cables Makes</option>
                                         <?php
@@ -177,7 +219,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="lightdiv" <?= (@$_GET['authtype'] == 2) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="lightdiv" <?= (@$_GET['authtype'] == 2) ? '' : 'style="display: none;"' ?>>
                                     <select name='lighting' class="lmakes browser-default" id="lighting">
                                         <option value="0">Select Lighting Makes</option>
                                         <?php
@@ -191,7 +233,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="wiresdiv" <?= (@$_GET['authtype'] == 3) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="wiresdiv" <?= (@$_GET['authtype'] == 3) ? '' : 'style="display: none;"' ?>>
                                     <select name='wires' class="wmakes browser-default" id="wires">
                                         <option value="0">Select Wire Makes</option>
                                         <?php
@@ -205,7 +247,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="cementdiv" <?= (@$_GET['authtype'] == 4) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="cementdiv" <?= (@$_GET['authtype'] == 4) ? '' : 'style="display: none;"' ?>>
                                     <select name='cement' class="cementmakes browser-default" id="cement">
                                         <option value="0">Select Cement Makes</option>
                                         <?php
@@ -219,7 +261,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="rsteeldiv" <?= (@$_GET['authtype'] == 5) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="rsteeldiv" <?= (@$_GET['authtype'] == 5) ? '' : 'style="display: none;"' ?>>
                                     <select name='rsteel' class="rmakes browser-default" id="rsteel">
                                         <option value="0">Select Reinforcement Steel Makes</option>
                                         <?php
@@ -233,7 +275,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="ssteeldiv" <?= (@$_GET['authtype'] == 6) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="ssteeldiv" <?= (@$_GET['authtype'] == 6) ? '' : 'style="display: none;"' ?>>
                                     <select name='ssteel' class="smakes browser-default" id="ssteel">
                                         <option value="0">Select Structural Steel Makes</option>
                                         <?php
@@ -247,7 +289,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-fields col s4 row" id="nsteeldiv" <?= (@$_GET['authtype'] == 7) ? '' : 'style="display: none;"' ?>>
+                                <div class="input-field col s12" id="nsteeldiv" <?= (@$_GET['authtype'] == 7) ? '' : 'style="display: none;"' ?>>
                                     <select name='nsteel' class="nmakes browser-default" id="nsteel">
                                         <option value="0">Select Non Structural Steel Makes</option>
                                         <?php
@@ -261,35 +303,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                     </select>
                                 </div>
-                                <div class="input-field col s4 row">
-                                    <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
-                                    if (@$_GET['fromdate']) {
-                                        echo @$_GET['fromdate'];
-                                    }
-                                    ?>">
-                                    <label for="fromdate">From Date</label>
-                                </div>
-
-                                <div class="input-field col s4 row">
-                                    <input id="todate" type="text" name = "todate" class="required todatepicker" value="<?php
-                                    if (@$_GET['todate']) {
-                                        echo @$_GET['todate'];
-                                    }
-                                    ?>">
-                                    <label for="todate">To Date</label>
-                                </div>
-                                <?php if (@$cont) { ?>
-                                    <div id="conextra">
-                                        <input type="hidden" name="contype" value="<?= $cont->id ?>">
-                                    </div>
-                                <?php }
-                                ?>
-                                
                             </div>
-                            <div style='text-align:center;'><h5><b>Search By Offices</b></h5></div>
-                            <div class="input-fields col s4 row">
+
+                            <div class="row firstrow">
+                                <div style="text-align: center;"><h5><b>Search By Offices</b></h5></div>
+                                <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
-                                        <option value="">ALL COMMANDS</option>
+                                        <option value="0">ALL COMMANDS</option>
                                         <option value="1" <?php
                                         if (@$_GET['command'] == 1) {
                                             echo "selected";
@@ -358,607 +378,608 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <!--option value="2">B/R</option-->
                                     </select>
                                 </div>
-                            <?php
-                            if (isset($_GET['submit'])) {
-                                if ((@$_GET['cengineer'] == 0 || @$_GET['cengineer'] == null) && (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null)) {
-                                    $arrcommands = [1, 2, 3, 4, 5, 13];
-                                    $getcengineers = \common\models\Cengineer::find()->where(['command' => $_GET['command']])->all();
-                                    if (@$getcengineers && (!in_array($_GET['command'], $arrcommands))) {
-                                        ?>
-                                        <div id="ce">
-                                            <div class="input-fields col s4 row">
-                                                <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                                    <option value="">Select CE</option>
-                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
-                                                </select>
-                                            </div>
-                                        </div>
-                                        <?php
-                                    } elseif (@$getcengineers && (in_array($_GET['command'], $arrcommands))) {
-                                        ?>
-                                        <div id="ge">
-                                            <div class="input-fields col s4 row">
-                                                <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                                    <option value="">Select GE</option>
-                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
-                                                </select>
-                                            </div>
-                                        </div>  
-                                        <?php
-                                    }
-                                }
-                                if (@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) {
-                                    ?>
-                                    <div id="ce">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                                <option value="">Select CE</option>
-                                                <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cengineer']); ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <?php
-                                    if (@$_GET['cwengineer'] == 0 || @$_GET['cwengineer'] == null) {
-                                        $getcwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $_GET['cengineer']])->all();
-                                        ?>
-                                        <?php if (@$getcwengineers) { ?>            
-                                            <div id="cwe">
-                                                <div class="input-fields col s4 row">
-                                                    <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                                        <option value="">Select CWE</option>
-                                                        <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], ''); ?>
+                                <?php
+                                if (isset($_GET['submit'])) {
+                                    if ((@$_GET['cengineer'] == 0 || @$_GET['cengineer'] == null) && (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null)) {
+                                        $arrcommands = [1, 2, 3, 4, 5, 13];
+                                        $getcengineers = \common\models\Cengineer::find()->where(['command' => $_GET['command']])->all();
+                                        if (@$getcengineers && (!in_array($_GET['command'], $arrcommands))) {
+                                            ?>
+                                            <div id="ce">
+                                                <div class="input-field col s12">
+                                                    <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                        <option value="">Select CE</option>
+                                                        <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
                                                     </select>
                                                 </div>
                                             </div>
                                             <?php
-                                        }
-                                    }
-                                    ?>
-                                <?php } elseif (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) { ?>
-                                    <div id="cwe">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                                <option value="">Select CE</option>
-                                                <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cwengineer']); ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                <?php } elseif (@$_GET['gengineer'] != 0 || @$_GET['gengineer'] != null) { ?>
-                                    <div id="ge">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                                <option value="">Select CE</option>
-                                                <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['gengineer']); ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                <?php } else { ?>
-                                    <div id="ce" style="display: none;">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                                <option value="" disabled selected>Select CE</option>
-                                            </select>
-                                        </div>
-                                    </div>
-                                <?php } ?>
-
-                                <?php
-                                if ((@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) && (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null)) {
-                                    ?>
-                                    <div id="cwe">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                                <option value="">Select CWE</option>
-                                                <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], $_GET['cwengineer']); ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                    <?php
-                                    if (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null) {
-                                        $getgengineers = \common\models\Gengineer::find()->where(['cwengineer' => $_GET['cwengineer']])->all();
-                                        ?>
-                                        <?php if (@$getgengineers) { ?>
+                                        } elseif (@$getcengineers && (in_array($_GET['command'], $arrcommands))) {
+                                            ?>
                                             <div id="ge">
-                                                <div class="input-fields col s4 row">
+                                                <div class="input-field col s12">
                                                     <select class="validate required materialSelect" name="gengineer" id="gengineer">
                                                         <option value="">Select GE</option>
-                                                        <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], ''); ?>
+                                                        <?php SiteController::actionGetcengineerbycommand($_GET['command'], ''); ?>
                                                     </select>
                                                 </div>
                                             </div>  
                                             <?php
                                         }
                                     }
+                                    if (@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) {
+                                        ?>
+                                        <div id="ce">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                    <option value="">Select CE</option>
+                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cengineer']); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <?php
+                                        if (@$_GET['cwengineer'] == 0 || @$_GET['cwengineer'] == null) {
+                                            $getcwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $_GET['cengineer']])->all();
+                                            ?>
+                                            <?php if (@$getcwengineers) { ?>            
+                                                <div id="cwe">
+                                                    <div class="input-field col s12">
+                                                        <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                            <option value="">Select CWE</option>
+                                                            <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], ''); ?>
+                                                        </select>
+                                                    </div>
+                                                </div>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    <?php } elseif (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) { ?>
+                                        <div id="cwe">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                    <option value="">Select CE</option>
+                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['cwengineer']); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php } elseif (@$_GET['gengineer'] != 0 || @$_GET['gengineer'] != null) { ?>
+                                        <div id="ge">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                    <option value="">Select CE</option>
+                                                    <?php SiteController::actionGetcengineerbycommand($_GET['command'], $_GET['gengineer']); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php } else { ?>
+                                        <div id="ce" style="display: none;">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                    <option value="" disabled selected>Select CE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+
+                                    <?php
+                                    if ((@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) && (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null)) {
+                                        ?>
+                                        <div id="cwe">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                    <option value="">Select CWE</option>
+                                                    <?php SiteController::actionGetcwengineerbyce($_GET['cengineer'], $_GET['cwengineer']); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <?php
+                                        if (@$_GET['gengineer'] == 0 || @$_GET['gengineer'] == null) {
+                                            $getgengineers = \common\models\Gengineer::find()->where(['cwengineer' => $_GET['cwengineer']])->all();
+                                            ?>
+                                            <?php if (@$getgengineers) { ?>
+                                                <div id="ge">
+                                                    <div class="input-field col s12">
+                                                        <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                            <option value="">Select GE</option>
+                                                            <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], ''); ?>
+                                                        </select>
+                                                    </div>
+                                                </div>  
+                                                <?php
+                                            }
+                                        }
+                                    } else {
+                                        ?>
+                                        <div id="cwe" style="display: none;">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
+                                                    <option value="" disabled selected>Select CWE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
+
+                                    if ((@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) && (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) && @$_GET['gengineer'] != 0) {
+                                        ?>
+
+                                        <div id="ge">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                    <option value="">Select GE</option>
+                                                    <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], $_GET['gengineer']); ?>
+                                                </select>
+                                            </div>
+                                        </div>
+                                    <?php } else { ?>
+                                        <div id="ge" style="display: none;">
+                                            <div class="input-field col s12">
+                                                <select class="validate required materialSelect" name="gengineer" id="gengineer">
+                                                    <option value="" disabled selected>Select GE</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <?php
+                                    }
                                 } else {
                                     ?>
+                                    <div id="ce" style="display: none;">
+                                        <div class="input-field col s12">
+                                            <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
+                                                <option value="0" disabled selected>Select CE</option>
+                                            </select>
+                                        </div>
+                                    </div>
+
+
                                     <div id="cwe" style="display: none;">
-                                        <div class="input-fields col s4 row">
+                                        <div class="input-field col s12">
                                             <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                                <option value="" disabled selected>Select CWE</option>
+                                                <option value="0" disabled selected>Select CWE</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <?php
-                                }
 
-                                if ((@$_GET['cengineer'] != 0 || @$_GET['cengineer'] != null) && (@$_GET['cwengineer'] != 0 || @$_GET['cwengineer'] != null) && @$_GET['gengineer'] != 0) {
-                                    ?>
-
-                                    <div id="ge">
-                                        <div class="input-fields col s4 row">
-                                            <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                                <option value="">Select GE</option>
-                                                <?php SiteController::actionGetgengineerbycwe($_GET['cwengineer'], $_GET['gengineer']); ?>
-                                            </select>
-                                        </div>
-                                    </div>
-                                <?php } else { ?>
                                     <div id="ge" style="display: none;">
-                                        <div class="input-fields col s4 row">
+                                        <div class="input-field col s12">
                                             <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                                <option value="" disabled selected>Select GE</option>
+                                                <option value="0" disabled selected>Select GE</option>
                                             </select>
                                         </div>
                                     </div>
-                                    <?php
-                                }
-                            } else {
-                                ?>
-                                <div id="ce" style="display: none;">
-                                    <div class="input-fields col s4 row">
-                                        <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
-                                            <option value="0" disabled selected>Select CE</option>
-                                        </select>
-                                    </div>
-                                </div>
+                                <?php } ?>
 
 
-                                <div id="cwe" style="display: none;">
-                                    <div class="input-fields col s4 row">
-                                        <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
-                                            <option value="0" disabled selected>Select CWE</option>
-                                        </select>
-                                    </div>
-                                </div>
-
-                                <div id="ge" style="display: none;">
-                                    <div class="input-fields col s4 row">
-                                        <select class="validate required materialSelect" name="gengineer" id="gengineer">
-                                            <option value="0" disabled selected>Select GE</option>
-                                        </select>
-                                    </div>
-                                </div>
-                            <?php } ?>
+                            </div>
                             <div class="row" style="float:left;width:100%">
                                 <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
                             </div>
                         </form>
-                    </div>
-                    <?php if (@$tenders) {
-                        ?>
-                        <form id="sort-data" method = "post" action = "<?= str_replace('/admin', '', Yii::$app->request->url) ?>">
-                            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-                            <input type="hidden" name="page" value="<?= @$_GET['page'] ?>">
-                            <div class="col s2">
-                                <select class="validate required" name="sort" onchange="submitform()" id="sort">
-                                    <option value="5" <?= (@$_GET['filter'] == 5) ? 'selected' : '' ?>>5</option>
-                                    <option value="10" <?= (@$_GET['filter'] == 10) ? 'selected' : '' ?>>10</option>
-                                    <option value="25" <?= (@$_GET['filter'] == 25) ? 'selected' : '' ?>>25</option>
-                                    <option value="50" <?= (@$_GET['filter'] == 50) ? 'selected' : '' ?>>50</option>
-                                    <option value="100" <?= (@$_GET['filter'] == 100) ? 'selected' : '' ?>>100</option>
-                                </select>
-                            </div>
-                        </form>
-                        <?php
-                    }
-                    if (isset($_GET['submit'])) {
-                        ?>
-                        <table class="responsive-table bordered">
-                            <thead>
-                                <tr>
-                                    <th data-field="email" width="100px">Tender Id</th>
-                                    <th data-field="name" >Details of Contracting Office</th>
-                                    <th data-field="email" width="120px">Cost of Tender</th>
-                                    <th data-field="email" width="100px">Bid end date</th>
-                                    <th data-field="email" width="100px">Bid open date</th>
-                                    <th data-field="email">Status</th>
-                                    <th data-field="email">Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody id="contacts_list">
-                                <?php
-                                if (@$tenders) {
-                                    $i = 0;
-                                    foreach ($tenders as $key => $tender) {
-                                        $tdetails = '';
-                                        $command = Sitecontroller::actionGetcommand($tender->command);
-                                        if (!isset($tender->cengineer) && isset($tender->gengineer)) {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
-                                        } else {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
-                                        }
-                                        $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
-                                        $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
-                                        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
-                                        if ($tender->status == 1 && $tender->is_archived == 1) {
-                                            $status = 'Archived';
-                                            $class = 'orange';
-                                        } elseif ($tender->status == 1) {
-                                            $status = 'Approved';
-                                            $class = 'green';
-                                        } else {
-                                            $status = 'Unapproved';
-                                            $class = 'red';
-                                        }
-                                        if ($tender->on_hold == 1) {
-                                            $classaoc = 'red';
-                                            $text = 'On Hold';
-                                        } else {
-                                            $classaoc = 'green';
-                                            $text = 'Ready';
-                                        }
-                                        $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
-                                        $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
-                                        ?>
-                                        <tr data-id = "<?= $tender->tender_id ?>">
-                                            <td class = ""><?= $tender->tender_id ?></td>
-                                            <td class = ""><?= $tdetails ?></td>
-                                            <td class = ""><?= $tender->cvalue ?></td>
-                                            <td class = ""><?= $tender->bid_end_date ?></td>
-                                            <td class = ""><?= $tender->bid_opening_date ?></td>
-                                            <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
-                                            <td>
-                                                <?php
-                                                if ($user->group_id == 9) {
-                                                    if ($stop_date >= date('Y-m-d H:i:s') && $tender->status == 0) {
-                                                        ?>
-                                                        <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
-                                                        <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
-                                                        <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
-
-                                                        <?php
-                                                    }
-                                                } else {
-                                                    if ($tender->status == 1) {
-
-                                                        if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
+                        <?php if (@$tenders) {
+                            ?>
+                            <form id="sort-data" method = "post" action = "<?= str_replace('/admin', '', Yii::$app->request->url) ?>">
+                                <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                                <input type="hidden" name="page" value="<?= @$_GET['page'] ?>">
+                                <div class="col s2">
+                                    <select class="validate required" name="sort" onchange="submitform()" id="sort">
+                                        <option value="5" <?= (@$_GET['filter'] == 5) ? 'selected' : '' ?>>5</option>
+                                        <option value="10" <?= (@$_GET['filter'] == 10) ? 'selected' : '' ?>>10</option>
+                                        <option value="25" <?= (@$_GET['filter'] == 25) ? 'selected' : '' ?>>25</option>
+                                        <option value="50" <?= (@$_GET['filter'] == 50) ? 'selected' : '' ?>>50</option>
+                                        <option value="100" <?= (@$_GET['filter'] == 100) ? 'selected' : '' ?>>100</option>
+                                    </select>
+                                </div>
+                            </form>
+                            <?php
+                        }
+                        if (isset($_GET['submit'])) {
+                            ?>
+                            <table class="responsive-table bordered">
+                                <thead>
+                                    <tr>
+                                        <th data-field="email" width="100px">Tender Id</th>
+                                        <th data-field="name" width="350px">Details of Contracting Office</th>
+                                        <th data-field="email" width="120px">Cost of Tender</th>
+                                        <th data-field="email" width="120px">Awarded Cost</th>
+                                        <th data-field="email" width="100px">Bid end date</th>
+                                        <th data-field="email">Status</th>
+                                        <th data-field="email">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="contacts_list">
+                                    <?php
+                                    if (@$tenders) {
+                                        $i = 0;
+                                        foreach ($tenders as $key => $tender) {
+                                            $tdetails = '';
+                                            $command = Sitecontroller::actionGetcommand($tender->command);
+                                            if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                            } else {
+                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                            }
+                                            $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
+                                            $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
+                                            $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
+                                            if ($tender->status == 1 && $tender->is_archived == 1) {
+                                                $status = 'Archived';
+                                                $class = 'orange';
+                                            } elseif ($tender->status == 1) {
+                                                $status = 'Approved';
+                                                $class = 'green';
+                                            } else {
+                                                $status = 'Unapproved';
+                                                $class = 'red';
+                                            }
+                                            if ($tender->on_hold == 1) {
+                                                $classaoc = 'red';
+                                                $text = 'On Hold';
+                                            } else {
+                                                $classaoc = 'green';
+                                                $text = 'Ready';
+                                            }
+                                            $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
+                                            $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one();
+                                            ?>
+                                            <tr data-id = "<?= $tender->tender_id ?>">
+                                                <td class = ""><?= $tender->tender_id ?></td>
+                                                <td class = ""><?= $tdetails ?></td>
+                                                <td class = ""><?= $tender->cvalue ?></td>
+                                                <td class = ""><?= ($tender->qvalue) ? $tender->qvalue : '---' ?></td>
+                                                <td class = ""><?= $tender->bid_end_date ?></td>
+                                                <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
+                                                <td>
+                                                    <?php
+                                                    if ($user->group_id == 9) {
+                                                        if ($stop_date >= date('Y-m-d H:i:s') && $tender->status == 0) {
                                                             ?>
-
-                                                            <a href="javascript:void(0);" class="waves-effect waves-light btn green">AOC</a>
+                                                            <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
+                                                            <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                            <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
 
                                                             <?php
-                                                        } else {
-                                                            if ($user->group_id == 4 || $user->group_id == 5) {
-                                                                if ($tender->status == 1 && $tender->is_archived != 1) {
-                                                                    ?>
-                                                                    <a class="waves-effect waves-light btn blue">AOC</a>
-                                                                <?php } ?>
-                                                            <?php } else { ?>
-                                                                <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
-                                                                <?php
-                                                            }
                                                         }
                                                     } else {
-                                                        ?>
-                                                        <a class="waves-effect waves-light btn red">Unapproved</a>
-                                                        <?php
-                                                    }
+                                                        if ($tender->status == 1) {
 
-                                                    if ($tender->status == 1) {
-                                                        if ($user->group_id == 1) {
+                                                            if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
+                                                                ?>
+
+                                                                <a href="javascript:void(0);" class="waves-effect waves-light btn green">AOC</a>
+
+                                                                <?php
+                                                            } elseif ($tender->aoc_status != 1 && $tender->is_archived != 1) {
+                                                                if ($user->group_id == 4 || $user->group_id == 5) {
+                                                                    ?>
+                                                                    <a href="javascript:void(0);" class="waves-effect waves-light btn blue">AOC</a>
+                                                                <?php } else {
+                                                                    ?>
+                                                                    <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
+                                                                    <?php
+                                                                }
+                                                            }
+                                                        } else {
+                                                            ?>
+                                                            <a class="waves-effect waves-light btn red">Unapproved</a>
+                                                            <?php
+                                                        }
+
+                                                        if ($tender->status == 1) {
+                                                            if ($user->group_id == 1) {
+                                                                ?>
+                                                                <a href="<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
+                                                                <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
+                                                                <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
+                                                                <?php
+                                                            }
+                                                        } else {
                                                             ?>
                                                             <a href="<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                                             <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                                             <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
                                                             <?php
                                                         }
-                                                    } else {
                                                         ?>
-                                                        <a href="<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
-                                                        <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
-                                                        <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
-                                                        <?php
-                                                    }
+
+                                                    <?php }
                                                     ?>
 
-                                                <?php }
-                                                ?>
+                                                    <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
+                                                    <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
+                                                    <?php if ($contractor) { ?>
+                                                        <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
+                                                    <?php } ?>
+                                                    <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5)) { ?>
+                                                        <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
+                                                    <?php } ?>
 
-                                                <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
-                                                <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
-                                                <?php if ($contractor) { ?>
-                                                    <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
-                                                <?php } ?>
-                                                <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5)) { ?>
-                                                    <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
-                                                <?php } ?>
+                                                </td>
 
-                                            </td>
-
-                                        </tr>
-                                    <div id="modal<?= $tender->id; ?>" class="modal">
-                                        <div class="modal-content">
-                                            <h4>Confirmation Message</h4>
-                                            <p>Are you sure you want to delete it ?</p>
-                                        </div>
-                                        <div class="modal-footer">
-                                            <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
-                                            <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
-                                        </div>
-                                    </div>
-
-
-                                    <?php
-                                    $i++;
-                                }
-                            }
-                            ?>
-                            </tbody>
-
-                        </table>
-                        <span class="totaltenders"><?= $type ?> Tenders: <?= $total; ?></span>
-                        <?php
-                        echo LinkPager::widget([
-                            'pagination' => $pages,
-                        ]);
-                        ?>
-                        </form>
-                        <?php
-                        if (@$tenders) {
-                            foreach ($tenders as $key => $tender) {
-                                ?>
-
-
-
-                                <div id="modalfiles<?= $tender->id; ?>" class="modal">
-                                    <?php ?>
-                                    <div class="modal-content">
-                                        <h4>View Tender Files</h4>
-
-                                        <div class="row">
-                                            <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
-                                            <div class="input-field col s4">
-                                                <?php if ($tech->tfile != '') { ?>
-                                                    <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
-                                                <?php } else { ?>
-                                                    <a class="notavailable">No Tender files yet</a>
-                                                <?php } ?>
+                                            </tr>
+                                        <div id="modal<?= $tender->id; ?>" class="modal">
+                                            <div class="modal-content">
+                                                <h4>Confirmation Message</h4>
+                                                <p>Are you sure you want to delete it ?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <a href="javascript::void()" class=" modal-action modal-close waves-effect waves-green btn-flat">No</a>
+                                                <a href="<?= Url::to(['site/delete-tender', 'id' => $tender->id]) ?>" class=" modal-action modal-close waves-effect waves-green btn-flat">Yes</a>
                                             </div>
                                         </div>
 
-                                        <h4>View BOQ Sheet</h4>
-                                        <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
-                                        <div class="row">
-                                            <?php
-                                            if (@$finfiles) {
-                                                $i = 0;
-                                                foreach ($finfiles as $ffiles) {
-                                                    if ($i == 0) {
-                                                        $txt = 'BOQ Comparitive List';
+
+                                        <?php
+                                        $i++;
+                                    }
+                                }
+                                ?>
+                                </tbody>
+
+                            </table>
+                            <span class="totaltenders"><?= $type ?> Tenders: <?= $total; ?></span>
+                            <?php
+                            echo LinkPager::widget([
+                                'pagination' => $pages,
+                            ]);
+                            ?>
+                            </form>
+                            <?php
+                            if (@$tenders) {
+                                foreach ($tenders as $key => $tender) {
+                                    ?>
+
+
+
+                                    <div id="modalfiles<?= $tender->id; ?>" class="modal">
+                                        <?php ?>
+                                        <div class="modal-content">
+                                            <h4>View Tender Files</h4>
+
+                                            <div class="row">
+                                                <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
+                                                <div class="input-field col s4">
+                                                    <?php if ($tech->tfile != '') { ?>
+                                                        <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
+                                                    <?php } else { ?>
+                                                        <a class="notavailable">No Tender files yet</a>
+                                                    <?php } ?>
+                                                </div>
+                                            </div>
+
+                                            <h4>View BOQ Sheet</h4>
+                                            <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                            <div class="row">
+                                                <?php
+                                                if (@$finfiles) {
+                                                    $i = 0;
+                                                    foreach ($finfiles as $ffiles) {
+                                                        if ($i == 0) {
+                                                            $txt = 'BOQ Comparitive List';
+                                                            ?>
+                                                            <div class="input-field col s4">
+                                                                <a href="<?= $ffiles->file; ?>" download><?= $txt; ?></a>
+                                                            </div>
+                                                            <?php
+                                                        }
+                                                        ?>
+
+                                                        <?php
+                                                        $i++;
+                                                    }
+                                                } else {
+                                                    ?>
+                                                    <div class="input-field col s4">
+                                                        <a class="notavailable">No BOQ Sheet yet</a>
+                                                    </div>
+                                                <?php }
+                                                ?>
+
+                                            </div>
+                                            <h4>View AOC Files</h4>
+                                            <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
+                                            <div class="row">
+                                                <?php
+                                                if (@$aocfiles) {
+                                                    $i = 0;
+                                                    foreach ($aocfiles as $ffiles) {
+                                                        if ($i == 0) {
+                                                            $txt = 'AOC Summary';
+                                                        } else {
+                                                            $txt = 'Opening Summary';
+                                                        }
                                                         ?>
                                                         <div class="input-field col s4">
                                                             <a href="<?= $ffiles->file; ?>" download><?= $txt; ?></a>
                                                         </div>
                                                         <?php
+                                                        $i++;
                                                     }
-                                                    ?>
-
-                                                    <?php
-                                                    $i++;
-                                                }
-                                            } else {
-                                                ?>
-                                                <div class="input-field col s4">
-                                                    <a class="notavailable">No BOQ Sheet yet</a>
-                                                </div>
-                                            <?php }
-                                            ?>
-
-                                        </div>
-                                        <h4>View AOC Files</h4>
-                                        <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
-                                        <div class="row">
-                                            <?php
-                                            if (@$aocfiles) {
-                                                $i = 0;
-                                                foreach ($aocfiles as $ffiles) {
-                                                    if ($i == 0) {
-                                                        $txt = 'AOC Summary';
-                                                    } else {
-                                                        $txt = 'Opening Summary';
-                                                    }
+                                                } else {
                                                     ?>
                                                     <div class="input-field col s4">
-                                                        <a href="<?= $ffiles->file; ?>" download><?= $txt; ?></a>
+                                                        <a class="notavailable">No AOC files yet</a>
+                                                    </div>
+                                                <?php }
+                                                ?>
+
+                                            </div>
+                                            <div class="row">
+                                                <?php
+                                                if (@$tech->aoc_date) {
+                                                    ?>
+                                                    <div class="input-field col s4">
+                                                        AOC Date - <?= $tech->aoc_date ?>
                                                     </div>
                                                     <?php
-                                                    $i++;
-                                                }
-                                            } else {
+                                                } else {
+                                                    ?>
+                                                    <div class="input-field col s4">
+                                                        <a class="notavailable">AOC Date not available</a>
+                                                    </div>
+                                                <?php }
                                                 ?>
-                                                <div class="input-field col s4">
-                                                    <a class="notavailable">No AOC files yet</a>
-                                                </div>
-                                            <?php }
-                                            ?>
-
-                                        </div>
-                                        <div class="row">
-                                            <?php
-                                            if (@$tech->aoc_date) {
-                                                ?>
-                                                <div class="input-field col s4">
-                                                    AOC Date - <?= $tech->aoc_date ?>
-                                                </div>
-                                                <?php
-                                            } else {
-                                                ?>
-                                                <div class="input-field col s4">
-                                                    <a class="notavailable">AOC Date not available</a>
-                                                </div>
-                                            <?php }
-                                            ?>
-
-                                        </div>
-
-                                    </div>
-
-
-
-                                </div>
-
-                                <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
-                                <?php if ($contractor) { ?>        
-                                    <div id="modalcont<?= $tender->id; ?>" class="modal">
-
-                                        <div class="modal-content"> 
-                                            <h5>Contractor Information</h5>
-
-                                            <div class="row">
-
-                                                <div class="col s6">
-                                                    <h4>Firm Name</h4>
-                                                    <?= $contractor->firm; ?>
-                                                </div>
-
-                                                <div class="col s6">
-                                                    <h4>Name</h4>
-                                                    <?= $contractor->name; ?>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-
-                                                <div class="col s6">
-                                                    <h4>Address</h4>
-                                                    <?= $contractor->address; ?>
-                                                </div>
-
-                                                <div class="col s6">
-                                                    <h4>Contact No.</h4>
-                                                    <?= $contractor->contact; ?>
-                                                </div>
-                                            </div>
-                                            <div class="row">
-
-                                                <div class="col s6">
-                                                    <h4>Email</h4>
-                                                    <?= $contractor->email; ?>
-                                                </div>
 
                                             </div>
 
                                         </div>
-                                    </div>
-                                <?php } ?>
-                                <div id="modalaoc<?= $tender->id; ?>" class="modal">
-
-                                    <div class="modal-content">
-                                        <form id="create-item" method = "post" enctype="multipart/form-data" action = "<?= $baseURL ?>site/aocstatus">
-                                            <h4>AOC Bid Opening Summary Upload</h4>
-                                            <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-                                            <input type="hidden" name="tid" value="<?= $tender->id; ?>">
-                                            <div class="file-field input-field">
-                                                <div class="btn teal lighten-1">
-                                                    <span>File</span>
-                                                    <input type="file" name="fileone" required="">
-                                                </div>
-                                                <div class="file-path-wrapper">
-                                                    <input class="file-path validate" type="text">
-                                                </div>
-                                            </div>
-                                            <h4>BOQ Comparative Summary</h4>
-                                            <div class="file-field input-field">
-                                                <div class="btn teal lighten-1">
-                                                    <span>File</span>
-                                                    <input type="file" name="filetwo" required="">
-                                                </div>
-                                                <div class="file-path-wrapper">
-                                                    <input class="file-path validate" type="text">
-                                                </div>
-                                            </div>
-                                            <h4>Opening Summary</h4>
-                                            <div class="file-field input-field">
-                                                <div class="btn teal lighten-1">
-                                                    <span>File</span>
-                                                    <input type="file" name="filethree" required="">
-                                                </div>
-                                                <div class="file-path-wrapper">
-                                                    <input class="file-path validate" type="text">
-                                                </div>
-                                            </div>
-                                            <div class="input-field col s12">
-                                                <input id="quotedvalue" type="text" name = "qvalue" required="" class="validate required" value="">
-                                                <label for="quotedvalue">Quoted Value</label>
-                                                <!--textarea id="item" name="desc" class="materialize-textarea"></textarea>
-                                                <label for="item">Item description</label-->
-                                            </div>
-                                            <div class="row">
-                                                <div class="input-field col s12 tender<?= $tender->id; ?>">
-                                                    <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" class="pdatepicker required" placeholder="AOC Date">
-                                                </div>
-                                            </div>
-                                            <div class="input-field col s12 row">
-                                                <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
-
-                                                </select>
-                                            </div>
-                                            <a class="waves-effect waves-light btn blue" onclick="showform('<?= $tender->id; ?>')">Add Contractor</a>
-                                            <div class="row contractform<?= $tender->id; ?>" style="display: none;">
-                                                <div class="row">
-                                                    <div class="input-field col s6">
-                                                        <input id="firm<?= $tender->id; ?>" type="text" name = "firm" class="validate required firm" value="<?= @$contractor->firm; ?>">
-                                                        <label for="firm">Name of Firm/CO</label>
-                                                    </div>
 
 
-
-                                                    <div class="input-field col s6">
-                                                        <input id="name<?= $tender->id; ?>" type="text" name = "name" class="validate required name" value="<?= @$contractor->name; ?>">
-                                                        <label for="name">Name</label>
-                                                    </div>
-
-                                                </div>
-                                                <div class="row">
-                                                    <div class="input-field col s6">
-                                                        <textarea id="address<?= $tender->id; ?>" name="address" class="materialize-textarea required address"><?= @$contractor->address; ?></textarea>
-                                                        <label for="address">Address</label>
-                                                    </div>
-
-
-
-                                                    <div class="input-field col s6">
-                                                        <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate required contact" value="<?= @$contractor->contact; ?>">
-                                                        <label for="contact">Contact No.</label>
-                                                    </div>
-
-                                                </div>
-                                                <div class="row">
-                                                    <div class="input-field col s6">
-                                                        <input id="email<?= $tender->id; ?>" type="email" name = "email" class="validate required email" value="<?= @$contractor->email; ?>">
-                                                        <label for="email">Email-Id</label>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                            <input type="submit" name="submit" class="waves-effect waves-light btn blue" value="Submit">
-                                        </form>
 
                                     </div>
 
+                                    <?php $contractor = \common\models\Contractor::find()->where(['id' => $tender->contractor])->one(); ?>
+                                    <?php if ($contractor) { ?>        
+                                        <div id="modalcont<?= $tender->id; ?>" class="modal">
+
+                                            <div class="modal-content"> 
+                                                <h5>Contractor Information</h5>
+
+                                                <div class="row">
+
+                                                    <div class="col s6">
+                                                        <h4>Firm Name</h4>
+                                                        <?= $contractor->firm; ?>
+                                                    </div>
+
+                                                    <div class="col s6">
+                                                        <h4>Name</h4>
+                                                        <?= $contractor->name; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col s6">
+                                                        <h4>Address</h4>
+                                                        <?= $contractor->address; ?>
+                                                    </div>
+
+                                                    <div class="col s6">
+                                                        <h4>Contact No.</h4>
+                                                        <?= $contractor->contact; ?>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+
+                                                    <div class="col s6">
+                                                        <h4>Email</h4>
+                                                        <?= $contractor->email; ?>
+                                                    </div>
+
+                                                </div>
+
+                                            </div>
+                                        </div>
+                                    <?php } ?>
+                                    <div id="modalaoc<?= $tender->id; ?>" class="modal">
+
+                                        <div class="modal-content">
+                                            <form id="create-item" method = "post" enctype="multipart/form-data" action = "<?= $baseURL ?>site/aocstatus">
+                                                <h4>AOC Bid Opening Summary Upload</h4>
+                                                <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                                                <input type="hidden" name="tid" value="<?= $tender->id; ?>">
+                                                <div class="file-field input-field">
+                                                    <div class="btn teal lighten-1">
+                                                        <span>File</span>
+                                                        <input type="file" name="fileone" required="">
+                                                    </div>
+                                                    <div class="file-path-wrapper">
+                                                        <input class="file-path validate" type="text">
+                                                    </div>
+                                                </div>
+                                                <h4>BOQ Comparative Summary</h4>
+                                                <div class="file-field input-field">
+                                                    <div class="btn teal lighten-1">
+                                                        <span>File</span>
+                                                        <input type="file" name="filetwo" required="">
+                                                    </div>
+                                                    <div class="file-path-wrapper">
+                                                        <input class="file-path validate" type="text">
+                                                    </div>
+                                                </div>
+                                                <h4>Opening Summary</h4>
+                                                <div class="file-field input-field">
+                                                    <div class="btn teal lighten-1">
+                                                        <span>File</span>
+                                                        <input type="file" name="filethree" required="">
+                                                    </div>
+                                                    <div class="file-path-wrapper">
+                                                        <input class="file-path validate" type="text">
+                                                    </div>
+                                                </div>
+                                                <div class="input-field col s12">
+                                                    <input id="quotedvalue" type="text" name = "qvalue" required="" class="validate required" value="">
+                                                    <label for="quotedvalue">Quoted Value</label>
+                                                    <!--textarea id="item" name="desc" class="materialize-textarea"></textarea>
+                                                    <label for="item">Item description</label-->
+                                                </div>
+                                                <div class="row">
+                                                    <div class="input-field col s12 tender<?= $tender->id; ?>">
+                                                        <input id="pdate" type="text" name = "aoc_date" data-tid ="<?= $tender->id; ?>" class="pdatepicker required" placeholder="AOC Date">
+                                                    </div>
+                                                </div>
+                                                <div class="input-field col s12 row">
+                                                    <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
+
+                                                    </select>
+                                                </div>
+                                                <a class="waves-effect waves-light btn blue" onclick="showform('<?= $tender->id; ?>')">Add Contractor</a>
+                                                <div class="row contractform<?= $tender->id; ?>" style="display: none;">
+                                                    <div class="row">
+                                                        <div class="input-field col s6">
+                                                            <input id="firm<?= $tender->id; ?>" type="text" name = "firm" class="validate required firm" value="<?= @$contractor->firm; ?>">
+                                                            <label for="firm">Name of Firm/CO</label>
+                                                        </div>
 
 
-                                </div>
-                                <?php
+
+                                                        <div class="input-field col s6">
+                                                            <input id="name<?= $tender->id; ?>" type="text" name = "name" class="validate required name" value="<?= @$contractor->name; ?>">
+                                                            <label for="name">Name</label>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="input-field col s6">
+                                                            <textarea id="address<?= $tender->id; ?>" name="address" class="materialize-textarea required address"><?= @$contractor->address; ?></textarea>
+                                                            <label for="address">Address</label>
+                                                        </div>
+
+
+
+                                                        <div class="input-field col s6">
+                                                            <input id="contact<?= $tender->id; ?>" type="text" name = "contact" class="validate required contact" value="<?= @$contractor->contact; ?>">
+                                                            <label for="contact">Contact No.</label>
+                                                        </div>
+
+                                                    </div>
+                                                    <div class="row">
+                                                        <div class="input-field col s6">
+                                                            <input id="email<?= $tender->id; ?>" type="email" name = "email" class="validate required email" value="<?= @$contractor->email; ?>">
+                                                            <label for="email">Email-Id</label>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <input type="submit" name="submit" class="waves-effect waves-light btn blue" value="Submit">
+                                            </form>
+
+                                        </div>
+
+
+
+                                    </div>
+                                    <?php
+                                }
                             }
                         }
-                    }
-                    ?>
+                        ?>
+                    </div>
                 </div>
             </div>
+
+
+
         </div>
-
-
-
-    </div>
 
 
 </main>

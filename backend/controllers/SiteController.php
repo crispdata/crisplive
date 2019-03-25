@@ -3845,7 +3845,7 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC]);
+        $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['aoc_date' => SORT_ASC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -8989,7 +8989,7 @@ class SiteController extends Controller {
     public function actionAocstatus() {
         $user = Yii::$app->user->identity;
 
-        if ($_POST['contractor'] == '') {
+        if (@$_POST['contractor'] == '') {
             $model = new \common\models\Contractor();
             $model->firm = @$_POST['firm'];
             $model->name = @$_POST['name'];
