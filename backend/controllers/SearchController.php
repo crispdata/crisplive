@@ -193,7 +193,7 @@ class SearchController extends Controller {
                     ['contractor' => $_REQUEST['contype']]
                 ]);
             }
-            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '') {
+            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
                 $tenders->andWhere(['and',
                     ['command' => $_REQUEST['command']]
                 ]);

@@ -23,7 +23,7 @@ $(document).ready(function () {
             cache: true,
         }
     });
-    
+
     $('select.materialSelectcon').select2({
         closeOnSelect: true,
         placeholder: 'All Contractors',
