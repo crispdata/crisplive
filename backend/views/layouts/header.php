@@ -110,6 +110,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
     a.btn.green.asearch {
         /* float: left; */
         margin-left: 15px;
+        font-size: 11px;
     }
 </style>
 <div class="loader-bg"></div>
@@ -311,6 +312,26 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             <i class="material-icons">search</i>
                             Advanced search
                         </a>
+                    </li>
+
+                </ul>
+            <?php } elseif ($user->group_id == 6) { ?>
+                <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/">
+                            <i class="material-icons">dashboard</i>
+                            Dashboard
+                        </a>
+                    </li>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'approvedtenders') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'approvedtenders' || $action == 'archivetenders' || $action == 'searchtenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= $atenders + $archivetenders ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <div class="collapsible-body">
+                            <ul>
+                                <li><a href="/site/approvedtenders" class="<?= ($controller == 'site' && $action == 'approvedtenders') ? 'active-page' : '' ?>">Approved (<?= $atenders; ?>)</a></li>
+                                <li><a href="/site/archivetenders" class="<?= ($controller == 'site' && $action == 'archivetenders') ? 'active-page' : '' ?>">Archived (<?= $archivetenders; ?>)</a></li>
+                                <li><a href="/site/searchtenders" class="<?= ($controller == 'site' && $action == 'searchtenders') ? 'active-page' : '' ?>">Search By Make</a></li>
+                            </ul>
+                        </div>
                     </li>
 
                 </ul>

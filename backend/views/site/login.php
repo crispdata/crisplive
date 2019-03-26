@@ -183,6 +183,31 @@ $cookies->add(new \yii\web\Cookie([
                                     <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
 
                                     <div class="input-field col s12">
+                                        <select name='LoginForm[authtype]' id="authtype" class="contact-authtypes browser-default required <?= isset($errors['authtype']) ? 'invalid' : 'validate' ?>">
+                                            <option value=''>Select Product</option>
+                                            <option value='12' selected>All Products</option>
+                                            <option value='1'>Cables</option>
+                                            <option value='2'>Lighting</option>
+                                            <option value='3'>Fans</option>
+                                            <option value='4'>Accessories</option>
+                                            <option value='5'>Wires</option>
+                                            <option value='6'>DB/MCB/MCCB/Timers</option>
+                                            <option value='7'>Transformers</option>
+                                            <option value='8'>Cable Jointing Kits</option>
+                                            <option value='9'>Panels</option>
+                                            <option value='10'>ACB</option>
+                                            <option value='11'>Motors</option>
+                                        </select>
+                                        <?php
+                                        if (isset($errors['authtype'])) {
+                                            ?>
+                                            <label id="authtype-error" class="error" for="authtype"><?= $errors['authtype'][0] ?></label>
+                                            <?php
+                                        }
+                                        ?>
+                                    </div>
+
+                                    <div class="input-field col s12">
                                         <input id="username" type="text" name = "LoginForm[username]" value = "<?= !empty($model->username) ? $model->username : '' ?>" class="required <?= isset($errors['username']) ? 'invalid' : 'validate' ?>">
                                         <label for="username">Username</label>
                                         <?php
