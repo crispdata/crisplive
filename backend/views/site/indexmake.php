@@ -150,11 +150,26 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #gengg:focus{outline: 0px solid transparent;}
 
 </style>
+
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/zebra_datepicker@latest/dist/css/bootstrap/zebra_datepicker.min.css">
 <?php if ($user->group_id == 4 || $user->group_id == 6) {
     ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script type="text/javascript">
+        $(document).ready(function () {
+            $('#datepicker-range-start').Zebra_DatePicker({
+                pair: $('#datepicker-range-end'),
+                onChange: function (view, elements) {
+                    $("#datepicker-range-end").removeAttr('disabled');
+                }
+            });
+
+            $('#datepicker-range-end').Zebra_DatePicker({
+                direction: true
+            });
+        });
         google.charts.load('current', {'packages': ['corechart']});
     <?php if (isset($details) && count($details)) { ?>
             google.charts.setOnLoadCallback(drawChartpie);
@@ -987,21 +1002,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </select>
                                 </div>
                                 <div class="input-field col s5">
-                                    <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
-                                    if (@$_POST['fromdate']) {
-                                        echo @$_POST['fromdate'];
-                                    }
-                                    ?>">
-                                    <label for="fromdate">From Date</label>
+                                    <label for='fromdate'>From Date</label>
+                                    <input id="fromdate" type="text" name = "fromdate" class="fromdatepicker">
+
                                 </div>
 
                                 <div class="input-field col s5">
-                                    <input id="todate" type="text" name = "todate" disabled="" class="required todatepicker" value="<?php
-                                    if (@$_POST['todate']) {
-                                        echo @$_POST['todate'];
-                                    }
-                                    ?>">
-                                    <label for="todate">To Date</label>
+                                    <label for='todate'>To Date</label>
+                                    <input id="todate" type="text" name = "todate" disabled="" class="todatepicker">
+
                                 </div>
                                 <div class="input-field col s2">
                                     <?php
@@ -1124,7 +1133,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <option value="<?= $type ?>" selected><?= $type ?></option>
                             </select>
                         </div>
-                        
+
                         <div class="col s12 m12 l12">
                             <div class="card visitors-card chart">
                                 <div class="card-content">
@@ -1211,13 +1220,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <td class = "boxzz" id="o5"></td>
                                             </tr>
                                             <tr>
-                                                <td class = "boxzz" id="a1"></td>
-                                                <td class = "boxzz" id="a2"></td>
-                                                <td class = "boxzz" id="a3"></td>
-                                                <td class = "boxzz" id="a4"></td>
-                                                <td class = "boxzz" id="a5"></td>
-                                            </tr>
-                                            <tr>
                                                 <td class = "boxzz" id="b1"></td>
                                                 <td class = "boxzz" id="b2"></td>
                                                 <td class = "boxzz" id="b3"></td>
@@ -1254,7 +1256,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <tr>
                                                 <th data-field="0">Type of Fittings</th>
                                                 <th data-field="1">Approved</th>
-                                                <th data-field="2">Archived</th>
                                                 <th data-field="3" id="lighthead"></th>
                                                 <th data-field="4" id="lightheadtwo"></th>
                                             </tr>
@@ -1264,7 +1265,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <td class = "" id="d1"><select class="validate required materialSelecttype lights" data-field="5" id="typelights" name='typelights'>
                                                     </select></td>
                                                 <td class = "boxzz" id="d2"></td>
-                                                <td class = "boxzz" id="d3"></td>
                                                 <td class = "boxzz" id="d4"></td>
                                                 <td class = "boxzz" id="d5"></td>
 
@@ -1531,5 +1531,5 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </div></div></main>
 <?php } ?>
 
-
+<script src="https://cdn.jsdelivr.net/npm/zebra_datepicker@latest/dist/zebra_datepicker.min.js"></script>
 
