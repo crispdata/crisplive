@@ -2922,13 +2922,20 @@ class SiteController extends Controller {
                     $quantities['headthree'] = 'With ' . $makename->make . '';
                     $mname = $makename->make;
                 }
-
+                $aquantitywithlight = 0;
+                $aquantitywithoutlight = 0;
+                $quantitywithlight = 0;
+                $quantitywithoutlight = 0;
                 /* $quantities['archivedlt'] = $quantityltwith + $quantityltwithout . ' ' . $unit;
                   $quantities['archivedcp'] = $quantitycpwith + $quantitycpwithout . ' ' . $unit;
                   $quantities['archivedar'] = $quantityarwith + $quantityarwithout . ' ' . $unit;
                   $quantities['archivedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit; */
                 $quantities['headone'] = 'Archived';
                 $quantities['headfour'] = 'Approved';
+                $quantities['atotallight'] = $aquantitywithlight + $aquantitywithoutlight . ' ' . $unit;
+                $quantities['totallight'] = $quantitywithlight + $quantitywithoutlight . ' ' . $unit;
+                $quantities['withlight'] = $quantitywithlight . ' ' . $unit;
+                $quantities['withoutlight'] = $quantitywithoutlight . ' ' . $unit;
 
                 /* $quantities['withlt'] = $quantityltwith . ' ' . $unit;
                   $quantities['withcp'] = $quantitycpwith . ' ' . $unit;
@@ -8613,9 +8620,9 @@ class SiteController extends Controller {
             $data[] = '<option value="27">GE (W) JABALPUR - MES</option>';
         } elseif ($value == 12) {
             $data[] = '<option value="28">GE AWC - MES</option>';
-            $data[] = '<option value="29>GE (Maint) Inf School - MES</option>';
-            $data[] = '<option value="323>GE (P) Inf School - MES</option>';
-            $data[] = '<option value="324>GE MCTE - MES</option>';
+            $data[] = '<option value="29">GE (Maint) Inf School - MES</option>';
+            $data[] = '<option value="323">GE (P) Inf School - MES</option>';
+            $data[] = '<option value="324">GE MCTE - MES</option>';
         } elseif ($value == 13) {
             $data[] = '<option value="30">GE DANAPUR - MES</option>';
             $data[] = '<option value="31">GE DIPATOLI - MES</option>';

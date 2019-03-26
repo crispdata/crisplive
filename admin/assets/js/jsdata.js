@@ -346,7 +346,7 @@ $(document).ready(function () {
                                 $('.materialSelecttype').on('contentChanged', function () {
                                     $(this).material_select();
                                 });
-
+                                types += '<option value="">Select Fitting</option>';
                                 $.each(myJSON.tlights, function (key, value) {
                                     if (key != 0) {
                                         types += '<option value="' + key + '">' + value + '</option>';
@@ -535,6 +535,7 @@ $(document).ready(function () {
                         $(this).material_select();
                     });
 
+                    types += '<option value="">Select Fitting</option>';
                     $.each(myJSON.tlights, function (key, value) {
                         if (key != 0) {
                             types += '<option value="' + key + '">' + value + '</option>';
@@ -729,6 +730,7 @@ $(document).ready(function () {
                             $(this).material_select();
                         });
 
+                        types += '<option value="">Select Fitting</option>';
                         $.each(myJSON.tlights, function (key, value) {
                             if (key != 0) {
                                 types += '<option value="' + key + '">' + value + '</option>';
