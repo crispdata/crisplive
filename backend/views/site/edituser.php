@@ -13,6 +13,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         border-color: unset;
     }
     .row{margin-bottom: 0px;}
+    .select2-container {
+        width: 100%!important;
+    }
 </style>
 
 <main class="mn-inner">
@@ -79,6 +82,127 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </select>
                             </div>
 
+                            <?php if ($user->group_id == 6) { ?>
+                                <div class='row'>
+                                    <div class="input-field col s12">
+                                        <select name='authtype' id="authtype" class="contact-authtypes browser-default" onchange="showdivssearch(this.value)">
+                                            <option value=''>Select Product</option>
+                                            <option value='1' <?= (@$user->authtype == 1) ? 'selected' : '' ?>>Cables</option>
+                                            <option value='2' <?= (@$user->authtype == 2) ? 'selected' : '' ?>>Lighting</option>
+                                            <option value='3' <?= (@$user->authtype == 3) ? 'selected' : '' ?>>Wires</option>
+                                            <option value='4' <?= (@$user->authtype == 4) ? 'selected' : '' ?>>Cement</option>
+                                            <option value='5' <?= (@$user->authtype == 5) ? 'selected' : '' ?>>Reinforcement Steel</option>
+                                            <option value='6' <?= (@$user->authtype == 6) ? 'selected' : '' ?>>Structural Steel</option>
+                                            <option value='7' <?= (@$user->authtype == 7) ? 'selected' : '' ?>>Non Structural Steel</option>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="cablesdiv" <?= (@$user->cables) ? '' : 'style="display: none;"' ?> >
+                                       <label for='cables'>Select Cables Makes</label>
+                                        <select name='cables' class="cmakes browser-default" id="cables">
+                                            <option value="0">Select Cables Makes</option>
+                                            <?php
+                                            if (@$cables) {
+                                                foreach ($cables as $cable_) {
+                                                    ?>
+                                                    <option value="<?= $cable_->id ?>" <?= (@$user->cables == $cable_->id) ? 'selected' : '' ?>><?= $cable_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="lightdiv" <?= (@$user->lighting) ? '' : 'style="display: none;"' ?>>
+                                        <label for='lighting'>Select Lighting Makes</label>
+                                        <select name='lighting' class="lmakes browser-default" id="lighting">
+                                            <option value="0">Select Lighting Makes</option>
+                                            <?php
+                                            if (@$lights) {
+                                                foreach ($lights as $light_) {
+                                                    ?>
+                                                    <option value="<?= $light_->id ?>" <?= (@$user->lighting == $light_->id) ? 'selected' : '' ?>><?= $light_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="wiresdiv" <?= (@$user->wires) ? '' : 'style="display: none;"' ?>>
+                                        <label for='wires'>Select Wire Makes</label>
+                                        <select name='wires' class="wmakes browser-default" id="wires">
+                                            <option value="0">Select Wire Makes</option>
+                                            <?php
+                                            if (@$wires) {
+                                                foreach ($wires as $wire_) {
+                                                    ?>
+                                                    <option value="<?= $wire_->id ?>" <?= (@$user->wires == $wire_->id) ? 'selected' : '' ?>><?= $wire_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="cementdiv" <?= (@$user->cement) ? '' : 'style="display: none;"' ?>>
+                                        <label for='cement'>Select Cement Makes</label>
+                                        <select name='cement' class="cementmakes browser-default" id="cement">
+                                            <option value="0">Select Cement Makes</option>
+                                            <?php
+                                            if (@$cements) {
+                                                foreach ($cements as $cement_) {
+                                                    ?>
+                                                    <option value="<?= $cement_->id ?>" <?= (@$user->cement == $cement_->id) ? 'selected' : '' ?>><?= $cement_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="rsteeldiv" <?= (@$user->rsteel) ? '' : 'style="display: none;"' ?>>
+                                        <label for='rsteel'>Select Reinforcement Steel Makes</label>
+                                        <select name='rsteel' class="rmakes browser-default" id="rsteel">
+                                            <option value="0">Select Reinforcement Steel Makes</option>
+                                            <?php
+                                            if (@$rsteel) {
+                                                foreach ($rsteel as $rsteel_) {
+                                                    ?>
+                                                    <option value="<?= $rsteel_->id ?>" <?= (@$user->rsteel == $rsteel_->id) ? 'selected' : '' ?>><?= $rsteel_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="ssteeldiv" <?= (@$user->ssteel) ? '' : 'style="display: none;"' ?>>
+                                        <label for='ssteel'>Select Structural Steel Makes</label>
+                                        <select name='ssteel' class="smakes browser-default" id="ssteel">
+                                            <option value="0">Select Structural Steel Makes</option>
+                                            <?php
+                                            if (@$ssteel) {
+                                                foreach ($ssteel as $ssteel_) {
+                                                    ?>
+                                                    <option value="<?= $ssteel_->id ?>" <?= (@$user->ssteel == $ssteel_->id) ? 'selected' : '' ?>><?= $ssteel_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                    <div class="input-fields col s12" id="nsteeldiv" <?= (@$user->nsteel) ? '' : 'style="display: none;"' ?>>
+                                        <label for='nsteel'>Select Non Structural Steel Makes</label>
+                                        <select name='nsteel' class="nmakes browser-default" id="nsteel">
+                                            <option value="0">Select Non Structural Steel Makes</option>
+                                            <?php
+                                            if (@$nsteel) {
+                                                foreach ($nsteel as $nsteel_) {
+                                                    ?>
+                                                    <option value="<?= $nsteel_->id ?>" <?= (@$user->nsteel == $nsteel_->id) ? 'selected' : '' ?>><?= $nsteel_->make ?></option>
+                                                    <?php
+                                                }
+                                            }
+                                            ?>
+                                        </select>
+                                    </div>
+                                </div>
+                            <?php } ?>
                             <div class="file-field input-field col s12">
                                 <div class="btn teal lighten-1">
                                     <span>Profile Image</span>

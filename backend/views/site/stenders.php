@@ -15,7 +15,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .add-contact{    float: right;
                      margin-right: 15px;}    
     .btn, .btn-flat {
-        font-size: 13px;
+        font-size: 11px;
     }
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
         border-color: unset;

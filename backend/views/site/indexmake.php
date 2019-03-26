@@ -53,6 +53,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .card.visitors-card.make {
         border:5px solid #ff6666;
     }
+    .card.server-card.make {
+        border:5px solid #ff6666;
+    }
     .make .counter{color:#ff6666;}
     .input-field label{color:#4c4c4c;}
     label[for="quotedvalue"] {
@@ -145,9 +148,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
-    
+
 </style>
-<?php if ($user->group_id == 4 || $user->group_id == 6) { ?>
+<?php if ($user->group_id == 4 || $user->group_id == 6) {
+    ?>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
     <script type="text/javascript">
@@ -201,7 +205,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
             var data = google.visualization.arrayToDataTable([
                 ['type', 'value'],
-                ['All Makes', '<?php echo $values; ?>']
+                ['WITH <?= $makename ?>', <?= $mvalues ?>],
+                ['WITHOUT <?= $makename ?>', <?= $others ?>]
             ]);
 
 
@@ -231,7 +236,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
         function drawChart() {
-            var data = google.visualization.arrayToDataTable((<?= json_encode($graphs); ?>));
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'Command');
+            data.addColumn('number', 'All Tenders');
+            data.addColumn('number', '<?= $makename ?>');
+            data.addColumn({type: 'string', role: 'annotation'});
+            data.addRows(<?= json_encode($graphs); ?>);
+
 
             var options = {
                 title: '',
@@ -895,17 +907,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="col s12 m12 l12">
                     <div class="card top">
                         <div class="card-content">
-                            <div class="input-field col s12">
-                                <form id="product-types" method = "post" action = "<?= $baseURL ?>">
-                                    <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-                                    <select class="validate required materialSelect" id="product" name='type'>
-                                        <option value="" disabled selected>Select Product</option>
-                                        <option value="1" <?= (@$_POST['type'] == 1) ? 'selected' : '' ?> >Cables</option>
-                                        <option value="2" <?= (@$_POST['type'] == 2) ? 'selected' : '' ?>>Lighting</option>
-                                        <!--option value="5" <?= (@$_POST['type'] == 5) ? 'selected' : '' ?>>Wires</option-->
-                                    </select>
-                                </form>
-                            </div>
+
                             <?php if (isset($details) && count($details)) { ?>
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="command" id="command" required="">
@@ -1013,8 +1015,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <main class="mn-inner inner-active-sidebar">
                 <div class="middle-content">
                     <div class="row no-m-t no-m-b">
-                        <div class="col s12 m12 l4">
-                            <div class="card stats-card approved">
+                        <div class="col s12 m12 l3">
+                            <div class="card stats-card archive">
                                 <div class="card-content">
                                     <?php
                                     if (@$details) {
@@ -1046,8 +1048,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div id="sparkline-bar"></div>
                             </div>
                         </div>
-                        <div class="col s12 m12 l4">
-                            <div class="card stats-card archive">
+                        <div class="col s12 m12 l3">
+                            <div class="card stats-card approved">
                                 <div class="card-content">
                                     <?php
                                     if (@$details) {
@@ -1075,8 +1077,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div id="sparkline-line"></div>
                             </div>
                         </div>
-                        <div class="col s12 m12 l4">
-                            <div class="card server-card balance">
+                        <div class="col s12 m12 l3">
+                            <div class="card server-card make">
                                 <div class="card-content">
                                     <?php
                                     if (@$details) {
@@ -1102,47 +1104,27 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
                             </div>
                         </div>
-                    </div>
-                    <div class="row no-m-t no-m-b">
-                        <div class="col s12 m12 l8">
-                            <div class="card visitors-card make">
-                                <div class="card-content">
-                                    <span class="card-title">Select Make</span>
-                                    <select class="validate required materialSelect browser-default dashmake" id="dashmake" name='make' style="float:left; width:30%;">
-                                        <option value="" disabled selected>Select Make</option>
-                                        <?php
-                                        if (isset($makes) && count($makes)) {
-                                            foreach ($makes as $_make) {
-                                                ?>
-                                                <option value="<?= $_make->id ?>"><?= $_make->make ?></option>
-                                                <?php
-                                            }
-                                        }
-                                        ?>
-                                    </select>
-                                    <?php
-                                    if (@$_POST['type'] == 1) {
-                                        $value = 'Value in Rs.';
-                                    } else {
-                                        $value = 'Approx avg value in Rs.';
-                                    }
-                                    ?>
-                                    <div class="numbers">
-                                        <span class="stats-counter quantity total"><span class="counter" id="total">0</span><small>Tenders</small></span>
-                                        <span class="stats-counter quantity quantity"><span class="counter" id="quantity">0</span><small><?= $head ?></small></span>
-                                        <span class="stats-counter quantity quantity"><span class="counter" id="value">0</span><small><?= $value ?></small></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="col s12 m12 l4">
+                        <div class="col s12 m12 l3">
                             <div class="card server-card piechart">
                                 <div class="card-content">
                                     <span class="card-title">stats of Quantities of all tenders</span>
-                                    <div id="piechart" style="width: 100%; height: 150px;"></div>
+                                    <div id="piechart" style="width: 100%; height: 110px;"></div>
                                 </div>
                             </div>
                         </div>
+                    </div>
+                    <div class="row no-m-t no-m-b">
+                        <div class='selecttag' style='display:none;'>
+                            <select class="validate required materialSelect browser-default dashmake" id="dashmake" name='make' style="display:none;">
+                                <option value="" disabled>Select Make</option>
+                                <option value="<?= $make ?>" selected><?= $make ?></option>
+                            </select>
+                            <select class="validate required materialSelect browser-default product" id="product" name='product' style="display:none;">
+                                <option value="" disabled>Select Product</option>
+                                <option value="<?= $type ?>" selected><?= $type ?></option>
+                            </select>
+                        </div>
+                        
                         <div class="col s12 m12 l12">
                             <div class="card visitors-card chart">
                                 <div class="card-content">
@@ -1511,7 +1493,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <div class="card-content">
                             <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
                                 <span class="card-title leftside">All Clients</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans+$dcons+$ddeals; ?></span></span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans + $dcons + $ddeals; ?></span></span>
                             </a>
                         </div>
                         <div class="progress stats-card-progress green">
@@ -1519,7 +1501,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">

@@ -323,8 +323,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>">
                                     <label for="enddate">Bid end date</label>
                                 </div>
-
-
                             </div>
 
                             <div class="row">
