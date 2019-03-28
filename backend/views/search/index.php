@@ -10,6 +10,7 @@ $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 <style>
     .add-contact{    float: right;
                      margin-right: 15px;}    
@@ -60,12 +61,50 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         float: left;
     }
     ::placeholder{color:rgba(0,0,0,.6)!important;}
-    input#keyword,#fromdate,#todate {
+    input#keyword,#fromdatesearch,#todatesearch {
         margin-bottom: 0px;
     }
     .row.fullrow {
         margin-bottom: 0px;
-    }   
+    }  
+    .ui-datepicker {
+        width: 25em!important;
+        padding: .2em .2em 0;
+        display: none;
+        z-index: 2!important;
+    }
+    .ui-widget{font-size:20px!important;}
+    .ui-datepicker table {
+        width: 100%;
+        font-size: .7em;
+        border-collapse: collapse;
+        font-family:verdana;
+        margin: 0 0 .4em;
+        color:#000000;
+        background:#FDF8E4;    
+    }
+    .ui-datepicker td {
+
+        border: 0;
+        padding: 1px;
+
+
+    }
+    .ui-datepicker select {
+        display: block!important;
+        float: left;
+        width: 45%!important;
+        margin-left: 15px!important;
+        border: 1px solid #000;
+        border-radius: 10px;
+    }
+    .ui-datepicker td span,
+    .ui-datepicker td a {
+        display: block;
+        padding: .8em;
+        text-align: center!important;
+        text-decoration: none;
+    }
 </style>
 <main class="mn-inner">
     <div class="row">
@@ -108,21 +147,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Dates</b></h5></div>
                                 <div class="input-field col s6">
-                                    <input id="fromdate" type="text" name = "fromdate" class="required fromdatepicker" value="<?php
+                                    <input id="fromdatesearch" type="text" name = "fromdate"  placeholder='From Date' autocomplete="off" value="<?php
                                     if (@$_GET['fromdate']) {
                                         echo @$_GET['fromdate'];
                                     }
                                     ?>">
-                                    <label for="fromdate">From Date</label>
                                 </div>
 
                                 <div class="input-field col s6">
-                                    <input id="todate" type="text" name = "todate" class="required todatepicker" value="<?php
+                                    <input id="todatesearch" type="text" name = "todate" autocomplete="off" placeholder="To Date" value="<?php
                                     if (@$_GET['todate']) {
                                         echo @$_GET['todate'];
                                     }
                                     ?>">
-                                    <label for="todate">To Date</label>
                                 </div>
 
 

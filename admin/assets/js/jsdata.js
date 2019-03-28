@@ -14,6 +14,24 @@ $(document).ready(function () {
     $(".button").click(function () {
         $(this).closest('div.row').remove();
     });
+    
+    $('#fromdatesearch').datepicker({
+        showAnim: "fold",
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+        onSelect: function (selectedDate) {
+            var newDate = $(this).datepicker('getDate');
+            $('#todatesearch').datepicker('option', 'minDate', newDate);
+        }
+    });
+    
+    $('#todatesearch').datepicker({
+        showAnim: "fold",
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+    });
 
     $("#conform").submit(function (e) {
         e.preventDefault();
@@ -174,33 +192,47 @@ $(document).ready(function () {
         });
     });
 
-    $('.fromdatepicker').pickadate({
-        format: 'yyyy-mm-dd',
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
-        onSet: function (ele) {
-            if (ele.select) {
-                var chosen_date = $('.fromdatepicker').val();
-                $('.todatepicker').pickadate('picker').set('min', chosen_date);
-                $(".todatepicker").removeAttr('disabled');
-                this.close();
-            }
-        },
-        onClose: function () {
-            //$('.datepicker').blur();
-            $(document.activeElement).blur()
+    /*$('.fromdatepicker').pickadate({
+     format: 'yyyy-mm-dd',
+     selectMonths: true, // Creates a dropdown to control month
+     selectYears: 15, // Creates a dropdown of 15 years to control year
+     onSet: function (ele) {
+     if (ele.select) {
+     var chosen_date = $('.fromdatepicker').val();
+     $('.todatepicker').pickadate('picker').set('min', chosen_date);
+     $(".todatepicker").removeAttr('disabled');
+     this.close();
+     }
+     },
+     onClose: function () {
+     //$('.datepicker').blur();
+     $(document.activeElement).blur()
+     }
+     });*/
+
+    $('.fromdatepicker').datepicker({
+        showAnim: "fold",
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+        onSelect: function (selectedDate) {
+            var newDate = $(this).datepicker('getDate');
+            $('.todatepicker').datepicker('option', 'minDate', newDate);
+            $(".todatepicker").removeAttr('disabled');
         }
     });
+    
+    
 
-    $('.todatepicker').pickadate({
-        format: 'yyyy-mm-dd',
-        selectMonths: true, // Creates a dropdown to control month
-        selectYears: 15, // Creates a dropdown of 15 years to control year
-        onSet: function (ele) {
-            if (ele.select) {
+    $('.todatepicker').datepicker({
+        showAnim: "fold",
+        dateFormat: "yy-mm-dd",
+        changeMonth: true,
+        changeYear: true,
+        onSelect: function (selectedDate) {
+            if (selectedDate) {
                 var fromdate = $('.fromdatepicker').val();
                 var todate = $('.todatepicker').val();
-                this.close();
 
                 var command = $("#command option:selected").val();
                 var product = $("#product option:selected").val();
@@ -389,12 +421,213 @@ $(document).ready(function () {
                     }
                 });
             }
-        },
-        onClose: function () {
-            //$('.datepicker').blur();
-            $(document.activeElement).blur()
         }
     });
+
+    /* $('.todatepicker').pickadate({
+     format: 'yyyy-mm-dd',
+     selectMonths: true, // Creates a dropdown to control month
+     selectYears: 15, // Creates a dropdown of 15 years to control year
+     onSet: function (ele) {
+     if (ele.select) {
+     var fromdate = $('.fromdatepicker').val();
+     var todate = $('.todatepicker').val();
+     this.close();
+     
+     var command = $("#command option:selected").val();
+     var product = $("#product option:selected").val();
+     var make = $("#dashmake option:selected").val();
+     var sizeval = $("#typefour option:selected").val();
+     $("#typeone").prop('selectedIndex', 0);
+     $("#typeone").material_select();
+     $("#typetwo").prop('selectedIndex', 0);
+     $("#typetwo").material_select();
+     $("#typethree").prop('selectedIndex', 0);
+     $("#typethree").material_select();
+     $("#typefour").prop('selectedIndex', 0);
+     $("#typefour").material_select();
+     
+     if (make != '') {
+     if (product == 1) {
+     $("#cable-size").show();
+     $("#light-type").hide();
+     var ext = 'RM';
+     //$("#light-capacity").hide();
+     } else if (product == 2) {
+     $("#cable-size").hide();
+     $("#light-type").show();
+     var ext = 'NOS';
+     //$("#light-capacity").show();
+     } else {
+     $("#cable-size").hide();
+     $("#light-type").hide();
+     var ext = 'RM';
+     }
+     
+     }
+     
+     var sizes = '';
+     var types = '';
+     var ctypes = '';
+     $.ajax({
+     type: 'post',
+     url: baseUrl + 'site/getmakedetails',
+     data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+     beforeSend: function () {
+     $("#u10").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u20").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u30").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u11").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u21").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u31").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u12").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#chief").hide();
+     $("#cwengg").hide();
+     $("#gengg").hide();
+     $("#curve_chart").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
+     if (make != '') {
+     $("#total").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#value").html('<img src="/assets/images/loading.gif" alt="">');
+     $(".boxzz").html('<img src="/assets/images/loading.gif" alt="">');
+     $("#p2").hide();
+     $("#p3").hide();
+     $("#p4").hide();
+     $("#p5").hide();
+     }
+     },
+     success: function (response) {
+     
+     
+     var myJSON = JSON.parse(response);
+     if (myJSON) {
+     if (make != '') {
+     $("#total").html(myJSON.first.total);
+     $("#quantity").html(myJSON.first.quantity);
+     $("#value").html(myJSON.first.value);
+     }
+     var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
+     if (checkone != 0) {
+     $("#piechart").show();
+     drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
+     } else {
+     $("#piechart").html('No Data Available');
+     }
+     $("#u10").html(myJSON.first.aptenderstotal);
+     $("#u20").html(myJSON.first.aptendersquantity);
+     $("#u30").html(myJSON.first.aptendersprice);
+     $("#u11").html(myJSON.first.artenderstotal);
+     $("#u21").html(myJSON.first.artendersquantity);
+     $("#u31").html(myJSON.first.artendersprice);
+     $("#u12").html(myJSON.first.bltenderstotal);
+     $("#u22").html(myJSON.first.bltendersquantity);
+     $("#u32").html(myJSON.first.bltendersprice);
+     if (myJSON.first.artenders == 0) {
+     $("#cable-size").hide();
+     }
+     if (make != '') {
+     $("#a1").html(myJSON.second.headone);
+     $("#a2").html('0 ' + ext + '');
+     $("#a3").html('0 ' + ext + '');
+     $("#a4").html('0 ' + ext + '');
+     $("#a5").html('0 ' + ext + '');
+     $("#b1").html(myJSON.second.headtwo);
+     $("#b2").html('0 ' + ext + '');
+     $("#b3").html('0 ' + ext + '');
+     $("#b4").html('0 ' + ext + '');
+     $("#b5").html('0 ' + ext + '');
+     $("#c1").html(myJSON.second.headthree);
+     $("#c2").html('0 ' + ext + '');
+     $("#c3").html('0 ' + ext + '');
+     $("#c4").html('0 ' + ext + '');
+     $("#c5").html('0 ' + ext + '');
+     $("#o1").html(myJSON.second.headfour);
+     $("#o2").html('0 ' + ext + '');
+     $("#o3").html('0 ' + ext + '');
+     $("#o4").html('0 ' + ext + '');
+     $("#o5").html('0 ' + ext + '');
+     $("#d2").html(myJSON.second.atotallight);
+     $("#d3").html(myJSON.second.totallight);
+     $("#d4").html(myJSON.second.withlight);
+     $("#d5").html(myJSON.second.withoutlight);
+     $("#e2").html(myJSON.second.totalclight);
+     $("#e3").html(myJSON.second.withclight);
+     $("#lighthead").html('With ' + myJSON.makename);
+     $("#lightheadtwo").html('Without ' + myJSON.makename);
+     $("#capacityhead").html(myJSON.makename);
+     
+     
+     /*$('.materialSelectsize').on('contentChanged', function () {
+     $(this).material_select();
+     });
+     
+     $.each(myJSON.sizes, function (key, value) {
+     if (key != 0) {
+     sizes += '<option value="' + key + '">' + value + '</option>';
+     } else {
+     sizes += '<option value="" disabled required>No Sizes</option>';
+     }
+     }
+     );
+     $("#typefour").html(sizes);
+     $("#typefour").trigger('contentChanged');*/
+
+    /*$('.materialSelecttype').on('contentChanged', function () {
+     $(this).material_select();
+     });
+     types += '<option value="">Select Fitting</option>';
+     $.each(myJSON.tlights, function (key, value) {
+     if (key != 0) {
+     types += '<option value="' + key + '">' + value + '</option>';
+     } else {
+     types += '<option value="" disabled required>No Types</option>';
+     }
+     }
+     );
+     $("#typelights").html(types);
+     $("#typelights").trigger('contentChanged');
+     
+     /*$('.materialSelecttypecapacity').on('contentChanged', function () {
+     $(this).material_select();
+     });
+     
+     $.each(myJSON.clights, function (key, value) {
+     if (key != 0) {
+     ctypes += '<option value="' + key + '">' + value + '</option>';
+     } else {
+     ctypes += '<option value="" disabled required>No Capacity</option>';
+     }
+     }
+     );
+     $("#capacitylights").html(ctypes);
+     $("#capacitylights").trigger('contentChanged');*/
+    /* drawLineChart(myJSON.graph, "curve_chart", myJSON.makename);
+     } else {
+     drawLineChart(myJSON.graph, "curve_chart");
+     }
+     
+     /*if (command == 1 || command == 2 || command == 3 || command == 4 || command == 5 || command == 12 || command == 13) {
+     $("#curve_chart_ce").html('');
+     $("#chief").hide();
+     } else {
+     $("#chief").show();
+     drawLineChartce(myJSON.graphce, "curve_chart_ce");
+     }*/
+    /*}
+     
+     }
+     });
+     }
+     },
+     onClose: function () {
+     //$('.datepicker').blur();
+     $(document.activeElement).blur()
+     }
+     });
+     */
 
     $("#makes0").on('change', function () {
         var make = $(this).children("option:selected").val();
