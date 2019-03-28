@@ -54,7 +54,7 @@ class SiteController extends Controller {
             'verbs' => [
                 'class' => VerbFilter::className(),
                 'actions' => [
-                // 'logout' => ['post'],
+// 'logout' => ['post'],
                 ],
             ],
         ];
@@ -113,7 +113,7 @@ class SiteController extends Controller {
         $daoctenders = [];
 
         if ($user->group_id != 4 || $user->group_id != 6) {
-            //dashboard
+//dashboard
             $dapprovedtenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC])->count();
             $dalltenders = \common\models\Tender::find()->where(['status' => 1])->orWhere(['status' => 0])->count();
             $dunapprovedtenders = \common\models\Tender::find()->where(['status' => 0])->orderBy(['id' => SORT_DESC])->count();
@@ -141,9 +141,9 @@ class SiteController extends Controller {
 
 
 
-            //dashboatd
+//dashboatd
             $finalgraph[] = ['Command', 'All Tenders'];
-            //commands
+//commands
             $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
             foreach ($comm as $i) {
                 $tidsc = [];
@@ -183,7 +183,7 @@ class SiteController extends Controller {
 
 
 
-                //archive
+//archive
                 if (isset($archivetenderscommand) && count($archivetenderscommand)) {
                     foreach ($archivetenderscommand as $_tender) {
                         $archivetidsc[] = $_tender->id;
@@ -208,7 +208,7 @@ class SiteController extends Controller {
 
                 $finalgraph[] = [$command, $graphonequantity];
             }
-            //values
+//values
             $tids = [];
             $iids = [];
             $iidsone = [];
@@ -220,16 +220,16 @@ class SiteController extends Controller {
             $eprice = 0;
 
             if ($type == 1) {
-                //Lt
+//Lt
                 $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                 $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                 $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                //Ht
+//Ht
                 $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
             } else {
-                //Lt
+//Lt
                 $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                 $itemstwo = [];
                 $itemsthree = [];
@@ -374,12 +374,12 @@ class SiteController extends Controller {
             $epriceone = 0;
 
             if ($type == 1) {
-                //Lt
+//Lt
                 $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                 $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                 $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                //Ht
+//Ht
                 $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
             } else {
@@ -659,14 +659,14 @@ class SiteController extends Controller {
             $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
             $maketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
 
-            //dashboatd
+//dashboatd
             $mnamegraph = '';
             if (isset($make) && $make != '') {
                 $makename = \common\models\Make::find()->where(['id' => $make])->one();
                 $mnamegraph = $makename->make;
             }
-            //$finalgraph[] = ['Command', 'All Tenders', $mnamegraph];
-            //commands
+//$finalgraph[] = ['Command', 'All Tenders', $mnamegraph];
+//commands
             $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
             foreach ($comm as $i) {
                 $tidsc = [];
@@ -729,7 +729,7 @@ class SiteController extends Controller {
                 }
             }
 
-            //values
+//values
             $tids = [];
             $iids = [];
             $iidsone = [];
@@ -741,16 +741,16 @@ class SiteController extends Controller {
             $eprice = 0;
 
             if ($type == 1) {
-                //Lt
+//Lt
                 $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                 $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                 $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                //Ht
+//Ht
                 $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                 $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
             } else {
-                //Lt
+//Lt
                 $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                 $itemstwo = [];
                 $itemsthree = [];
@@ -759,6 +759,17 @@ class SiteController extends Controller {
                 $itemssix = [];
             }
 
+
+            //$itemdetailone = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsone]);
+            //$itemdetailtwo = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidstwo]);
+            //$itemdetailthree = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsthree])->andWhere(['!=','prices.price','0']);
+//$itemdetailfour = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsfour]);
+//$itemdetailfive = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsfive]);
+//$itemdetailsix = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidssix]);
+            //$eprice += $itemdetailone->sum('itemdetails.quantity*prices.price');
+            //$eprice += $itemdetailtwo->sum('itemdetails.quantity*prices.price');
+            //echo $eprice += $itemdetailthree->sum('CASE WHEN prices.price != "" THEN itemdetails.quantity*prices.price ELSE "" END');
+            //die();*/
             if (isset($itemsone)) {
                 foreach ($itemsone as $_item) {
                     $iidsone[] = $_item->id;
@@ -810,7 +821,7 @@ class SiteController extends Controller {
             if (isset($itemdetailthree)) {
                 foreach ($itemdetailthree as $_detail) {
                     if ($type == 1) {
-                        $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->one();
+                        $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description, 'mtypefive' => $_detail->core])->andWhere(['!=', 'price', '0'])->one();
                     } else {
                         $price = \common\models\Prices::find()->where(['mtypefour' => $_detail->description])->one();
                     }
@@ -1020,69 +1031,12 @@ class SiteController extends Controller {
             }
 
             if (isset($type)) {
-                if (isset($tenders) && count($tenders)) {
-                    foreach ($tenders as $_tender) {
-                        $tids[] = $_tender->id;
-                    }
-                }
-                $items = \common\models\Item::find()->where(['tender_id' => $tids, 'tenderfour' => $type])->all();
-                if (isset($items) && count($items)) {
-                    foreach ($items as $_item) {
-                        $iids[] = $_item->id;
-                    }
-                }
-                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iids])->all();
-                if (isset($idetails) && count($idetails)) {
-                    foreach ($idetails as $_idetail) {
-                        $allquantity[] = ['quantity' => $_idetail->quantity];
-                    }
-                }
 
-                $maketids = [];
-                if (isset($maketenders) && count($maketenders)) {
-                    foreach ($maketenders as $_tender) {
-                        $maketids[] = $_tender->id;
-                    }
-                }
-                $items = \common\models\Item::find()->where(['tender_id' => $maketids, 'tenderfour' => $type])->all();
+                $idetailsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1]);
+                $idetailstwo = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
 
-                $miids = [];
-                if (isset($items) && count($items)) {
-                    foreach ($items as $_item) {
-                        $miids[] = $_item->id;
-                    }
-                }
-
-                $allmakes = [];
-                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $miids])->all();
-                if (isset($idetails) && count($idetails)) {
-                    foreach ($idetails as $_idetail) {
-                        $allmakes = explode(',', $_idetail->make);
-                        if (in_array($make, $allmakes)) {
-                            $makequantity[] = ['quantity' => $_idetail->quantity];
-                        }
-                    }
-                }
-
-                $sizes = [];
-                $onequantity = 0;
-                if (isset($allquantity) && count($allquantity)) {
-                    foreach ($allquantity as $_quantity) {
-                        if ($_quantity['quantity'] != '' && is_numeric($_quantity['quantity'])) {
-                            $onequantity += $_quantity['quantity'];
-                        }
-                    }
-                }
-
-                $sizes = [];
-                $twoquantity = 0;
-                if (isset($makequantity) && count($makequantity)) {
-                    foreach ($makequantity as $_quantity) {
-                        if ($_quantity['quantity'] != '' && is_numeric($_quantity['quantity'])) {
-                            $twoquantity += $_quantity['quantity'];
-                        }
-                    }
-                }
+                $onequantity = $idetailsone->sum('quantity');
+                $twoquantity = $idetailstwo->sum('quantity');
 
                 if ($type == 1) {
                     $unit = 'RM';
@@ -1110,8 +1064,7 @@ class SiteController extends Controller {
                 $balanced = (count($tenders) - count($maketenders));
                 $balancedq = ($onequantity - $twoquantity);
                 $balancedprice = ($eprice - $epriceone);
-                $makes = \common\models\Make::find()->where(['mtype' => $type, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
-                $sizes = \common\models\Size::find()->where(['mtypeone' => 1, 'mtypetwo' => 1, 'mtypethree' => 1, 'status' => 1])->all();
+
                 $finalarr[] = ['title' => 'All Tenders', 'total' => count($tenders), 'quantity' => $onequantity, 'value' => $this->actionMoneyformat(round($eprice))];
                 $finalarr[] = ['title' => 'With ' . $mnamegraph . '', 'total' => count($maketenders), 'quantity' => $twoquantity, 'value' => $this->actionMoneyformat(round($epriceone))];
                 $finalarr[] = ['title' => 'Without ' . $mnamegraph . '', 'total' => $balanced, 'quantity' => $balancedq, 'value' => $this->actionMoneyformat(round($balancedprice))];
@@ -1148,22 +1101,9 @@ class SiteController extends Controller {
                         'type' => $type,
                         'makename' => $mnamegraph,
                         'head' => @$head,
-                        'sizes' => @$sizes,
                         'others' => @$others,
                         'mvalues' => $makevalues,
                         'graphs' => @$finalgraph,
-                        'alltenders' => $dalltenders,
-                        'approvedtenders' => $dapprovedtenders,
-                        'archivedtenders' => $darchivedtenders,
-                        'unapprovedtenders' => $dunapprovedtenders,
-                        'aoctenders' => $daoctenders,
-                        'dcontractors' => $dcontractors,
-                        'dlogs' => $dlogs,
-                        'dmans' => $dmans,
-                        'dcons' => $dcons,
-                        'ddeals' => $ddeals,
-                        'emmakes' => $emmakes,
-                        'civilmakes' => $civilmakes,
                         'graphsce' => ''
             ]);
         }
@@ -1230,7 +1170,7 @@ class SiteController extends Controller {
                 }
             }
 
-            //value
+//value
             $tids = [];
             $iids = [];
             $iidsone = [];
@@ -1250,68 +1190,68 @@ class SiteController extends Controller {
                 if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
 
                     if ($type == 1) {
-                        //Approved
-                        //Lt
+//Approved
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
 
                         if ($searchtype == 1) {
-                            //Archived
-                            //Lt
+//Archived
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                            //Ht
+//Ht
                             $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         }
                     } else {
-                        //Approved
-                        //Lt
+//Approved
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         if ($searchtype == 1) {
-                            //Archived
-                            //Lt
+//Archived
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         }
                     }
                 } else {
 
                     if ($type == 1) {
-                        //Approved
-                        //Lt
+//Approved
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
 
                         if ($searchtype == 1) {
-                            //Archived
-                            //Lt
+//Archived
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                             $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                             $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                             $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                            //Ht
+//Ht
                             $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                             $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                         }
                     } else {
-                        //Approved
-                        //Lt
+//Approved
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                         if ($searchtype == 1) {
-                            //Archived
-                            //Lt
+//Archived
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                         }
                     }
@@ -1320,31 +1260,31 @@ class SiteController extends Controller {
                 if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
 
                     if ($type == 1) {
-                        //Lt
-                        //$itemsone = \common\models\ItemDetails::find()->select('itemdetails.*')->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
+//Lt
+//$itemsone = \common\models\ItemDetails::find()->select('itemdetails.*')->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->all();
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     } else {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     }
                 } else {
                     if ($type == 1) {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                     } else {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                     }
                 }
@@ -1354,31 +1294,31 @@ class SiteController extends Controller {
                     if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
 
                         if ($type == 1) {
-                            //Lt
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                            //Ht
+//Ht
                             $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                             $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         } else {
-                            //Lt
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         }
                     } else {
 
                         if ($type == 1) {
-                            //Lt
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                             $itemstwoarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                             $itemsthreearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                             $itemsfourarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                            //Ht
+//Ht
                             $itemsfivearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                             $itemssixarc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                         } else {
-                            //Lt
+//Lt
                             $itemsonearc = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.is_archived' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                         }
                     }
@@ -1657,7 +1597,7 @@ class SiteController extends Controller {
 
             if ($searchtype == 1) {
 
-                //Archived
+//Archived
                 if (isset($itemsonearc)) {
                     foreach ($itemsonearc as $_item) {
                         $iidsone[] = $_item->id;
@@ -1788,8 +1728,8 @@ class SiteController extends Controller {
                 $makename = \common\models\Make::find()->where(['id' => $make])->one();
                 $mnamegraph = $makename->make;
             }
-            //$finalgraph[] = ['Command', 'Approved Tenders', $mnamegraph];
-            //commands
+//$finalgraph[] = ['Command', 'Approved Tenders', $mnamegraph];
+//commands
             $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
             foreach ($comm as $i) {
                 $tidsc = [];
@@ -2229,7 +2169,7 @@ class SiteController extends Controller {
                   }
                   }
                   } */
-                //echo $quantitywithoutlight;
+//echo $quantitywithoutlight;
 
 
                 if ($type == 1) {
@@ -2265,7 +2205,7 @@ class SiteController extends Controller {
                   }
                   } */
                 $typelight = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
-                //$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
+//$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
 
                 if (isset($typelight) && count($typelight)) {
                     foreach ($typelight as $_tlight) {
@@ -2381,14 +2321,14 @@ class SiteController extends Controller {
             }
 
 
-            //dashboatd
+//dashboatd
             $mnamegraph = '';
             if (isset($make) && $make != '') {
                 $makename = \common\models\Make::find()->where(['id' => $make])->one();
                 $mnamegraph = $makename->make;
             }
-            //$finalgraph[] = ['Command', 'All Tenders', $mnamegraph];
-            //commands
+//$finalgraph[] = ['Command', 'All Tenders', $mnamegraph];
+//commands
             $comm = ['1', '2', '6', '7', '8', '9', '10', '11', '12'];
             foreach ($comm as $i) {
                 $tidsc = [];
@@ -2458,7 +2398,7 @@ class SiteController extends Controller {
                 }
             }
 
-            //values
+//values
             $tids = [];
             $iids = [];
             $iidsone = [];
@@ -2477,16 +2417,16 @@ class SiteController extends Controller {
                 }
                 if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
                     if ($type == 1) {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     } else {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                         $itemstwo = [];
                         $itemsthree = [];
@@ -2496,16 +2436,16 @@ class SiteController extends Controller {
                     }
                 } else {
                     if ($type == 1) {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->all();
                         $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                         $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->all();
-                        //Ht
+//Ht
                         $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->all();
                         $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->all();
                     } else {
-                        //Lt
+//Lt
                         $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'tenders.command' => $commall, 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->all();
                         $itemstwo = [];
                         $itemsthree = [];
@@ -2516,16 +2456,16 @@ class SiteController extends Controller {
                 }
             } else {
                 if ($type == 1) {
-                    //Lt
+//Lt
                     $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     $itemstwo = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     $itemsthree = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     $itemsfour = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '2'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
-                    //Ht
+//Ht
                     $itemsfive = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '1', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     $itemssix = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 2, 'items.tenderfour' => @$type, 'items.tenderfive' => '2', 'items.tendersix' => '1'])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                 } else {
-                    //Lt
+//Lt
                     $itemsone = \common\models\Item::find()->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['tenders.status' => '1', 'items.tenderthree' => 1, 'items.tenderfour' => @$type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     $itemstwo = [];
                     $itemsthree = [];
@@ -2797,69 +2737,32 @@ class SiteController extends Controller {
             }
 
             if (isset($type)) {
-                if (isset($tenders) && count($tenders)) {
-                    foreach ($tenders as $_tender) {
-                        $tids[] = $_tender->id;
+
+                if (isset($command) && $command != '' && $command != 14) {
+                    if ($command == 1) {
+                        $commall = [1, 3, 4, 5, 13];
+                    } else {
+                        $commall = $command;
                     }
-                }
-                $items = \common\models\Item::find()->where(['tender_id' => $tids, 'tenderfour' => $type])->all();
-                if (isset($items) && count($items)) {
-                    foreach ($items as $_item) {
-                        $iids[] = $_item->id;
+                    if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                        $idetailsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'tenders.command' => $commall])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate]);
+                        $idetailstwo = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'tenders.command' => $commall])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate]);
+                    } else {
+                        $idetailsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'tenders.command' => $commall]);
+                        $idetailstwo = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'tenders.command' => $commall])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
                     }
-                }
-                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $iids])->all();
-                if (isset($idetails) && count($idetails)) {
-                    foreach ($idetails as $_idetail) {
-                        $allquantity[] = ['quantity' => $_idetail->quantity];
+                } else {
+                    if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                        $idetailsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate]);
+                        $idetailstwo = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate]);
+                    } else {
+                        $idetailsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1]);
+                        $idetailstwo = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
                     }
                 }
 
-                $maketids = [];
-                if (isset($maketenders) && count($maketenders)) {
-                    foreach ($maketenders as $_tender) {
-                        $maketids[] = $_tender->id;
-                    }
-                }
-                $items = \common\models\Item::find()->where(['tender_id' => $maketids, 'tenderfour' => $type])->all();
-
-                $miids = [];
-                if (isset($items) && count($items)) {
-                    foreach ($items as $_item) {
-                        $miids[] = $_item->id;
-                    }
-                }
-
-                $allmakes = [];
-                $idetails = \common\models\ItemDetails::find()->where(['item_id' => $miids])->all();
-                if (isset($idetails) && count($idetails)) {
-                    foreach ($idetails as $_idetail) {
-                        $allmakes = explode(',', $_idetail->make);
-                        if (in_array($make, $allmakes)) {
-                            $makequantity[] = ['quantity' => $_idetail->quantity];
-                        }
-                    }
-                }
-
-                $sizes = [];
-                $onequantity = 0;
-                if (isset($allquantity) && count($allquantity)) {
-                    foreach ($allquantity as $_quantity) {
-                        if ($_quantity['quantity'] != '' && is_numeric($_quantity['quantity'])) {
-                            $onequantity += $_quantity['quantity'];
-                        }
-                    }
-                }
-
-                $sizes = [];
-                $twoquantity = 0;
-                if (isset($makequantity) && count($makequantity)) {
-                    foreach ($makequantity as $_quantity) {
-                        if ($_quantity['quantity'] != '' && is_numeric($_quantity['quantity'])) {
-                            $twoquantity += $_quantity['quantity'];
-                        }
-                    }
-                }
+                $onequantity = $idetailsone->sum('quantity');
+                $twoquantity = $idetailstwo->sum('quantity');
 
                 if ($type == 1) {
                     $unit = 'RM';
@@ -2902,7 +2805,7 @@ class SiteController extends Controller {
                   }
                   } */
                 $typelight = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
-                //$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
+//$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
 
                 if (isset($typelight) && count($typelight)) {
                     foreach ($typelight as $_tlight) {
@@ -2926,28 +2829,13 @@ class SiteController extends Controller {
                 $aquantitywithoutlight = 0;
                 $quantitywithlight = 0;
                 $quantitywithoutlight = 0;
-                /* $quantities['archivedlt'] = $quantityltwith + $quantityltwithout . ' ' . $unit;
-                  $quantities['archivedcp'] = $quantitycpwith + $quantitycpwithout . ' ' . $unit;
-                  $quantities['archivedar'] = $quantityarwith + $quantityarwithout . ' ' . $unit;
-                  $quantities['archivedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit; */
+
                 $quantities['headone'] = 'Archived';
                 $quantities['headfour'] = 'Approved';
                 $quantities['atotallight'] = $aquantitywithlight + $aquantitywithoutlight . ' ' . $unit;
                 $quantities['totallight'] = $quantitywithlight + $quantitywithoutlight . ' ' . $unit;
                 $quantities['withlight'] = $quantitywithlight . ' ' . $unit;
                 $quantities['withoutlight'] = $quantitywithoutlight . ' ' . $unit;
-
-                /* $quantities['withlt'] = $quantityltwith . ' ' . $unit;
-                  $quantities['withcp'] = $quantitycpwith . ' ' . $unit;
-                  $quantities['withar'] = $quantityarwith . ' ' . $unit;
-                  $quantities['withsize'] = $quantityallwith . ' ' . $unit;
-
-
-                  $quantities['withoutlt'] = $quantityltwithout . ' ' . $unit;
-                  $quantities['withoutcp'] = $quantitycpwithout . ' ' . $unit;
-                  $quantities['withoutar'] = $quantityarwithout . ' ' . $unit;
-                  $quantities['withoutsize'] = $quantityallwithout . ' ' . $unit; */
-
 
                 $finalarr['aptenderstotal'] = count($tenders);
                 $finalarr['artenderstotal'] = count($maketenders);
@@ -2962,7 +2850,7 @@ class SiteController extends Controller {
                 $othersone = ($onequantity - $twoquantity);
 
                 $labelsone = ['WITH ' . $mnamegraph, 'WITHOUT ' . $mnamegraph];
-                $valuesone = [$twoquantity, $othersone];
+                $valuesone = [(int) $twoquantity, $othersone];
 
 
                 echo json_encode(['first' => $finalarr, 'second' => $quantities, 'sizes' => $getsizes, 'tlights' => $gettlights, 'clights' => $getclights, 'makename' => $mnamegraph, 'labelsone' => $labelsone, 'valuesone' => $valuesone, 'graph' => $finalgraph]);
@@ -2999,9 +2887,9 @@ class SiteController extends Controller {
         }
 
         if ($mnamegraph != '') {
-            //$finalgraphce[] = ['Cheif Engineers', 'Approved Tenders', $mnamegraph];
+//$finalgraphce[] = ['Cheif Engineers', 'Approved Tenders', $mnamegraph];
         } else {
-            //$finalgraphce[] = ['Cheif Engineers', 'Approved Tenders'];
+//$finalgraphce[] = ['Cheif Engineers', 'Approved Tenders'];
         }
 
         if (isset($command) && $command == 14) {
@@ -3073,7 +2961,7 @@ class SiteController extends Controller {
                 }
             }
         } else {
-            //commands
+//commands
             if (isset($cengineers) && count($cengineers)) {
                 foreach ($cengineers as $_cengineer) {
                     $tidsc = [];
@@ -3191,11 +3079,11 @@ class SiteController extends Controller {
             $gengineers = \common\models\Cengineer::find()->where(['command' => $cvalue])->all();
 
             if ($mnamegraph != '') {
-                //$finalgraphcwe[] = ['Garisson Engineers', 'Approved Tenders', $mnamegraph];
+//$finalgraphcwe[] = ['Garisson Engineers', 'Approved Tenders', $mnamegraph];
             } else {
-                //$finalgraphcwe[] = ['Garisson Engineers', 'Approved Tenders'];
+//$finalgraphcwe[] = ['Garisson Engineers', 'Approved Tenders'];
             }
-            //commands
+//commands
             if (isset($gengineers) && count($gengineers)) {
                 foreach ($gengineers as $_cengineer) {
                     $tidsc = [];
@@ -3264,9 +3152,9 @@ class SiteController extends Controller {
             }
         } else {
             if ($mnamegraph != '') {
-                //$finalgraphcwe[] = ['Commander Works Engineers', 'Approved Tenders', $mnamegraph];
+//$finalgraphcwe[] = ['Commander Works Engineers', 'Approved Tenders', $mnamegraph];
             } else {
-                //$finalgraphcwe[] = ['Commander Works Engineers', 'Approved Tenders'];
+//$finalgraphcwe[] = ['Commander Works Engineers', 'Approved Tenders'];
             }
 
 
@@ -3276,7 +3164,7 @@ class SiteController extends Controller {
             } else {
                 $commall = $command;
             }
-            //commands
+//commands
             if (isset($cwengineers) && count($cwengineers)) {
                 foreach ($cwengineers as $_cengineer) {
                     $tidsc = [];
@@ -3383,9 +3271,9 @@ class SiteController extends Controller {
         }
 
         if ($mnamegraph != '') {
-            //$finalgraphge[] = ['Garisson Engineers', 'Approved Tenders', $mnamegraph];
+//$finalgraphge[] = ['Garisson Engineers', 'Approved Tenders', $mnamegraph];
         } else {
-            //$finalgraphge[] = ['Garisson Engineers', 'Approved Tenders'];
+//$finalgraphge[] = ['Garisson Engineers', 'Approved Tenders'];
         }
 
         $cwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $cengineerval])->all();
@@ -3403,7 +3291,7 @@ class SiteController extends Controller {
 
         $geval = $cwids[$rownum];
         $gengineers = \common\models\Gengineer::find()->where(['cwengineer' => $geval])->all();
-        //commands
+//commands
         if (isset($gengineers) && count($gengineers)) {
             foreach ($gengineers as $_cengineer) {
                 $tidsc = [];
@@ -4613,7 +4501,7 @@ class SiteController extends Controller {
 
         $models = $tenders->offset($offset)->limit($items_per_page)->all();
 
-        //$tenders=[];
+//$tenders=[];
         $contractors = [];
 
         if ($val) {
@@ -4664,7 +4552,7 @@ class SiteController extends Controller {
 
 
 
-            //$tenders=[];
+//$tenders=[];
             $contractors = [];
 
             $cables = \common\models\Make::find()->where(['mtype' => 1])->andWhere(['status' => '1'])->orderBy(['make' => SORT_ASC])->all();
@@ -5559,7 +5447,7 @@ class SiteController extends Controller {
                     $detail->capacityfitting = @$_POST['text'][$k];
                     $detail->accessoryone = @$_POST['accessoryone'][$k];
                     $detail->accessorytwo = @$_POST['accessorytwo'][$k];
-                    //$detail->make = @$newarr[$k];
+//$detail->make = @$newarr[$k];
                     $detail->make = implode(',', array_filter($_POST['makes']));
                     $detail->makeid = @$_POST['makeid'][$k];
                     $detail->user_id = $user->UserId;
@@ -5590,7 +5478,7 @@ class SiteController extends Controller {
                             $mdetail->capacityfitting = @$_POST['text'][$k];
                             $mdetail->accessoryone = @$_POST['accessoryone'][$k];
                             $mdetail->accessorytwo = @$_POST['accessorytwo'][$k];
-                            //$mdetail->make = $makes_ids;
+//$mdetail->make = $makes_ids;
                             $mdetail->make = implode(',', $_POST['makes']);
                             $mdetail->makeid = @$_POST['makeid'][$k];
                             $mdetail->user_id = $user->UserId;
@@ -5603,11 +5491,11 @@ class SiteController extends Controller {
                                 $mdetail->status = 0;
                             }
 
-                            $mdetails = \Yii::$app
+                            /*$mdetails = \Yii::$app
                                     ->db
                                     ->createCommand()
                                     ->insert('makedetails', $mdetail)
-                                    ->execute();
+                                    ->execute();*/
                         }
                     }
                 }
@@ -6720,7 +6608,7 @@ class SiteController extends Controller {
             $sizes = [];
             if ($value) {
                 $sizes = \common\models\Size::find()->where(['mtypeone' => $value, 'mtypetwo' => $subone, 'mtypethree' => $subtwo, 'status' => 1])->orderBy(['size' => SORT_ASC])->all();
-                //$sizes = \common\models\Size::find()->where(['mtypeone' => $value, 'status' => 1])->orderBy(['size' => SORT_ASC])->all();
+//$sizes = \common\models\Size::find()->where(['mtypeone' => $value, 'status' => 1])->orderBy(['size' => SORT_ASC])->all();
             } else {
                 $sizes = \common\models\Size::find()->where(['status' => 1])->orderBy(['size' => SORT_ASC])->all();
             }

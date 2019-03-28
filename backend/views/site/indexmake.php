@@ -61,6 +61,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     label[for="quotedvalue"] {
         color:#9e9e9e!important;
     }
+    ::placeholder{color:#365264!important;}
     .piechart {
         background-color: lightblue;
         border:5px solid lightblue;
@@ -148,7 +149,45 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
+    .ui-datepicker {
+        width: 25em!important;
+        padding: .2em .2em 0;
+        display: none;
+        background:#846733;  
+        z-index: 2!important;
+    }
+    .ui-widget{font-size:20px!important;}
+    .ui-datepicker table {
+        width: 100%;
+        font-size: .7em;
+        border-collapse: collapse;
+        font-family:verdana;
+        margin: 0 0 .4em;
+        color:#000000;
+        background:#FDF8E4;    
+    }
+    .ui-datepicker td {
 
+        border: 0;
+        padding: 1px;
+
+
+    }
+    .ui-datepicker select {
+        display: block!important;
+        float: left;
+        width: 45%!important;
+        margin-left: 15px!important;
+        border: 1px solid #000;
+        border-radius: 10px;
+    }
+    .ui-datepicker td span,
+    .ui-datepicker td a {
+        display: block;
+        padding: .8em;
+        text-align: center!important;
+        text-decoration: none;
+    }
 </style>
 
 
@@ -1002,14 +1041,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </select>
                                 </div>
                                 <div class="input-field col s5">
-                                    <label for='fromdate'>From Date</label>
-                                    <input id="fromdate" type="text" name = "fromdate" class="fromdatepicker">
+                                    <input id="fromdate" type="text" name = "fromdate" autocomplete="off"  placeholder='From Date' class="fromdatepicker">
 
                                 </div>
 
                                 <div class="input-field col s5">
-                                    <label for='todate'>To Date</label>
-                                    <input id="todate" type="text" name = "todate" disabled="" class="todatepicker">
+                                    <input id="todate" type="text" name = "todate" disabled="" autocomplete="off" placeholder="To Date" class="todatepicker">
 
                                 </div>
                                 <div class="input-field col s2">
