@@ -4454,7 +4454,7 @@ class SiteController extends Controller {
     public function actionSearchtender() {
         $user = Yii::$app->user->identity;
         $val = $_REQUEST['val'];
-        if ($user->group_id != 4 && $user->group_id != 5) {
+        if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
             $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
         } else {
             $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->andWhere(['status' => 1])->orderBy(['id' => SORT_DESC])->all();
