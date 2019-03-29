@@ -207,7 +207,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div style="text-align: center;"><h5><b>Search By Contractor</b></h5></div>
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelectcon browser-default" name="contype" id="contype">
-                                        <!--option value="">All Contractors</option-->
+                                        <option value="">All Contractors</option>
 
                                     </select>
                                     <?php

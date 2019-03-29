@@ -958,32 +958,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         if (@$_POST['command'] == 1) {
                                             echo "selected";
                                         }
-                                        ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
+                                        ?>>ADG (CG AND PROJECT) CHENNAI</option>
                                         <option value="2" <?php
                                         if (@$_POST['command'] == 2) {
                                             echo "selected";
                                         }
                                         ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
-                                        <option value="3" <?php
-                                        if (@$_POST['command'] == 3) {
-                                            echo "selected";
-                                        }
-                                        ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
-                                        <option value="4" <?php
-                                        if (@$_POST['command'] == 4) {
-                                            echo "selected";
-                                        }
-                                        ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
-                                        <option value="5" <?php
-                                        if (@$_POST['command'] == 5) {
-                                            echo "selected";
-                                        }
-                                        ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
-                                        <option value="13" <?php
-                                        if (@$tender->command == 13) {
-                                            echo "selected";
-                                        }
-                                        ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
                                         <option value="6" <?php
                                         if (@$_POST['command'] == 6) {
                                             echo "selected";
@@ -1548,7 +1528,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <div class="card-content">
                             <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
                                 <span class="card-title leftside">All Clients</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans+$dcons+$ddeals; ?></span></span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans + $dcons + $ddeals; ?></span></span>
                             </a>
                         </div>
                         <div class="progress stats-card-progress green">
@@ -1556,7 +1536,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
                     </div>
                 </div>
-                
+
                 <div class="col s12 m12 l4">
                     <div class="card stats-card">
                         <div class="card-content">
