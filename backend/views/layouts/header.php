@@ -451,6 +451,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 Users
                             </a>
                         </li>
+                        <li class="no-padding <?= ($controller == 'search' && $action == 'items') ? 'active' : '' ?>">
+                            <a class="waves-effect waves-grey" href="/search/items">
+                                <i class="material-icons">search</i>
+                                Search Items
+                            </a>
+                        </li>
                     <?php } ?>
                     <li class="no-padding <?= ($controller == 'search' && $action == 'index') ? 'active' : '' ?>">
                         <a class="waves-effect waves-grey" href="/search/index">
