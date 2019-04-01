@@ -5375,7 +5375,7 @@ class SiteController extends Controller {
             if ($user->group_id == 3) {
                 return $this->redirect(array('site/utenders'));
             } else {
-                return $this->redirect(array('site/atenders'));
+                return $this->redirect(array('site/utenders'));
             }
 
             die();
@@ -7238,13 +7238,13 @@ class SiteController extends Controller {
                 if (isset($ids) && count($ids)) {
                     foreach ($ids as $_id) {
                         $itemdetail = \common\models\ItemDetails::find()->where(['id' => $_id])->one();
-                        $makedetail = \common\models\MakeDetails::find()->where(['item_detail_id' => $_id])->one();
+                        //$makedetail = \common\models\MakeDetails::find()->where(['item_detail_id' => $_id])->one();
                         $itemz = \common\models\Item::find()->where(['id' => $itemdetail->item_id])->one();
                         $itemz->status = 1;
-                        $makedetail->status = 1;
+                        //$makedetail->status = 1;
                         $itemdetail->status = 1;
                         $itemdetail->save();
-                        $makedetail->save();
+                        //$makedetail->save();
                         $itemz->save();
                     }
                 }
