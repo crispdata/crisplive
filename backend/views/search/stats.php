@@ -11,7 +11,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 ?>
 <style>
     .add-contact{    float: right;
-                     margin-right: 15px;}    
+                     margin-right: 15px;}   
+    .card-content>.card-title{font-size:15px!important;}
+    .stats-counter small{font-size:15px!important;}
+    .secondary-title{font-size:15px!important;}
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled{border-color: unset;}
     select#dashmake {
         float: left;
@@ -35,42 +38,42 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     #value img,#total img,#quantity img,.boxzz img,.upper img{width:20px;}
     #curve_chart_ce img{width:50px;}
     span.stats-counter.quantitys {
-        margin-bottom: 30px!important;
+        margin-bottom: 20px!important;
     }
-    .card.stats-card.approved {
+    /*.card.stats-card.approved {
         border:5px solid #6666ff;
-    }
+    }*/
     .approved .leftside{color:#6666ff;}
 
-    .card.stats-card.archive {
+    /*.card.stats-card.archive {
         border:5px solid #00cc00;
-    }
+    }*/
     .archive .leftside{color:#00cc00;}
-    .card.server-card.balance {
+    /*.card.server-card.balance {
         border:5px solid #000;
-    }
+    }*/
     .balance .leftside{color:#000;}
-    .card.visitors-card.make {
+    /*.card.visitors-card.make {
         border:5px solid #ff6666;
-    }
+    }*/
     .make .counter{color:#ff6666;}
     .input-field label{color:#4c4c4c;}
     label[for="quotedvalue"] {
         color:#9e9e9e!important;
     }
     ::placeholder{color:#365264!important;}
-    .piechart {
-        background-color: lightblue;
-        border:5px solid lightblue;
+    /*.piechart {
+        //background-color: lightblue;
+        //border:5px solid lightblue;
     }
-    .chart{background-color: lightgoldenrodyellow;}
-    .products{background-color: lightblue;}
-    .top{background-color: lightskyblue;}
+    //.chart{background-color: lightgoldenrodyellow;}
+    //.products{background-color: lightblue;}
+    //.top{background-color: lightskyblue;}*/
     .numbers {
         float: right;
-        width: 50%;
+        width: 55%;
     }
-    #fromdate,#todate{border-bottom:1px solid #365264;}
+    #fromdate,#todate{border-bottom:1px solid #9e9e9e;}
     #curve_chart_ce img {
         width: 100px;
         text-align: center;
@@ -177,9 +180,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <script type="text/javascript">
     google.charts.load('current', {'packages': ['corechart']});
 <?php if (isset($details) && count($details)) { ?>
-        google.charts.setOnLoadCallback(drawChartpie);
-        google.charts.setOnLoadCallback(drawChart);
-        //google.charts.setOnLoadCallback(drawChartce);
+            google.charts.setOnLoadCallback(drawChartpie);
+            google.charts.setOnLoadCallback(drawChart);
+            //google.charts.setOnLoadCallback(drawChartce);
 <?php } ?>
 
     function drawPieChart(labels, values, id) {
@@ -200,7 +203,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             displayExactValues: true,
             'showRowNumber': false,
             'allowHtml': true,
-            backgroundColor: 'lightblue',
+            backgroundColor: '',
             pieSliceText: 'value-and-percentage',
             is3D: true,
             chartArea: {
@@ -235,7 +238,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             displayExactValues: true,
             'showRowNumber': false,
             'allowHtml': true,
-            backgroundColor: 'lightblue',
+            backgroundColor: '',
             pieSliceText: 'value-and-percentage',
             is3D: true,
             chartArea: {
@@ -262,7 +265,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -368,7 +371,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -505,7 +508,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -624,7 +627,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -759,7 +762,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -859,7 +862,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             curveType: 'function',
             pointsVisible: true,
             focusTarget: 'category',
-            backgroundColor: 'lightgoldenrodyellow',
+            backgroundColor: '',
             chartArea: {
                 left: 110,
                 top: 50,
@@ -1010,7 +1013,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
 
 
-                        </div></div></div></div></main>
+                        </div>
+                        <div class="progress stats-card-progress lightblue">
+                            <div class="determinate lightblue" style="width: 100%"></div>
+                        </div>
+                    </div></div></div></main>
         <main class="mn-inner inner-active-sidebar">
             <div class="middle-content">
                 <div class="row no-m-t no-m-b">
@@ -1044,7 +1051,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 }
                                 ?>
                             </div>
-                            <div id="sparkline-bar"></div>
+                            <div class="progress stats-card-progress blue">
+                                <div class="determinate blue" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col s12 m12 l4">
@@ -1073,7 +1082,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 ?>
 
                             </div>
-                            <div id="sparkline-line"></div>
+                            <div class="progress stats-card-progress green">
+                                <div class="determinate green" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col s12 m12 l4">
@@ -1101,11 +1112,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 }
                                 ?>
                             </div>
+                            <div class="progress stats-card-progress black">
+                                <div class="determinate black" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
                 <div class="row no-m-t no-m-b">
-                    <div class="col s12 m12 l8">
+                    <div class="col s12 m12 l6">
                         <div class="card visitors-card make">
                             <div class="card-content">
                                 <span class="card-title">Select Make</span>
@@ -1134,13 +1148,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <span class="stats-counter quantity quantity"><span class="counter" id="value">0</span><small><?= $value; ?></small></span>
                                 </div>
                             </div>
+                            <div class="progress stats-card-progress red">
+                                <div class="determinate red" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
-                    <div class="col s12 m12 l4">
+                    <div class="col s12 m12 l6">
                         <div class="card server-card piechart">
                             <div class="card-content">
                                 <span class="card-title">stats of Quantities of all tenders</span>
-                                <div id="piechart" style="width: 100%; height: 150px;"></div>
+                                <div id="piechart" style="width: 100%; height: 146px;"></div>
+                            </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
                             </div>
                         </div>
                     </div>
@@ -1150,6 +1170,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="card-title">Comparison between all commands<span class="secondary-title">Stats of all tenders</span></span>
                                 <!--input type="text" id="firstdate" class='datepicker' Placeholder='Select Date'-->
                                 <div id="curve_chart" style="width: 100%; height: 500px"></div>
+                            </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
                             </div>
                         </div>
                     </div>
@@ -1161,6 +1184,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="card-title">Comparison between all chief engineers<span class="secondary-title">Stats of all tenders</span></span>
                                 <div id="curve_chart_ce" style="width: 100%; height: 400px;"></div>
                             </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                     <input type='hidden' value='' id='ceid' name='ceid'>
@@ -1170,6 +1196,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <span class="card-title">Comparison between all commander works engineers<span class="secondary-title">Stats of all tenders</span></span>
                                 <div id="curve_chart_cwe" style="width: 100%; height: 400px;"></div>
                             </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                     <div class="col s12 m12 l12" tabindex='1' id='gengg' style='display:none;'>
@@ -1177,6 +1206,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="card-content">
                                 <span class="card-title">Comparison between all garrison engineers<span class="secondary-title">Stats of all tenders</span></span>
                                 <div id="curve_chart_ge" style="width: 100%; height: 400px;"></div>
+                            </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
                             </div>
                         </div>
                     </div>
@@ -1260,6 +1292,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
 
                             </div>
+                            <div class="progress stats-card-progress lightblue">
+                                <div class="determinate lightblue" style="width: 100%"></div>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -1295,6 +1330,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <div class="upper" id="l2" style="width: 50%; height: 200px;float:left;margin-left:355px;display:none;"></div>
                                 </div>
 
+                            </div>
+                            <div class="progress stats-card-progress lightblue">
+                                <div class="determinate lightblue" style="width: 100%"></div>
                             </div>
                         </div>
                     </div>
