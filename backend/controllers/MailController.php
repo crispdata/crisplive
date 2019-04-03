@@ -39,11 +39,11 @@ class MailController extends Controller {
                 'class' => AccessControl::className(),
                 'rules' => [
                     [
-                        'actions' => ['login', 'signup', 'request-password-reset', 'reset-password', 'error'],
+                        'actions' => ['login', 'signup', 'request-password-reset', 'reset-password', 'error', 'sendmail'],
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'sendmail', 'sendmess', 'uploadawsdata', 'mlogs', 'clogs', 'updatelogs', 'resendmail', 'data', 'getdata'],
+                        'actions' => ['logout', 'index', 'sendmess', 'uploadawsdata', 'mlogs', 'clogs', 'updatelogs', 'resendmail', 'data', 'getdata'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],

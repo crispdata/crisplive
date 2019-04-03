@@ -10,6 +10,12 @@ return [
             'charset' => 'utf8',
             'enableSchemaCache' => false,
         ],
+        'sphinx' => [
+            'class' => 'yii\sphinx\Connection',
+            'dsn' => 'mysql:host=localhost;port=9306;',
+            'username' => 'root',
+            'password' => 'WRcqP^UiFk0#k0L',
+        ],
         'assetManager' => [
             'appendTimestamp' => true,
         ],

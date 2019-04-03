@@ -929,13 +929,72 @@ class SearchController extends Controller {
             $val = @$_REQUEST['sort'];
             $page = @$_REQUEST['page'];
             $filter = @$_REQUEST['filter'];
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '5';
+            }
+            $offset = ($page - 1) * $fval;
 
-            if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
-                $tendersall = \common\models\Tender::find()->select('tenderfiles.file as file, tenders.tender_id,tenders.id')->leftJoin('tenderfiles', 'tenders.id = tenderfiles.tender_id')->where(['tenders.status' => '1', 'tenders.aoc_status' => 1, 'tenderfiles.type' => 2])->orderBy(['tenderfiles.id' => SORT_DESC])->asArray()->all();
+            if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '' && !isset($page)) {
+                $tendersall = \common\models\Tender::find()->select('tenderfiles.file as file, tenders.tender_id,tenders.id')->leftJoin('tenderfiles', 'tenders.id = tenderfiles.tender_id')->where(['tenders.status' => '1', 'tenders.aoc_status' => 1, 'tenderfiles.type' => 2]);
+                $fromdate = @$_REQUEST['fromdate'];
+                $todate = @$_REQUEST['todate'];
+                if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                    $tendersall->andWhere(['and',
+                        ['>=', 'tenders.bid_end_date', $fromdate],
+                        ['<=', 'tenders.bid_end_date', $todate],
+                    ]);
+                } elseif (isset($fromdate) && $fromdate != '') {
+                    $tendersall->andWhere(['and',
+                        ['>=', 'tenders.bid_end_date', $fromdate],
+                    ]);
+                } elseif (isset($todate) && $todate != '') {
+                    $tendersall->andWhere(['and',
+                        ['<=', 'tenders.bid_end_date', $todate],
+                    ]);
+                }
+
+
+                if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
+                    $tendersall->andWhere(['and',
+                        ['command' => $_REQUEST['command']]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => null],
+                        ['gengineer' => null]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => $_REQUEST['cwengineer']],
+                        ['gengineer' => null]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => $_REQUEST['cwengineer']],
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+                if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => null],
+                        ['cwengineer' => null],
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+
+                $alltenders = $tendersall->orderBy(['tenderfiles.id' => SORT_DESC])->asArray()->all();
                 $tids = [];
-             
-                if (isset($tendersall) && count($tendersall)) {
-                    foreach ($tendersall as $_tender) {
+
+                if (isset($alltenders) && count($alltenders)) {
+                    foreach ($alltenders as $_tender) {
                         $files = explode('/', $_tender['file']);
                         $xls_obj = array(
                             'Bucket' => $files[3],
@@ -982,7 +1041,22 @@ class SearchController extends Controller {
                 }
             }
 
-            $tenders = \common\models\Tender::find()->where(['status' => '1', 'aoc_status' => 1, 'id' => $tids]);
+            $session = Yii::$app->session;
+
+            if (!isset($page)) {
+                $alltids = $tids;
+                $session->set('tids', $tids);
+            } else {
+                $alltids = $session->get('tids');
+            }
+
+            $filestodelete = glob($_SERVER['DOCUMENT_ROOT'] . "/admin/files/*"); // get all file names
+            foreach ($filestodelete as $filez) { // iterate files
+                if (is_file($filez))
+                    unlink($filez); // delete file
+            }
+
+            $tenders = \common\models\Tender::find()->where(['status' => '1', 'aoc_status' => 1, 'id' => $alltids]);
 
             $fromdate = @$_REQUEST['fromdate'];
             $todate = @$_REQUEST['todate'];
@@ -1086,7 +1160,7 @@ class SearchController extends Controller {
     public function actionInarray($needle, $haystack, $strict = false) {
         foreach ($haystack as $key => $item) {
             foreach ($item as $value) {
-                if (strpos($value, $needle) !== false) {
+                if (stripos($value, $needle) !== false) {
                     return true;
                 }
             }

@@ -149,7 +149,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                     <?php
                 }
             } else {
-                if ($user->group_id != 4 && $user->group_id != 5) {
+                if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                     ?>
                     <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= Url::to(['site/create-item', 'id' => $tid]) ?>"> Add Item</a>
                     <input type="submit" class="waves-effect waves-light btn blue m-b-xs add-contact" name="btn_delete" value="Delete Items"/>
@@ -168,13 +168,13 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                         <table id = "view-items" class="responsive-table">
                             <thead>
                                 <tr>
-                                    <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
+                                    <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="name">Sr. No.</th>
                                     <th data-field="name">Item Sr. No. of Tender</th>
-                                    <th data-field="name">Item Description</th>
+                                    <th data-field="name" width="200px">Item Description</th>
                                     <th data-field="name">Units</th>
                                     <th data-field="email">Quantity</th>
-                                    <th data-field="email" width="100px">Make</th>
+                                    <th data-field="email" width="300px">Make</th>
                                     <?php
                                     if ($user->group_id == 9) {
                                         if ($stop_date >= date('Y-m-d H:i:s') && $tdetails->status == 0) {
@@ -183,7 +183,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                             <?php
                                         }
                                     } else {
-                                        if ($user->group_id != 4 && $user->group_id != 5) {
+                                        if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                                             ?>
                                             <th data-field="email">Actions</th>
                                             <?php
@@ -200,7 +200,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                     foreach ($idetails as $key => $idetail) {
                                         ?>
                                         <tr data-id = "<?= $idetail->id ?>">
-                                            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($idetail->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $idetail->id; ?>" value="<?php echo $idetail->id; ?>"/><label for="check<?php echo $idetail->id; ?>"></label></td><?php } ?> 
+                                            <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($idetail->status == 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $idetail->id; ?>" value="<?php echo $idetail->id; ?>"/><label for="check<?php echo $idetail->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $key + 1 ?></td>
                                             <td class = ""><?= ($idetail->itemtender) ? $idetail->itemtender : '---' ?></td>
                                             <td class = ""><?= $idetail->description ?></td>
@@ -219,7 +219,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                                     <?php
                                                 }
                                             } else {
-                                                if ($user->group_id != 4 && $user->group_id != 5) {
+                                                if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                                                     ?>
 
                                                     <td><?php
