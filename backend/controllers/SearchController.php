@@ -20,6 +20,8 @@ use PhpOffice\PhpSpreadsheet\Style\Fill;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use backend\controllers\SiteController;
 use Twilio\Rest\Client;
+use Aws\S3\S3Client;
+use Aws\S3\Exception\S3Exception;
 use yii\data\Pagination;
 use yii\widgets\LinkPager;
 
@@ -41,7 +43,7 @@ class SearchController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'stats'],
+                        'actions' => ['logout', 'index', 'stats', 'items'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -895,6 +897,276 @@ class SearchController extends Controller {
         }
 
         return $result;
+    }
+
+    public function actionItems() {
+        $user = Yii::$app->user->identity;
+
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        $s3paths = [];
+        try {
+            // You may need to change the region. It will say in the URL when the bucket is open
+            // and on creation.
+            $s3 = S3Client::factory(
+                            array(
+                                'credentials' => array(
+                                    'key' => Yii::$app->params['IAM_KEY'],
+                                    'secret' => Yii::$app->params['IAM_SECRET']
+                                ),
+                                'version' => 'latest',
+                                'region' => 'us-east-2',
+                            )
+            );
+        } catch (Exception $e) {
+            // We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+            // return a json object.
+            die("Error: " . $e->getMessage());
+        }
+
+        $contractors = [];
+        if (isset($_GET['submit'])) {
+
+            $val = @$_REQUEST['sort'];
+            $page = @$_REQUEST['page'];
+            $filter = @$_REQUEST['filter'];
+            if ($filter) {
+                $fval = $filter;
+            } else {
+                $fval = '5';
+            }
+            $offset = ($page - 1) * $fval;
+
+            if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '' && !isset($page)) {
+                $tendersall = \common\models\Tender::find()->select('tenderfiles.file as file, tenders.tender_id,tenders.id')->leftJoin('tenderfiles', 'tenders.id = tenderfiles.tender_id')->where(['tenders.status' => '1', 'tenders.aoc_status' => 1, 'tenderfiles.type' => 2]);
+                $fromdate = @$_REQUEST['fromdate'];
+                $todate = @$_REQUEST['todate'];
+                if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                    $tendersall->andWhere(['and',
+                        ['>=', 'tenders.bid_end_date', $fromdate],
+                        ['<=', 'tenders.bid_end_date', $todate],
+                    ]);
+                } elseif (isset($fromdate) && $fromdate != '') {
+                    $tendersall->andWhere(['and',
+                        ['>=', 'tenders.bid_end_date', $fromdate],
+                    ]);
+                } elseif (isset($todate) && $todate != '') {
+                    $tendersall->andWhere(['and',
+                        ['<=', 'tenders.bid_end_date', $todate],
+                    ]);
+                }
+
+
+                if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
+                    $tendersall->andWhere(['and',
+                        ['command' => $_REQUEST['command']]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => null],
+                        ['gengineer' => null]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => $_REQUEST['cwengineer']],
+                        ['gengineer' => null]
+                    ]);
+                }
+                if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => $_REQUEST['cengineer']],
+                        ['cwengineer' => $_REQUEST['cwengineer']],
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+                if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                    $tendersall->andWhere(['and',
+                        ['cengineer' => null],
+                        ['cwengineer' => null],
+                        ['gengineer' => $_REQUEST['gengineer']]
+                    ]);
+                }
+
+                $alltenders = $tendersall->orderBy(['tenderfiles.id' => SORT_DESC])->asArray()->all();
+                $tids = [];
+
+                if (isset($alltenders) && count($alltenders)) {
+                    foreach ($alltenders as $_tender) {
+                        $files = explode('/', $_tender['file']);
+                        $xls_obj = array(
+                            'Bucket' => $files[3],
+                            'Key' => $files[4] . '/' . $files[5],
+                            'SaveAs' => $_SERVER['DOCUMENT_ROOT'] . "/admin/" . $files[4] . '/' . $files[5]
+                        );
+
+                        $file = '"s3"://' . $files[3] . '/' . $files[4] . '/' . $files[5];
+                        $s3->getObject($xls_obj);
+
+                        $reader = \PhpOffice\PhpSpreadsheet\IOFactory::createReaderForFile($files[4] . '/' . $files[5]);
+                        $spreadSheet = $reader->setReadDataOnly(true);
+                        $data = $reader->load($files[4] . '/' . $files[5]);
+                        $worksheetData = $reader->listWorksheetInfo($files[4] . '/' . $files[5]);
+                        /* echo '<h3>Worksheet Information</h3>';
+                          echo '<ol>';
+                          foreach ($worksheetData as $worksheet) {
+                          echo '<li>', $worksheet['worksheetName'], '<br />';
+                          echo 'Rows: ', $worksheet['totalRows'],
+                          ' Columns: ', $worksheet['totalColumns'], '<br />';
+                          echo 'Cell Range: A1:',
+                          $worksheet['lastColumnLetter'], $worksheet['totalRows'];
+                          echo '</li>';
+                          }
+                          echo '</ol>'; */
+                        foreach ($worksheetData as $worksheet) {
+                            $range = 'A1:' . $worksheet['lastColumnLetter'] . $worksheet['totalRows'];
+                            break;
+                        }
+                        $dataArray = $data->getActiveSheet()
+                                ->rangeToArray(
+                                $range, // The worksheet range that we want to retrieve
+                                NULL, // Value that should be returned for empty cells
+                                TRUE, // Should formulas be calculated (the equivalent of getCalculatedValue() for each cell)
+                                TRUE, // Should values be formatted (the equivalent of getFormattedValue() for each cell)
+                                TRUE         // Should the array be indexed by cell row and cell column
+                        );
+
+                        $dataArray = array_map('array_values', $dataArray);
+                        if ($this->actionInarray($_REQUEST['keyword'], $dataArray)) {
+                            $tids[] = $_tender['id'];
+                        }
+                    }
+                }
+            }
+
+            $session = Yii::$app->session;
+
+            if (!isset($page)) {
+                $alltids = $tids;
+                $session->set('tids', $tids);
+            } else {
+                $alltids = $session->get('tids');
+            }
+
+            $filestodelete = glob($_SERVER['DOCUMENT_ROOT'] . "/admin/files/*"); // get all file names
+            foreach ($filestodelete as $filez) { // iterate files
+                if (is_file($filez))
+                    unlink($filez); // delete file
+            }
+
+            $tenders = \common\models\Tender::find()->where(['status' => '1', 'aoc_status' => 1, 'id' => $alltids]);
+
+            $fromdate = @$_REQUEST['fromdate'];
+            $todate = @$_REQUEST['todate'];
+            if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
+                $tenders->andWhere(['and',
+                    ['>=', 'tenders.bid_end_date', $fromdate],
+                    ['<=', 'tenders.bid_end_date', $todate],
+                ]);
+            } elseif (isset($fromdate) && $fromdate != '') {
+                $tenders->andWhere(['and',
+                    ['>=', 'tenders.bid_end_date', $fromdate],
+                ]);
+            } elseif (isset($todate) && $todate != '') {
+                $tenders->andWhere(['and',
+                    ['<=', 'tenders.bid_end_date', $todate],
+                ]);
+            }
+
+
+            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
+                $tenders->andWhere(['and',
+                    ['command' => $_REQUEST['command']]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
+                $tenders->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => null],
+                    ['gengineer' => null]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
+                $tenders->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => $_REQUEST['cwengineer']],
+                    ['gengineer' => null]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                $tenders->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => $_REQUEST['cwengineer']],
+                    ['gengineer' => $_REQUEST['gengineer']]
+                ]);
+            }
+            if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                $tenders->andWhere(['and',
+                    ['cengineer' => null],
+                    ['cwengineer' => null],
+                    ['gengineer' => $_REQUEST['gengineer']]
+                ]);
+            }
+
+            $tenders->orderBy(['id' => SORT_DESC])->groupBy(['id']);
+
+            $countQuery = clone $tenders;
+
+            if ($val && $page) {
+                $items_per_page = $val;
+                $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $val, 'pageSize' => $val]);
+                $offset = $pages->offset;
+            } else {
+                if ($filter) {
+                    $fval = $filter;
+                } else {
+                    $fval = '5';
+                }
+                $pages = new Pagination(['totalCount' => $countQuery->count(), 'defaultPageSize' => $fval, 'pageSize' => $fval]);
+                $offset = $pages->offset;
+                $items_per_page = $fval;
+            }
+
+            $models = $tenders->offset($offset)->limit($items_per_page)->all();
+
+            if ($val) {
+                $urlnew = str_replace('/admin', '', Yii::$app->request->url);
+                $parsed = parse_url($urlnew);
+                $query = $parsed['query'];
+
+                parse_str($query, $params);
+
+                unset($params['page']);
+                unset($params['filter']);
+                $string = http_build_query($params);
+                return $this->redirect(array('/search/items?' . $string . '&filter=' . $val . ''));
+            } else {
+                return $this->render('items', [
+                            'tenders' => $models,
+                            'pages' => $pages,
+                            'total' => $countQuery->count(),
+                            'type' => 'All',
+                            'url' => 'items',
+                ]);
+            }
+        } else {
+            return $this->render('items', [
+            ]);
+        }
+    }
+
+    public function actionInarray($needle, $haystack, $strict = false) {
+        foreach ($haystack as $key => $item) {
+            foreach ($item as $value) {
+                if (stripos($value, $needle) !== false) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 }

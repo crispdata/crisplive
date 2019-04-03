@@ -173,7 +173,10 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     </div>
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
-                <a href="/search/index" class="btn green asearch">Advanced Search</a>
+                <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?>
+                    <a href="/search/index" class="btn green asearch">Advanced Search</a>
+                <?php }
+                ?>
                 <!--a class="btn green" id="sbutton">Search</a-->
                 <ul class="right col s7 m3 nav-right-menu setting">
                     <li><a href="javascript:void(0)" data-activates="chat-sidebar" class="chat-button show-on-large"><i class="material-icons">more_vert</i></a></li>
@@ -315,7 +318,20 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     </li>
 
                 </ul>
-            <?php } elseif ($user->group_id == 6) { ?>
+                <?php
+            } elseif ($user->group_id == 6) {
+                $type = @$user->authtype;
+                if ($type == 1) {
+                    $make = $user->cables;
+                } elseif ($type == 2) {
+                    $make = $user->lighting;
+                } else {
+                    $make = $user->cables;
+                }
+
+                $maketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $aocmaketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                ?>
                 <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
                     <li class="no-padding <?= ($controller == 'site' && $action == 'index') ? 'active' : '' ?>">
                         <a class="waves-effect waves-grey" href="/">
@@ -323,17 +339,15 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             Dashboard
                         </a>
                     </li>
-                    <li class="no-padding <?= ($controller == 'site' && $action == 'approvedtenders') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'approvedtenders' || $action == 'archivetenders' || $action == 'searchtenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= $atenders + $archivetenders ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'aoctenders' || $action == 'atenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= count($maketenders); ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <li><a href="/site/approvedtenders" class="<?= ($controller == 'site' && $action == 'approvedtenders') ? 'active-page' : '' ?>">Approved (<?= $atenders; ?>)</a></li>
-                                <li><a href="/site/archivetenders" class="<?= ($controller == 'site' && $action == 'archivetenders') ? 'active-page' : '' ?>">Archived (<?= $archivetenders; ?>)</a></li>
-                                <li><a href="/site/searchtenders" class="<?= ($controller == 'site' && $action == 'searchtenders') ? 'active-page' : '' ?>">Search By Make</a></li>
+                                <li><a href="/site/aoctenders" class="<?= ($controller == 'site' && $action == 'aoctenders') ? 'active-page' : '' ?>">AOC (<?= count($aocmaketenders); ?>)</a></li>
+                                <li><a href="/site/atenders" class="<?= ($controller == 'site' && $action == 'atenders') ? 'active-page' : '' ?>">Without AOC (<?= count($maketenders) - count($aocmaketenders); ?>)</a></li>
                             </ul>
                         </div>
                     </li>
-
                 </ul>
             <?php } else { ?>
                 <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
@@ -451,7 +465,14 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 Users
                             </a>
                         </li>
+
                     <?php } ?>
+                    <li class="no-padding <?= ($controller == 'search' && $action == 'items') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/search/items">
+                            <i class="material-icons">search</i>
+                            Search Items
+                        </a>
+                    </li>   
                     <li class="no-padding <?= ($controller == 'search' && $action == 'index') ? 'active' : '' ?>">
                         <a class="waves-effect waves-grey" href="/search/index">
                             <i class="material-icons">search</i>

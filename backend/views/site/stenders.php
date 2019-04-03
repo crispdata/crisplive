@@ -147,7 +147,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 }
                                             } else {
                                                 if ($tender->status == 1) {
-                                                    if ($user->group_id != 4 && $user->group_id != 5) {
+                                                    if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                                                         if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                             ?>
 
@@ -169,7 +169,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                             <a class="waves-effect waves-light btn green">AOC</a>
                                                             <?php
                                                         } else {
-                                                            if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
+                                                            if ($tender->status == 1 && $tender->is_archived != 1) {
                                                                 ?>
 
                                                                 <a class="waves-effect waves-light btn blue">AOC</a>

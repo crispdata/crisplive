@@ -1206,7 +1206,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
 
                     </div>
-                    <div class="row no-m-t no-m-b"  id = "cable-size" style="display: none;">
+                    <div class="row no-m-t no-m-b"  id = "cable-size" <?= ($type == 1) ? '' : 'style=display:none' ?>>
                         <div class="col s12 m12 l12">
                             <div class="card invoices-card products">
                                 <div class="card-content">
@@ -1217,7 +1217,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <tr>
                                                 <th data-field="0" width="200px">Type of Cables</th>
                                                 <th data-field="1"><select class="validate required materialSelect cables" data-field="1" id="typeone" name='typeone'>
-                                                        <option value="" disabled>Select LT/HT</option>
+                                                        <option value="" selected>Select LT/HT</option>
                                                         <option value="1" >LT</option>
                                                         <option value="2" >HT</option>
                                                     </select></th>
@@ -1247,25 +1247,25 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </thead>
                                         <tbody id="sizes-list">
                                             <tr>
-                                                <td class = "boxzz" id="o1"></td>
-                                                <td class = "boxzz" id="o2"></td>
-                                                <td class = "boxzz" id="o3"></td>
-                                                <td class = "boxzz" id="o4"></td>
-                                                <td class = "boxzz" id="o5"></td>
+                                                <td class = "boxzz" id="o1">All</td>
+                                                <td class = "boxzz" id="o2">0 RM</td>
+                                                <td class = "boxzz" id="o3">0 RM</td>
+                                                <td class = "boxzz" id="o4">0 RM</td>
+                                                <td class = "boxzz" id="o5">0 RM</td>
                                             </tr>
                                             <tr>
-                                                <td class = "boxzz" id="b1"></td>
-                                                <td class = "boxzz" id="b2"></td>
-                                                <td class = "boxzz" id="b3"></td>
-                                                <td class = "boxzz" id="b4"></td>
-                                                <td class = "boxzz" id="b5"></td>
+                                                <td class = "boxzz" id="b1">Without <?= $makename ?></td>
+                                                <td class = "boxzz" id="b2">0 RM</td>
+                                                <td class = "boxzz" id="b3">0 RM</td>
+                                                <td class = "boxzz" id="b4">0 RM</td>
+                                                <td class = "boxzz" id="b5">0 RM</td>
                                             </tr>
                                             <tr>
-                                                <td class = "boxzz" id="c1"></td>
-                                                <td class = "boxzz" id="c2"></td>
-                                                <td class = "boxzz" id="c3"></td>
-                                                <td class = "boxzz" id="c4"></td>
-                                                <td class = "boxzz" id="c5"></td>
+                                                <td class = "boxzz" id="c1">With <?= $makename ?></td>
+                                                <td class = "boxzz" id="c2">0 RM</td>
+                                                <td class = "boxzz" id="c3">0 RM</td>
+                                                <td class = "boxzz" id="c4">0 RM</td>
+                                                <td class = "boxzz" id="c5">0 RM</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -1283,7 +1283,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                         </div>
                     </div>
-                    <div class="row no-m-t no-m-b"  id = "light-type" style="display: none;">
+                    <div class="row no-m-t no-m-b"  id = "light-type" <?= ($type == 2) ? '' : 'style=display:none' ?>>
                         <div class="col s12 m12 l12">
                             <div class="card invoices-card products">
                                 <div class="card-content">
@@ -1292,18 +1292,28 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <thead>
                                             <tr>
                                                 <th data-field="0">Type of Fittings</th>
-                                                <th data-field="1">Approved</th>
-                                                <th data-field="3" id="lighthead"></th>
-                                                <th data-field="4" id="lightheadtwo"></th>
+                                                <th data-field="1">All</th>
+                                                <th data-field="3" id="lighthead">With <?= $makename ?></th>
+                                                <th data-field="4" id="lightheadtwo">Without <?= $makename ?></th>
                                             </tr>
                                         </thead>
                                         <tbody id="types-list">
                                             <tr>
                                                 <td class = "" id="d1"><select class="validate required materialSelecttype lights" data-field="5" id="typelights" name='typelights'>
+                                                        <option value="" selected>Select Fitting</option>
+                                                        <?php
+                                                        if (isset($tlights) && count($tlights)) {
+                                                            foreach ($tlights as $k => $_light) {
+                                                                ?>
+                                                                <option value="<?= $k ?>"><?= $_light ?></option>
+                                                                <?php
+                                                            }
+                                                        }
+                                                        ?>
                                                     </select></td>
-                                                <td class = "boxzz" id="d2"></td>
-                                                <td class = "boxzz" id="d4"></td>
-                                                <td class = "boxzz" id="d5"></td>
+                                                <td class = "boxzz" id="d2">0 NOS</td>
+                                                <td class = "boxzz" id="d4">0 NOS</td>
+                                                <td class = "boxzz" id="d5">0 NOS</td>
 
                                             </tr>
 

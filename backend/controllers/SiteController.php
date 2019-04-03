@@ -659,6 +659,7 @@ class SiteController extends Controller {
             $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
             $maketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
 
+
 //dashboatd
             $mnamegraph = '';
             if (isset($make) && $make != '') {
@@ -760,16 +761,16 @@ class SiteController extends Controller {
             }
 
 
-            //$itemdetailone = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsone]);
-            //$itemdetailtwo = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidstwo]);
-            //$itemdetailthree = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsthree])->andWhere(['!=','prices.price','0']);
+//$itemdetailone = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsone]);
+//$itemdetailtwo = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidstwo]);
+//$itemdetailthree = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsthree])->andWhere(['!=','prices.price','0']);
 //$itemdetailfour = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsfour]);
 //$itemdetailfive = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidsfive]);
 //$itemdetailsix = \common\models\ItemDetails::find()->leftJoin('prices', 'itemdetails.description = prices.mtypefour AND itemdetails.core = prices.mtypefive')->where(['itemdetails.item_id' => $iidssix]);
-            //$eprice += $itemdetailone->sum('itemdetails.quantity*prices.price');
-            //$eprice += $itemdetailtwo->sum('itemdetails.quantity*prices.price');
-            //echo $eprice += $itemdetailthree->sum('CASE WHEN prices.price != "" THEN itemdetails.quantity*prices.price ELSE "" END');
-            //die();*/
+//$eprice += $itemdetailone->sum('itemdetails.quantity*prices.price');
+//$eprice += $itemdetailtwo->sum('itemdetails.quantity*prices.price');
+//echo $eprice += $itemdetailthree->sum('CASE WHEN prices.price != "" THEN itemdetails.quantity*prices.price ELSE "" END');
+//die();*/
             if (isset($itemsone)) {
                 foreach ($itemsone as $_item) {
                     $iidsone[] = $_item->id;
@@ -1049,6 +1050,17 @@ class SiteController extends Controller {
                     $head = 'Quantity in Meter';
                 }
 
+                $gettlights = [];
+
+                $typelight = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
+//$capacitylight = \common\models\Fitting::find()->where(['type' => 2])->orderBy(['text' => SORT_ASC])->all();
+
+                if (isset($typelight) && count($typelight)) {
+                    foreach ($typelight as $_tlight) {
+                        $gettlights[$_tlight->id] = $_tlight->text;
+                    }
+                }
+
                 if ($type == 2) {
                     $eprice = $onequantity * 500;
                     $epriceone = $twoquantity * 500;
@@ -1100,6 +1112,7 @@ class SiteController extends Controller {
                         'make' => @$make,
                         'type' => $type,
                         'makename' => $mnamegraph,
+                        'tlights' => $gettlights,
                         'head' => @$head,
                         'others' => @$others,
                         'mvalues' => $makevalues,
@@ -2231,7 +2244,7 @@ class SiteController extends Controller {
                   $quantities['archivedar'] = $quantityarwith + $quantityarwithout . ' ' . $unit;
                   $quantities['archivedsize'] = $quantityallwith + $quantityallwithout . ' ' . $unit; */
                 $quantities['headone'] = 'Archived';
-                $quantities['headfour'] = 'Approved';
+                $quantities['headfour'] = 'All';
 
                 /* $quantities['withlt'] = $quantityltwith . ' ' . $unit;
                   $quantities['withcp'] = $quantitycpwith . ' ' . $unit;
@@ -2831,7 +2844,7 @@ class SiteController extends Controller {
                 $quantitywithoutlight = 0;
 
                 $quantities['headone'] = 'Archived';
-                $quantities['headfour'] = 'Approved';
+                $quantities['headfour'] = 'All';
                 $quantities['atotallight'] = $aquantitywithlight + $aquantitywithoutlight . ' ' . $unit;
                 $quantities['totallight'] = $quantitywithlight + $quantitywithoutlight . ' ' . $unit;
                 $quantities['withlight'] = $quantitywithlight . ' ' . $unit;
@@ -4454,10 +4467,20 @@ class SiteController extends Controller {
     public function actionSearchtender() {
         $user = Yii::$app->user->identity;
         $val = $_REQUEST['val'];
-        if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
-            $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
+//$query = new \yii\sphinx\Query();
+
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['like', 'tenders.tender_id', '%' . $val . '%', false])->andWhere(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
         } else {
-            $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->andWhere(['status' => 1])->orderBy(['id' => SORT_DESC])->all();
+            $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
         }
         $contractors = [];
         $pages = [];
@@ -4476,8 +4499,21 @@ class SiteController extends Controller {
         $val = @$_POST['sort'];
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
+        $user = Yii::$app->user->identity;
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
 
-        $tenders = \common\models\Tender::find()->orderBy(['id' => SORT_DESC]);
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+        } else {
+            $tenders = \common\models\Tender::find()->orderBy(['id' => SORT_DESC]);
+        }
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -4746,12 +4782,27 @@ class SiteController extends Controller {
     }
 
     public function actionAoctenders() {
-
+        $user = Yii::$app->user->identity;
         $val = @$_POST['sort'];
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC]);
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
+
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+        } else {
+            $tenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC]);
+        }
+
+
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -5041,8 +5092,22 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
 
-        $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.aoc_status' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+        } else {
+            $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
+        }
+
+
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -5491,11 +5556,11 @@ class SiteController extends Controller {
                                 $mdetail->status = 0;
                             }
 
-                            /*$mdetails = \Yii::$app
-                                    ->db
-                                    ->createCommand()
-                                    ->insert('makedetails', $mdetail)
-                                    ->execute();*/
+                            /* $mdetails = \Yii::$app
+                              ->db
+                              ->createCommand()
+                              ->insert('makedetails', $mdetail)
+                              ->execute(); */
                         }
                     }
                 }
@@ -6717,7 +6782,21 @@ class SiteController extends Controller {
             return $this->redirect(array('site/atenders'));
         }
 
-        $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
+            $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+        } else {
+            $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+        }
+
+
 
         if (@$idetails) {
             foreach ($idetails as $idetail) {
@@ -6730,7 +6809,7 @@ class SiteController extends Controller {
                     foreach ($makeids as $mid) {
                         $makename = \common\models\Make::find()->where(['id' => $mid])->one();
                         if (@$makename) {
-                            if ($user->group_id != 3) {
+                            if ($user->group_id != 3 && $user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                                 $makenameall .= '<span class="viewmake" id="' . $idetail->id . $mid . '">' . $makename->make . '<span class="singlemake" id="inner' . $idetail->id . $mid . '" itemid="' . $idetail->id . '" mid="' . $mid . '">&#10008;</span></span>';
                             } else {
                                 $makenameall .= '<span class="viewmake" id="' . $idetail->id . $mid . '">' . $makename->make . '</span>';
@@ -7186,7 +7265,7 @@ class SiteController extends Controller {
                 $tmodel->status = 0;
                 $tmodel->technical_status = 0;
                 $tmodel->financial_status = 0;
-                $tmodel->aoc_status = 0;
+                $tmodel->aoc_status = '';
                 $tmodel->aoc_date = '';
                 $tmodel->save();
             }
@@ -7226,7 +7305,7 @@ class SiteController extends Controller {
                         $tmodel->status = 0;
                         $tmodel->technical_status = 0;
                         $tmodel->financial_status = 0;
-                        $tmodel->aoc_status = 0;
+                        $tmodel->aoc_status = '';
                         $tmodel->aoc_date = '';
                         $tmodel->save();
                     }
@@ -7238,13 +7317,13 @@ class SiteController extends Controller {
                 if (isset($ids) && count($ids)) {
                     foreach ($ids as $_id) {
                         $itemdetail = \common\models\ItemDetails::find()->where(['id' => $_id])->one();
-                        //$makedetail = \common\models\MakeDetails::find()->where(['item_detail_id' => $_id])->one();
+//$makedetail = \common\models\MakeDetails::find()->where(['item_detail_id' => $_id])->one();
                         $itemz = \common\models\Item::find()->where(['id' => $itemdetail->item_id])->one();
                         $itemz->status = 1;
-                        //$makedetail->status = 1;
+//$makedetail->status = 1;
                         $itemdetail->status = 1;
                         $itemdetail->save();
-                        //$makedetail->save();
+//$makedetail->save();
                         $itemz->save();
                     }
                 }
