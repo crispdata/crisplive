@@ -348,6 +348,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             </ul>
                         </div>
                     </li>
+                    <li class="no-padding <?= ($controller == 'products' && $action == 'addresses') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/products/addresses">
+                            <i class="material-icons">perm_contact_calendar</i>
+                            Office Addresses
+                        </a>
+                    </li>
                 </ul>
             <?php } else { ?>
                 <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
@@ -435,7 +441,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                     <li><a href="/mail/index" class="<?= ($controller == 'mail' && $action == 'index') ? 'active-page' : '' ?>">Send Mail</a></li>
                                     <li><a href="/mail/clogs" class="<?= ($controller == 'mail' && $action == 'clogs') ? 'active-page' : '' ?>">Clients Logs</a></li>
                                     <li><a href="/mail/mlogs" class="<?= ($controller == 'mail' && $action == 'mlogs') ? 'active-page' : '' ?>">Manufacturers Logs</a></li>
-                                    <!--li><a href="/mail/data" class="<?= ($controller == 'mail' && $action == 'data') ? 'active-page' : '' ?>">Get Data</a></li-->
+                                    <li><a href="/mail/data" class="<?= ($controller == 'mail' && $action == 'data') ? 'active-page' : '' ?>">Get Data</a></li>
                                 </ul>
                             </div>
                         </li>

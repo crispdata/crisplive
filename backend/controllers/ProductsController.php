@@ -974,9 +974,48 @@ class ProductsController extends Controller {
     }
 
     public function actionAddresses() {
-        $addresses = \common\models\Addresses::find()->where(['status' => 1])->all();
+
+        if (isset($_POST['submit'])) {
+            $addresses = \common\models\Addresses::find()->where(['status' => 1]);
+            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
+                $addresses->andWhere(['and',
+                    ['command' => $_REQUEST['command']]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
+                $addresses->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => null],
+                    ['gengineer' => null]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
+                $addresses->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => $_REQUEST['cwengineer']],
+                    ['gengineer' => null]
+                ]);
+            }
+            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                $addresses->andWhere(['and',
+                    ['cengineer' => $_REQUEST['cengineer']],
+                    ['cwengineer' => $_REQUEST['cwengineer']],
+                    ['gengineer' => $_REQUEST['gengineer']]
+                ]);
+            }
+            if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                $addresses->andWhere(['and',
+                    ['cengineer' => null],
+                    ['cwengineer' => null],
+                    ['gengineer' => $_REQUEST['gengineer']]
+                ]);
+            }
+            $alladdress = $addresses->orderBy(['id' => SORT_DESC])->all();
+        } else {
+            $alladdress = [];
+        }
         return $this->render('addresses', [
-                    'addresses' => $addresses
+                    'addresses' => $alladdress
         ]);
     }
 

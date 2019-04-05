@@ -775,12 +775,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         function drawLineChartcwe(dataz, id, make, col) {
             if (col == 2) {
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Commander Works Engineers');
+                data.addColumn('string', 'Commanders Works Engineer');
                 data.addColumn('number', 'All Tenders');
                 data.addRows(dataz);
             } else {
                 var data = new google.visualization.DataTable();
-                data.addColumn('string', 'Commander Works Engineers');
+                data.addColumn('string', 'Commanders Works Engineer');
                 data.addColumn('number', 'All Tenders');
                 data.addColumn('number', make);
                 data.addColumn({type: 'string', role: 'annotation'});
@@ -800,7 +800,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     height: '70%'
                 },
                 legend: {position: 'top'},
-                hAxis: {title: 'Commander Works Engineers',
+                hAxis: {title: 'Commanders Works Engineer',
                 },
                 vAxis: {title: '<?= $head ?>',
                     viewWindow: {min: 0},
@@ -1185,7 +1185,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <div class="col s12 m12 l12" tabindex='1' id='cwengg' style='display:none;'>
                             <div class="card visitors-card chart">
                                 <div class="card-content">
-                                    <span class="card-title">Comparison between all commander works engineers<span class="secondary-title">Stats of all tenders</span></span>
+                                    <span class="card-title">Comparison between all commanders works engineer<span class="secondary-title">Stats of all tenders</span></span>
                                     <div id="curve_chart_cwe" style="width: 100%; height: 400px;"></div>
                                 </div>
                                 <div class="progress stats-card-progress indigo">

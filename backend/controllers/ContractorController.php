@@ -119,12 +119,13 @@ class ContractorController extends Controller {
 
                         // Data of excel sheet
                         $data['firm'] = @$row[1];
+                        $data['firmname'] = trim(str_replace('M/S ', '', str_replace('M/s ', '', @$row[1])));
                         $data['name'] = @$row[2];
                         $data['address'] = @$row[3];
                         $data['contact'] = @$row[4];
                         $data['email'] = @$row[5];
 
-                        $data = ['firm' => $data['firm'], 'name' => $data['name'], 'address' => $data['address'], 'contact' => $data['contact'], 'email' => $data['email'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+                        $data = ['firm' => $data['firm'], 'firmname' => $data['firmname'], 'name' => $data['name'], 'address' => $data['address'], 'contact' => $data['contact'], 'email' => $data['email'], 'user_id' => $user->UserId, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
 
                         if (@$row[1] != '') {
                             $contractor = \Yii::$app
@@ -194,7 +195,7 @@ class ContractorController extends Controller {
             if ($_POST['id']) {
                 $model = \common\models\Contractor::find()->where(['id' => $_POST['id']])->one();
                 $model->firm = @$_POST['firm'];
-                $model->firmname = str_replace('M/s ', '', @$_POST['firm']);
+                $model->firmname = trim(str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm'])));
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
