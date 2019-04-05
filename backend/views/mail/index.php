@@ -34,8 +34,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="card">
                 <div class="card-content">
                     <a href="<?= $baseURL ?>mail/sendmail" class="waves-effect waves-light btn blue m-b-xs" >Send Mail</a>
-                   
-                    
                 </div>
                 </div>
            </div>

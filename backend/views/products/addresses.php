@@ -292,10 +292,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <thead>
                                 <tr>
                                     <th data-field="name">Sr. No.</th>
-                                    <th data-field="name">Details of Contracting Office</th>
-                                    <th data-field="name" width="100px">Contact No.</th>
-                                    <th data-field="name" width="100px">Email ID</th>
-                                    <th data-field="name" width="200px">Address</th>
+                                    <th data-field="name">Office</th>
+                                    <th data-field="name">Contact No.</th>
+                                    <th data-field="name">Email ID</th>
+                                    <th data-field="name">Address</th>
                                     <?php if ($userdetail->group_id != 6) { ?>
                                         <th data-field="email">Actions</th>
                                     <?php } ?>
@@ -306,20 +306,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 if (@$addresses) {
                                     $i = 0;
                                     foreach ($addresses as $key => $user) {
-                                        $tdetails = '';
-                                        $command = Sitecontroller::actionGetcommand($user->command);
-                                        if (!isset($user->cengineer) && isset($user->gengineer)) {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $user->gengineer, 'status' => 1])->one();
-                                        } else {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $user->cengineer, 'status' => 1])->one();
-                                        }
-                                        $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $user->cengineer, 'cid' => $user->cwengineer, 'status' => 1])->one();
-                                        $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $user->cwengineer, 'gid' => $user->gengineer, 'status' => 1])->one();
-                                        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                         ?>
                                         <tr data-id = "<?= $user->id ?>">
                                             <td class = ""><?= $key + 1 ?></td>
-                                            <td class = ""><?= $tdetails ?></td>
+                                            <td class = ""><?= $user->command ?></td>
                                             <td class = ""><?= $user->contact ?></td>
                                             <td class = ""><?= $user->email ?></td>
                                             <td class = ""><?= $user->address ?></td>

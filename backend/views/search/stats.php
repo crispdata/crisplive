@@ -124,6 +124,26 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         text-align: center;
         vertical-align: middle;
     }
+    #lightchart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 85px;
+    }
+    div#lightchart {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #lightmakechart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 85px;
+    }
+    div#lightmakechart {
+        text-align: center;
+        vertical-align: middle;
+    }
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
@@ -182,6 +202,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <?php if (isset($details) && count($details)) { ?>
         google.charts.setOnLoadCallback(drawChartpie);
         google.charts.setOnLoadCallback(drawChart);
+    <?php if ($type == 2) { ?>
+            google.charts.setOnLoadCallback(drawChartlightpie);
+    <?php } ?>
+        //google.charts.setOnLoadCallback(drawChartlightmakepie);
         //google.charts.setOnLoadCallback(drawChartce);
 
 
@@ -256,6 +280,83 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
         }
 
+        function drawPiemakeChart(values, id) {
+
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'type');
+            data.addColumn('number', 'value');
+            data.addRows(values);
+
+
+            var options = {
+                displayExactValues: true,
+                'showRowNumber': false,
+                'allowHtml': true,
+                backgroundColor: '',
+                pieSliceText: 'value-and-percentage',
+                tooltip: {trigger: 'selection'},
+                chartArea: {
+                    left: "3%",
+                    top: "3%",
+                    height: "94%",
+                    width: "94%"
+                },
+                sliceVisibilityThreshold: 0
+                        /* slices: {1: {offset: 0.2},
+                         0: {offset: 0},
+                         },*/
+            };
+
+            var chart = new google.visualization.PieChart(document.getElementById(id));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'onmouseover', function (entry) {
+                chart.setSelection([{row: entry.row}]);
+            });
+
+            google.visualization.events.addListener(chart, 'onmouseout', function (entry) {
+                chart.setSelection([]);
+            });
+
+
+        }
+
+        function drawChartlightpie() {
+
+            var data = google.visualization.arrayToDataTable(<?php echo json_encode($lightchart); ?>);
+
+            var options = {
+                displayExactValues: true,
+                'showRowNumber': false,
+                'allowHtml': true,
+                backgroundColor: '',
+                pieSliceText: 'value-and-percentage',
+                tooltip: {trigger: 'selection'},
+                chartArea: {
+                    left: "3%",
+                    top: "3%",
+                    height: "94%",
+                    width: "94%"
+                },
+                sliceVisibilityThreshold: 0
+
+            };
+
+
+            var chart = new google.visualization.PieChart(document.getElementById('lightchart'));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'onmouseover', function (entry) {
+                chart.setSelection([{row: entry.row}]);
+            });
+
+            google.visualization.events.addListener(chart, 'onmouseout', function (entry) {
+                chart.setSelection([]);
+            });
+
+        }
 
         function drawChart() {
             var data = google.visualization.arrayToDataTable((<?= json_encode($graphs); ?>));
@@ -1294,6 +1395,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                             <div class="progress stats-card-progress lightblue">
                                 <div class="determinate lightblue" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-m-t no-m-b"  id = "light" <?= ($type == 2) ? '' : 'style=display:none' ?>>
+                    <div class="col s12 m12 l12">
+                        <div class="card server-card piechart">
+                            <div class="card-content">
+                                <span class="card-title">stats of Quantities of all fittings</span>
+                                <div id="lightchart" style="width: 100%; height: 300px;"></div>
+                            </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
                             </div>
                         </div>
                     </div>

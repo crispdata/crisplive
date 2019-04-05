@@ -1419,7 +1419,7 @@ class MailController extends Controller {
                             $allclmakes = '';
                             if (isset($singlemake) && count($singlemake)) {
                                 foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                    $makename = \common\models\Make::find()->where(['id' => $__smake, 'status' => 1])->one();
                                     if (@$makename) {
                                         $clmakename = $makename->make;
                                     }

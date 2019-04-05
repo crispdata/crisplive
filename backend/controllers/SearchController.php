@@ -803,6 +803,24 @@ class SearchController extends Controller {
                     $eprice = $onequantity * 500;
                     $epriceone = $twoquantity * 500;
                     $balancedprice = ($eprice - $epriceone);
+
+                    $gettlights = [];
+                    $lightchart = [];
+                    $lightchart[] = ['type', 'value'];
+                    $lightmakechart = [];
+                    $lightmakechart[] = ['type', 'value'];
+                    $typelight = \common\models\Fitting::find()->where(['type' => 1, 'status' => 1])->orderBy(['text' => SORT_ASC])->all();
+
+                    if (isset($typelight) && count($typelight)) {
+                        foreach ($typelight as $_tlight) {
+                            $ilightsone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'itemdetails.typefitting' => $_tlight->id]);
+                            $lquantity = $ilightsone->sum('quantity');
+                            $lightchart[] = [(string) $_tlight->text, (int) $lquantity];
+                            //$ilightsmakeone = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1, 'itemdetails.typefitting' => $_tlight->id])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
+                            //$lmakequantity = $ilightsmakeone->sum('quantity');
+                            //$lightmakechart[] = [(string) $_tlight->text, (int) $lmakequantity];
+                        }
+                    }
                 }
 
                 $labelsone = 'ALL MAKES';
@@ -826,6 +844,9 @@ class SearchController extends Controller {
                         'labels' => $labelsone,
                         'values' => $valuesone,
                         'graphs' => $finalgraph,
+                        'lightchart' => @$lightchart,
+                        'lightmakechart' => @$lightmakechart,
+                        'type'=>$type,
                         'graphsce' => ''
             ]);
         } else {
