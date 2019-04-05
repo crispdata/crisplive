@@ -180,719 +180,719 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <script type="text/javascript">
     google.charts.load('current', {'packages': ['corechart']});
 <?php if (isset($details) && count($details)) { ?>
-            google.charts.setOnLoadCallback(drawChartpie);
-            google.charts.setOnLoadCallback(drawChart);
-            //google.charts.setOnLoadCallback(drawChartce);
-<?php } ?>
-
-    function drawPieChart(labels, values, id) {
-
-        var years = labels;
-        var sales = values;
-
-        var data = new google.visualization.DataTable();
-        data.addColumn('string', 'years');
-        data.addColumn('number', 'sales');
-
-        for (i = 0; i < years.length; i++)
-            data.addRow([years[i], sales[i]]);
+        google.charts.setOnLoadCallback(drawChartpie);
+        google.charts.setOnLoadCallback(drawChart);
+        //google.charts.setOnLoadCallback(drawChartce);
 
 
-        var options = {
-            legend: {position: 'labeled'},
-            displayExactValues: true,
-            'showRowNumber': false,
-            'allowHtml': true,
-            backgroundColor: '',
-            pieSliceText: 'value-and-percentage',
-            is3D: true,
-            chartArea: {
-                left: "3%",
-                top: "3%",
-                height: "94%",
-                width: "94%"
-            },
-            sliceVisibilityThreshold: 0
-                    /* slices: {1: {offset: 0.2},
-                     0: {offset: 0},
-                     },*/
-        };
+        function drawPieChart(labels, values, id) {
 
-        // Create and draw the visualization.
-        new google.visualization.PieChart(document.getElementById(id)).
-                draw(data, options);
+            var years = labels;
+            var sales = values;
 
-    }
+            var data = new google.visualization.DataTable();
+            data.addColumn('string', 'years');
+            data.addColumn('number', 'sales');
 
-    function drawChartpie() {
-
-        var data = google.visualization.arrayToDataTable([
-            ['type', 'value'],
-            ['All Makes', '<?php echo $values; ?>']
-        ]);
+            for (i = 0; i < years.length; i++)
+                data.addRow([years[i], sales[i]]);
 
 
+            var options = {
+                legend: {position: 'labeled'},
+                displayExactValues: true,
+                'showRowNumber': false,
+                'allowHtml': true,
+                backgroundColor: '',
+                pieSliceText: 'value-and-percentage',
+                is3D: true,
+                chartArea: {
+                    left: "3%",
+                    top: "3%",
+                    height: "94%",
+                    width: "94%"
+                },
+                sliceVisibilityThreshold: 0
+                        /* slices: {1: {offset: 0.2},
+                         0: {offset: 0},
+                         },*/
+            };
 
-        var options = {
-            legend: {position: 'labeled'},
-            displayExactValues: true,
-            'showRowNumber': false,
-            'allowHtml': true,
-            backgroundColor: '',
-            pieSliceText: 'value-and-percentage',
-            is3D: true,
-            chartArea: {
-                left: "3%",
-                top: "3%",
-                height: "94%",
-                width: "94%"
-            },
-            sliceVisibilityThreshold: 0
+            // Create and draw the visualization.
+            new google.visualization.PieChart(document.getElementById(id)).
+                    draw(data, options);
 
-        };
-        var chart = new google.visualization.PieChart(document.getElementById('piechart'));
+        }
 
-        chart.draw(data, options);
+        function drawChartpie() {
 
-    }
+            var data = google.visualization.arrayToDataTable([
+                ['type', 'value'],
+                ['All Makes', '<?php echo $values; ?>']
+            ]);
 
 
-    function drawChart() {
-        var data = google.visualization.arrayToDataTable((<?= json_encode($graphs); ?>));
 
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Commands',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
+            var options = {
+                legend: {position: 'labeled'},
+                displayExactValues: true,
+                'showRowNumber': false,
+                'allowHtml': true,
+                backgroundColor: '',
+                pieSliceText: 'value-and-percentage',
+                is3D: true,
+                chartArea: {
+                    left: "3%",
+                    top: "3%",
+                    height: "94%",
+                    width: "94%"
+                },
+                sliceVisibilityThreshold: 0
 
-        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
+            };
+            var chart = new google.visualization.PieChart(document.getElementById('piechart'));
 
-        chart.draw(data, options);
+            chart.draw(data, options);
 
-        google.visualization.events.addListener(chart, 'select', selectHandler);
+        }
 
-        function selectHandler() {
-            var selection = chart.getSelection();
-            var message = '';
-            var rownum = '';
-            var command = 0;
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                rownum = item.row;
-            }
-            if (rownum >= 0 && rownum !== '') {
-                if (rownum == 2) {
-                    command = 6;
-                } else if (rownum == 3) {
-                    command = 7;
-                } else if (rownum == 4) {
-                    command = 8;
-                } else if (rownum == 5) {
-                    command = 9;
-                } else if (rownum == 6) {
-                    command = 10;
-                } else if (rownum == 7) {
-                    command = 11;
-                } else if (rownum == 8) {
-                    command = 12;
-                } else if (rownum == 1) {
-                    command = 2;
-                } else {
-                    command = 1;
+
+        function drawChart() {
+            var data = google.visualization.arrayToDataTable((<?= json_encode($graphs); ?>));
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Commands',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
                 }
-                $("#commandid").val(command);
-                var sizes = '';
-                var types = '';
-                var ctypes = '';
-                var product = $("#product option:selected").val();
-                var make = $("#dashmake option:selected").val();
-                var sizeval = $("#typefour option:selected").val();
-                var fromdate = $("#fromdate").val();
-                var todate = $("#todate").val();
-                $.ajax({
-                    type: 'post',
-                    url: baseUrl + 'site/getcegraph',
-                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
-                    beforeSend: function () {
-                        $("#chief").show();
-                        $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
-                        $('#chief').focus();
-                        $('#cwengg').hide();
-                        $('#gengg').hide();
-                    },
-                    success: function (response) {
-                        var myJSON = JSON.parse(response);
-                        if (myJSON) {
-                            if (command == 2 || command == 12) {
-                                $("#curve_chart_ce").html('');
-                                $("#chief").hide();
-                            } else {
-                                $("#chief").show();
-                                drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
-                            }
-                        }
+            };
 
-                    }
-                });
-            }
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart'));
 
-        }
-    }
+            chart.draw(data, options);
 
-    function drawChartce() {
-        var data = google.visualization.arrayToDataTable((<?= json_encode($graphsce); ?>));
+            google.visualization.events.addListener(chart, 'select', selectHandler);
 
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Chief Engineers',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
-
-        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ce'));
-
-        chart.draw(data, options);
-
-        google.visualization.events.addListener(chart, 'select', selectHandler);
-
-        function selectHandler() {
-            var selection = chart.getSelection();
-            var message = '';
-            var rownum = '';
-            var rowcid = '';
-            var cengg = 0;
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                rownum = item.row;
-            }
-            var command = $("#commandid").val();
-            if (command == 6) {
-                cengg = parseInt(rownum) + parseInt(1);
-            } else if (command == 7) {
-                cengg = parseInt(rownum) + parseInt(5);
-            } else if (command == 8) {
-                cengg = parseInt(rownum) + parseInt(15);
-            } else if (command == 9) {
-                cengg = parseInt(rownum) + parseInt(19);
-            } else if (command == 10) {
-                cengg = parseInt(rownum) + parseInt(28);
-            } else if (command == 11) {
-                cengg = parseInt(rownum) + parseInt(31);
-            } else if (command == 1) {
-                cengg = 0;
-            }
-            if (cengg >= 0) {
-                var sizes = '';
-                var types = '';
-                var ctypes = '';
-                $("#ceid").val(cengg);
-                var product = $("#product option:selected").val();
-                var make = $("#dashmake option:selected").val();
-                var sizeval = $("#typefour option:selected").val();
-                var fromdate = $("#fromdate").val();
-                var todate = $("#todate").val();
-                $.ajax({
-                    type: 'post',
-                    url: baseUrl + 'site/getcwegraph',
-                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
-                    beforeSend: function () {
-                        if (cengg == 0) {
-                            $("#cwengg").hide();
-                            $("#gengg").show();
-                            $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
-                            $('#gengg').focus();
-                        } else {
-                            $("#cwengg").show();
-                            $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
-                            $('#cwengg').focus();
-                            $('#gengg').hide();
-                        }
-                    },
-                    success: function (response) {
-                        var myJSON = JSON.parse(response);
-                        if (myJSON) {
-                            if (myJSON.graphcwe[1] != 0) {
-                                if (cengg == 0) {
-                                    $("#gengg").show();
-                                    drawLineChartge(myJSON.graphcwe, "curve_chart_ge");
-                                } else {
-                                    $("#cwengg").show();
-                                    drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe");
-                                }
-
-                            } else {
-                                if (cengg == 0) {
-                                    $("#gengg").hide();
-                                    $("#curve_chart_ge").html('');
-                                } else {
-                                    $("#cwengg").hide();
-                                    $("#curve_chart_cwe").html('');
-                                }
-
-                            }
-
-                        }
-
-                    }
-                });
-            }
-
-        }
-    }
-
-    function drawLineChart(dataz, id, make) {
-        //var data = google.visualization.arrayToDataTable((data));
-
-        if (make) {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Command');
-            data.addColumn('number', 'All Tenders');
-            data.addColumn('number', make);
-            data.addColumn({type: 'string', role: 'annotation'});
-            data.addRows(dataz);
-        } else {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Command');
-            data.addColumn('number', 'All Tenders');
-            data.addRows(dataz);
-        }
-
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Commands',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
-
-        var chart = new google.visualization.ColumnChart(document.getElementById(id));
-
-        chart.draw(data, options);
-
-        google.visualization.events.addListener(chart, 'select', selectHandler);
-
-        function selectHandler() {
-            var selection = chart.getSelection();
-            var message = '';
-            var rownum = '';
-            var command = 0;
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                rownum = item.row;
-            }
-            if (rownum >= 0 && rownum !== '') {
-                if (rownum == 2) {
-                    command = 6;
-                } else if (rownum == 3) {
-                    command = 7;
-                } else if (rownum == 4) {
-                    command = 8;
-                } else if (rownum == 5) {
-                    command = 9;
-                } else if (rownum == 6) {
-                    command = 10;
-                } else if (rownum == 7) {
-                    command = 11;
-                } else if (rownum == 8) {
-                    command = 12;
-                } else if (rownum == 1) {
-                    command = 2;
-                } else {
-                    command = 1;
-                }
-                $("#commandid").val(command);
-                var sizes = '';
-                var types = '';
-                var ctypes = '';
-                var product = $("#product option:selected").val();
-                var make = $("#dashmake option:selected").val();
-                var sizeval = $("#typefour option:selected").val();
-                var fromdate = $("#fromdate").val();
-                var todate = $("#todate").val();
-                $.ajax({
-                    type: 'post',
-                    url: baseUrl + 'site/getcegraph',
-                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
-                    beforeSend: function () {
-                        $("#chief").show();
-                        $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
-                        $('#chief').focus();
-                        $('#cwengg').hide();
-                        $('#gengg').hide();
-                    },
-                    success: function (response) {
-                        var myJSON = JSON.parse(response);
-                        if (myJSON) {
-                            if (command == 2 || command == 12) {
-                                $("#curve_chart_ce").html('');
-                                $("#chief").hide();
-                            } else {
-                                $("#chief").show();
-                                drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
-                            }
-                        }
-
-                    }
-                });
-            }
-
-        }
-    }
-
-    function drawLineChartce(dataz, id, make, col) {
-
-        if (col == 2) {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Cheif Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addRows(dataz);
-        } else {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Cheif Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addColumn('number', make);
-            data.addColumn({type: 'string', role: 'annotation'});
-            data.addRows(dataz);
-        }
-
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Chief Engineers',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
-
-        var chart = new google.visualization.ColumnChart(document.getElementById(id));
-
-        chart.draw(data, options);
-
-        google.visualization.events.addListener(chart, 'select', selectHandler);
-
-        function selectHandler() {
-            var selection = chart.getSelection();
-            var message = '';
-            var rownum = '';
-            var rowcid = '';
-            var cengg = 0;
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                if (item.row != null) {
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var command = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
                     rownum = item.row;
                 }
-            }
-            var command = $("#commandid").val();
-            if (command == 6) {
-                cengg = parseInt(rownum) + parseInt(1);
-            } else if (command == 7) {
-                cengg = parseInt(rownum) + parseInt(5);
-            } else if (command == 8) {
-                cengg = parseInt(rownum) + parseInt(15);
-            } else if (command == 9) {
-                cengg = parseInt(rownum) + parseInt(19);
-            } else if (command == 10) {
-                cengg = parseInt(rownum) + parseInt(28);
-            } else if (command == 11) {
-                cengg = parseInt(rownum) + parseInt(31);
-            } else if (command == 1) {
-                cengg = 0;
-            }
-            if (cengg >= 0) {
-                var sizes = '';
-                var types = '';
-                var ctypes = '';
-                $("#ceid").val(cengg);
-                var product = $("#product option:selected").val();
-                var make = $("#dashmake option:selected").val();
-                var sizeval = $("#typefour option:selected").val();
-                var fromdate = $("#fromdate").val();
-                var todate = $("#todate").val();
-                $.ajax({
-                    type: 'post',
-                    url: baseUrl + 'site/getcwegraph',
-                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
-                    beforeSend: function () {
-                        if (cengg == 0) {
-                            $("#cwengg").hide();
-                            $("#gengg").show();
-                            $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
-                            $('#gengg').focus();
-                        } else {
-                            $("#cwengg").show();
-                            $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
-                            $('#cwengg').focus();
-                            $('#gengg').hide();
-                        }
-                    },
-                    success: function (response) {
-                        var myJSON = JSON.parse(response);
-                        if (myJSON) {
-                            if (myJSON.graphcwe[1] != 0) {
-                                if (cengg == 0) {
-                                    $("#gengg").show();
-                                    drawLineChartge(myJSON.graphcwe, "curve_chart_ge", myJSON.makename, myJSON.col);
-                                } else {
-                                    $("#cwengg").show();
-                                    drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe", myJSON.makename, myJSON.col);
-                                }
-
-                            } else {
-                                if (cengg == 0) {
-                                    $("#gengg").hide();
-                                    $("#curve_chart_ge").html('');
-                                } else {
-                                    $("#cwengg").hide();
-                                    $("#curve_chart_cwe").html('');
-                                }
-
-                            }
-                        }
+                if (rownum >= 0 && rownum !== '') {
+                    if (rownum == 2) {
+                        command = 6;
+                    } else if (rownum == 3) {
+                        command = 7;
+                    } else if (rownum == 4) {
+                        command = 8;
+                    } else if (rownum == 5) {
+                        command = 9;
+                    } else if (rownum == 6) {
+                        command = 10;
+                    } else if (rownum == 7) {
+                        command = 11;
+                    } else if (rownum == 8) {
+                        command = 12;
+                    } else if (rownum == 1) {
+                        command = 2;
+                    } else {
+                        command = 1;
                     }
-                });
+                    $("#commandid").val(command);
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#chief").show();
+                            $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#chief').focus();
+                            $('#cwengg').hide();
+                            $('#gengg').hide();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (command == 2 || command == 12) {
+                                    $("#curve_chart_ce").html('');
+                                    $("#chief").hide();
+                                } else {
+                                    $("#chief").show();
+                                    drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
+                                }
+                            }
+
+                        }
+                    });
+                }
+
             }
-
-        }
-    }
-
-    function drawLineChartcwe(dataz, id, make, col) {
-        if (col == 2) {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Commander Works Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addRows(dataz);
-        } else {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Commander Works Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addColumn('number', make);
-            data.addColumn({type: 'string', role: 'annotation'});
-            data.addRows(dataz);
         }
 
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Commander Works Engineers',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
+        function drawChartce() {
+            var data = google.visualization.arrayToDataTable((<?= json_encode($graphsce); ?>));
 
-        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_cwe'));
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Chief Engineers',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
 
-        chart.draw(data, options);
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ce'));
 
-        google.visualization.events.addListener(chart, 'select', selectHandler);
+            chart.draw(data, options);
 
-        function selectHandler() {
-            var selection = chart.getSelection();
-            var message = '';
-            var rownum = '';
-            var rowcid = '';
-            for (var i = 0; i < selection.length; i++) {
-                var item = selection[i];
-                if (item.row != null) {
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                var cengg = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
                     rownum = item.row;
                 }
-            }
-            var cenggid = $("#ceid").val();
-            var command = $("#commandid").val();
-            if (rownum >= 0 && rownum !== '') {
-                var sizes = '';
-                var types = '';
-                var ctypes = '';
-                var product = $("#product option:selected").val();
-                var make = $("#dashmake option:selected").val();
-                var sizeval = $("#typefour option:selected").val();
-                var fromdate = $("#fromdate").val();
-                var todate = $("#todate").val();
-                $.ajax({
-                    type: 'post',
-                    url: baseUrl + 'site/getgegraph',
-                    data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cenggid + '&fromdate=' + fromdate + '&todate=' + todate + '&rownum=' + rownum + '&command=' + command + '&_csrf-backend=' + csrf_token,
-                    beforeSend: function () {
-                        $("#gengg").show();
-                        $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
-                        $('#gengg').focus();
-                    },
-                    success: function (response) {
-                        var myJSON = JSON.parse(response);
-                        if (myJSON) {
-                            if (myJSON.graphge[1] != 0) {
+                var command = $("#commandid").val();
+                if (command == 6) {
+                    cengg = parseInt(rownum) + parseInt(1);
+                } else if (command == 7) {
+                    cengg = parseInt(rownum) + parseInt(5);
+                } else if (command == 8) {
+                    cengg = parseInt(rownum) + parseInt(15);
+                } else if (command == 9) {
+                    cengg = parseInt(rownum) + parseInt(19);
+                } else if (command == 10) {
+                    cengg = parseInt(rownum) + parseInt(28);
+                } else if (command == 11) {
+                    cengg = parseInt(rownum) + parseInt(31);
+                } else if (command == 1) {
+                    cengg = 0;
+                }
+                if (cengg >= 0) {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    $("#ceid").val(cengg);
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcwegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            if (cengg == 0) {
+                                $("#cwengg").hide();
                                 $("#gengg").show();
-                                drawLineChartge(myJSON.graphge, "curve_chart_ge", myJSON.makename, myJSON.col);
+                                $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#gengg').focus();
                             } else {
-                                $("#gengg").hide();
-                                $("#curve_chart_ge").html('');
+                                $("#cwengg").show();
+                                $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#cwengg').focus();
+                                $('#gengg').hide();
+                            }
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphcwe[1] != 0) {
+                                    if (cengg == 0) {
+                                        $("#gengg").show();
+                                        drawLineChartge(myJSON.graphcwe, "curve_chart_ge");
+                                    } else {
+                                        $("#cwengg").show();
+                                        drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe");
+                                    }
+
+                                } else {
+                                    if (cengg == 0) {
+                                        $("#gengg").hide();
+                                        $("#curve_chart_ge").html('');
+                                    } else {
+                                        $("#cwengg").hide();
+                                        $("#curve_chart_cwe").html('');
+                                    }
+
+                                }
+
+                            }
+
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function drawLineChart(dataz, id, make) {
+            //var data = google.visualization.arrayToDataTable((data));
+
+            if (make) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Command');
+                data.addColumn('number', 'All Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Command');
+                data.addColumn('number', 'All Tenders');
+                data.addRows(dataz);
+            }
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Commands',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById(id));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var command = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    rownum = item.row;
+                }
+                if (rownum >= 0 && rownum !== '') {
+                    if (rownum == 2) {
+                        command = 6;
+                    } else if (rownum == 3) {
+                        command = 7;
+                    } else if (rownum == 4) {
+                        command = 8;
+                    } else if (rownum == 5) {
+                        command = 9;
+                    } else if (rownum == 6) {
+                        command = 10;
+                    } else if (rownum == 7) {
+                        command = 11;
+                    } else if (rownum == 8) {
+                        command = 12;
+                    } else if (rownum == 1) {
+                        command = 2;
+                    } else {
+                        command = 1;
+                    }
+                    $("#commandid").val(command);
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&command=' + command + '&fromdate=' + fromdate + '&todate=' + todate + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#chief").show();
+                            $("#curve_chart_ce").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#chief').focus();
+                            $('#cwengg').hide();
+                            $('#gengg').hide();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (command == 2 || command == 12) {
+                                    $("#curve_chart_ce").html('');
+                                    $("#chief").hide();
+                                } else {
+                                    $("#chief").show();
+                                    drawLineChartce(myJSON.graphce, "curve_chart_ce", myJSON.makename, myJSON.col);
+                                }
+                            }
+
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function drawLineChartce(dataz, id, make, col) {
+
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Cheif Engineers');
+                data.addColumn('number', 'All Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Cheif Engineers');
+                data.addColumn('number', 'All Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            }
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Chief Engineers',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById(id));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                var cengg = 0;
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    if (item.row != null) {
+                        rownum = item.row;
+                    }
+                }
+                var command = $("#commandid").val();
+                if (command == 6) {
+                    cengg = parseInt(rownum) + parseInt(1);
+                } else if (command == 7) {
+                    cengg = parseInt(rownum) + parseInt(5);
+                } else if (command == 8) {
+                    cengg = parseInt(rownum) + parseInt(15);
+                } else if (command == 9) {
+                    cengg = parseInt(rownum) + parseInt(19);
+                } else if (command == 10) {
+                    cengg = parseInt(rownum) + parseInt(28);
+                } else if (command == 11) {
+                    cengg = parseInt(rownum) + parseInt(31);
+                } else if (command == 1) {
+                    cengg = 0;
+                }
+                if (cengg >= 0) {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    $("#ceid").val(cengg);
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getcwegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cengg + '&fromdate=' + fromdate + '&todate=' + todate + '&command=' + command + '&rownum=' + rownum + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            if (cengg == 0) {
+                                $("#cwengg").hide();
+                                $("#gengg").show();
+                                $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#gengg').focus();
+                            } else {
+                                $("#cwengg").show();
+                                $("#curve_chart_cwe").html('<img src="/assets/images/loading.gif" alt="">');
+                                $('#cwengg').focus();
+                                $('#gengg').hide();
+                            }
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphcwe[1] != 0) {
+                                    if (cengg == 0) {
+                                        $("#gengg").show();
+                                        drawLineChartge(myJSON.graphcwe, "curve_chart_ge", myJSON.makename, myJSON.col);
+                                    } else {
+                                        $("#cwengg").show();
+                                        drawLineChartcwe(myJSON.graphcwe, "curve_chart_cwe", myJSON.makename, myJSON.col);
+                                    }
+
+                                } else {
+                                    if (cengg == 0) {
+                                        $("#gengg").hide();
+                                        $("#curve_chart_ge").html('');
+                                    } else {
+                                        $("#cwengg").hide();
+                                        $("#curve_chart_cwe").html('');
+                                    }
+
+                                }
                             }
                         }
+                    });
+                }
 
+            }
+        }
+
+        function drawLineChartcwe(dataz, id, make, col) {
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Commanders Works Engineer');
+                data.addColumn('number', 'All Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Commanders Works Engineer');
+                data.addColumn('number', 'All Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
+            }
+
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Commanders Works Engineer',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_cwe'));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'select', selectHandler);
+
+            function selectHandler() {
+                var selection = chart.getSelection();
+                var message = '';
+                var rownum = '';
+                var rowcid = '';
+                for (var i = 0; i < selection.length; i++) {
+                    var item = selection[i];
+                    if (item.row != null) {
+                        rownum = item.row;
                     }
-                });
+                }
+                var cenggid = $("#ceid").val();
+                var command = $("#commandid").val();
+                if (rownum >= 0 && rownum !== '') {
+                    var sizes = '';
+                    var types = '';
+                    var ctypes = '';
+                    var product = $("#product option:selected").val();
+                    var make = $("#dashmake option:selected").val();
+                    var sizeval = $("#typefour option:selected").val();
+                    var fromdate = $("#fromdate").val();
+                    var todate = $("#todate").val();
+                    $.ajax({
+                        type: 'post',
+                        url: baseUrl + 'site/getgegraph',
+                        data: 'type=1&make=' + make + '&product=' + product + '&sizeval=' + sizeval + '&cengineer=' + cenggid + '&fromdate=' + fromdate + '&todate=' + todate + '&rownum=' + rownum + '&command=' + command + '&_csrf-backend=' + csrf_token,
+                        beforeSend: function () {
+                            $("#gengg").show();
+                            $("#curve_chart_ge").html('<img src="/assets/images/loading.gif" alt="">');
+                            $('#gengg').focus();
+                        },
+                        success: function (response) {
+                            var myJSON = JSON.parse(response);
+                            if (myJSON) {
+                                if (myJSON.graphge[1] != 0) {
+                                    $("#gengg").show();
+                                    drawLineChartge(myJSON.graphge, "curve_chart_ge", myJSON.makename, myJSON.col);
+                                } else {
+                                    $("#gengg").hide();
+                                    $("#curve_chart_ge").html('');
+                                }
+                            }
+
+                        }
+                    });
+                }
+
+            }
+        }
+
+        function drawLineChartge(dataz, id, make, col) {
+            if (col == 2) {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Garisson Engineers');
+                data.addColumn('number', 'All Tenders');
+                data.addRows(dataz);
+            } else {
+                var data = new google.visualization.DataTable();
+                data.addColumn('string', 'Garisson Engineers');
+                data.addColumn('number', 'All Tenders');
+                data.addColumn('number', make);
+                data.addColumn({type: 'string', role: 'annotation'});
+                data.addRows(dataz);
             }
 
+            var options = {
+                title: '',
+                curveType: 'function',
+                pointsVisible: true,
+                focusTarget: 'category',
+                backgroundColor: '',
+                chartArea: {
+                    left: 110,
+                    top: 50,
+                    width: '100%',
+                    height: '70%'
+                },
+                legend: {position: 'top'},
+                hAxis: {title: 'Garrison Engineers',
+                },
+                vAxis: {title: '<?= $head ?>',
+                    viewWindow: {min: 0},
+                },
+                crosshair: {
+                    color: '#000',
+                    trigger: 'selection'
+                },
+                animation: {
+                    duration: 1200,
+                    easing: 'out',
+                    startup: true
+                }
+            };
+
+            var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ge'));
+
+            chart.draw(data, options);
+
         }
-    }
 
-    function drawLineChartge(dataz, id, make, col) {
-        if (col == 2) {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Garisson Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addRows(dataz);
-        } else {
-            var data = new google.visualization.DataTable();
-            data.addColumn('string', 'Garisson Engineers');
-            data.addColumn('number', 'All Tenders');
-            data.addColumn('number', make);
-            data.addColumn({type: 'string', role: 'annotation'});
-            data.addRows(dataz);
-        }
-
-        var options = {
-            title: '',
-            curveType: 'function',
-            pointsVisible: true,
-            focusTarget: 'category',
-            backgroundColor: '',
-            chartArea: {
-                left: 110,
-                top: 50,
-                width: '100%',
-                height: '70%'
-            },
-            legend: {position: 'top'},
-            hAxis: {title: 'Garrison Engineers',
-            },
-            vAxis: {title: '<?= $head ?>',
-                viewWindow: {min: 0},
-            },
-            crosshair: {
-                color: '#000',
-                trigger: 'selection'
-            },
-            animation: {
-                duration: 1200,
-                easing: 'out',
-                startup: true
-            }
-        };
-
-        var chart = new google.visualization.ColumnChart(document.getElementById('curve_chart_ge'));
-
-        chart.draw(data, options);
-
-    }
-
-
+<?php } ?>
 </script>
 
 
@@ -1193,7 +1193,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <div class="col s12 m12 l12" tabindex='1' id='cwengg' style='display:none;'>
                         <div class="card visitors-card chart">
                             <div class="card-content">
-                                <span class="card-title">Comparison between all commander works engineers<span class="secondary-title">Stats of all tenders</span></span>
+                                <span class="card-title">Comparison between all commanders works engineer<span class="secondary-title">Stats of all tenders</span></span>
                                 <div id="curve_chart_cwe" style="width: 100%; height: 400px;"></div>
                             </div>
                             <div class="progress stats-card-progress indigo">

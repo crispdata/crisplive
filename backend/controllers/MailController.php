@@ -370,6 +370,8 @@ class MailController extends Controller {
                 }
             }
         }
+
+        $plusquantity = 0;
         $filestosend = [];
         $tenderids = [];
         $itemids = [];
@@ -425,6 +427,7 @@ class MailController extends Controller {
 
 
                     if ($__data['ttype'] == 1) {
+                        $plusquantity += $__data['quantity'];
                         $arrayData = [];
                         if (in_array($__data['ref'], $tid)) {
                             $arrayData[] = '';
@@ -466,6 +469,7 @@ class MailController extends Controller {
                         $final[] = $arrayData;
 //$datas .= join("\t", $arrayData) . "\n";
                     } elseif ($__data['ttype'] == 2) {
+                        $plusquantity += $__data['quantity'];
                         $arrayData = [];
                         if (in_array($__data['ref'], $tid)) {
                             $arrayData[] = '';
@@ -510,7 +514,7 @@ class MailController extends Controller {
                     $tenderids[] = $__data['tid'];
                     $itemids[] = $__data['itemid'];
                 }
-
+                $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
 
                 $spreadsheet = new Spreadsheet();  /* ----Spreadsheet object----- */
 //$activeSheet = $spreadsheet->getActiveSheet();
@@ -570,6 +574,11 @@ class MailController extends Controller {
                                         ->getStartColor()->setARGB('D3D3D3');
                                 //$activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
                             }
+                        }
+                        if (count($final) == $c) {
+                            $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getFill()
+                                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                    ->getStartColor()->setARGB('ADD8E6');
                         }
                         $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
                         $activeSheet->getStyle('D' . $p . ':E' . $p . '')->applyFromArray($styleArrayinside);
@@ -1561,7 +1570,7 @@ class MailController extends Controller {
                     }
                 }
 
-
+                $plusquantity = 0;
                 $filestosend = [];
                 $tenderids = [];
                 $itemids = [];
@@ -1628,6 +1637,7 @@ class MailController extends Controller {
 
 
                             if ($__data['ttype'] == 1) {
+                                $plusquantity = $__data['quantity'];
                                 $arrayData = [];
                                 if (in_array($__data['ref'], $tid)) {
                                     $arrayData[] = '';
@@ -1664,6 +1674,7 @@ class MailController extends Controller {
                                 $tid[] = $__data['ref'];
                                 $final[] = $arrayData;
                             } elseif ($__data['ttype'] == 2) {
+                                $plusquantity = $__data['quantity'];
                                 $arrayData = [];
                                 if (in_array($__data['ref'], $tid)) {
                                     $arrayData[] = '';
@@ -1739,7 +1750,7 @@ class MailController extends Controller {
                             $tarchives[] = $__data['tid'];
                             $itemids[] = $__data['itemid'];
                         }
-
+                        $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
                         $excel = $this->actionCreateexcel($final, $__data['ttype']);
 
                         /* header('Content-Type: application/vnd.ms-excel');

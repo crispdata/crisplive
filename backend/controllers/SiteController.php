@@ -10118,7 +10118,7 @@ class SiteController extends Controller {
         if (@$_POST['contractor'] == '') {
             $model = new \common\models\Contractor();
             $model->firm = @$_POST['firm'];
-            $model->firmname = str_replace('M/s ', '', str_replace('M/S ', '', @$_POST['firm']));
+            $model->firmname = trim(str_replace('M/s ', '', str_replace('M/S ', '', @$_POST['firm'])));
             $model->name = @$_POST['name'];
             $model->address = @$_POST['address'];
             $model->contact = @$_POST['contact'];
