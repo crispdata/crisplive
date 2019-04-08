@@ -230,7 +230,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
                                                         <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
                                                         <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
-                                                        <?php if ($tender->is_archived != 1) { ?>
+                                                        <a href="<?= Url::to(['mail/create-excel-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn m-b-xs">Download Items in Excel</a>
+                                                            <?php if ($tender->is_archived != 1) { ?>
                                                             <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                         <?php } ?>
                                                         <?php if ($user->group_id != 3) { ?>    

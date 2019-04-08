@@ -149,6 +149,26 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         text-align: center;
         vertical-align: middle;
     }
+    #lightchart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 85px;
+    }
+    div#lightchart {
+        text-align: center;
+        vertical-align: middle;
+    }
+    #lightmakechart img {
+        width: 100px;
+        text-align: center;
+        vertical-align: middle;
+        margin-top: 85px;
+    }
+    div#lightmakechart {
+        text-align: center;
+        vertical-align: middle;
+    }
     #chief:focus{outline: 0px solid transparent;}
     #cwengg:focus{outline: 0px solid transparent;}
     #gengg:focus{outline: 0px solid transparent;}
@@ -246,6 +266,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
         }
 
+        
+
         function drawChartpie() {
 
             var data = google.visualization.arrayToDataTable([
@@ -278,7 +300,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             chart.draw(data, options);
 
         }
-
 
         function drawChart() {
 
@@ -1283,6 +1304,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                         </div>
                     </div>
+                    
                     <div class="row no-m-t no-m-b"  id = "light-type" <?= ($type == 2) ? '' : 'style=display:none' ?>>
                         <div class="col s12 m12 l12">
                             <div class="card invoices-card products">

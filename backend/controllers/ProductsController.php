@@ -945,18 +945,27 @@ class ProductsController extends Controller {
                 }
                 $addressavailable = $address->one();
 
-                if ($addressavailable) {
-                    Yii::$app->session->setFlash('error', "Address already existed");
-                } else {
-                    $files = \Yii::$app
-                            ->db
-                            ->createCommand()
-                            ->insert('addresses', $model)
-                            ->execute();
+                /* if ($addressavailable) {
+                  Yii::$app->session->setFlash('error', "Address already existed");
+                  } else {
+                  $files = \Yii::$app
+                  ->db
+                  ->createCommand()
+                  ->insert('addresses', $model)
+                  ->execute();
 
-                    if ($files) {
-                        Yii::$app->session->setFlash('success', "Address successfully added");
-                    }
+                  if ($files) {
+                  Yii::$app->session->setFlash('success', "Address successfully added");
+                  }
+                  } */
+                $files = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('addresses', $model)
+                        ->execute();
+
+                if ($files) {
+                    Yii::$app->session->setFlash('success', "Address successfully added");
                 }
             }
             return $this->redirect(array('products/addaddress'));
@@ -1011,12 +1020,83 @@ class ProductsController extends Controller {
                 ]);
             }
             $alladdress = $addresses->orderBy(['id' => SORT_DESC])->all();
+
+            if (isset($alladdress) && count($alladdress)) {
+                foreach ($alladdress as $_address) {
+                    if ($_address->command != '' && $_address->cengineer != '' && $_address->cwengineer != '' && $_address->gengineer != '') {
+                        $office = \common\models\Gengineer::find()->where(['cwengineer' => $_address->cwengineer, 'gid' => $_address->gengineer, 'status' => 1])->one();
+                        $officename = $office->text;
+                    } elseif ($_address->command != '' && $_address->cengineer != '' && $_address->cwengineer != '' && $_address->gengineer == '') {
+                        $office = \common\models\Cwengineer::find()->where(['cengineer' => $_address->cengineer, 'cid' => $_address->cwengineer, 'status' => 1])->one();
+                        $officename = $office->text;
+                    } elseif ($_address->command != '' && $_address->cengineer != '' && $_address->cwengineer == '' && $_address->gengineer == '') {
+                        if (!isset($_address->cengineer) && isset($_address->gengineer)) {
+                            $office = \common\models\Cengineer::find()->where(['cid' => $_address->gengineer, 'status' => 1])->one();
+                        } else {
+                            $office = \common\models\Cengineer::find()->where(['cid' => $_address->cengineer, 'status' => 1])->one();
+                        }
+                        $officename = $office->text;
+                    } elseif ($_address->command != '' && $_address->cengineer == '' && $_address->cwengineer == '' && $_address->gengineer == '') {
+                        $officename = $this->actionGetcommand($_address->command);
+                    } elseif ($_address->command != '' && $_address->cengineer == '' && $_address->cwengineer == '' && $_address->gengineer != '') {
+                        $office = \common\models\Cengineer::find()->where(['cid' => $_address->gengineer, 'status' => 1])->one();
+                        $officename = $office->text;
+                    }
+                    $_address->command = $officename;
+                }
+            }
         } else {
             $alladdress = [];
         }
         return $this->render('addresses', [
                     'addresses' => $alladdress
         ]);
+    }
+
+    public function actionGetcommand($id) {
+        switch ($id) {
+            case "1":
+                return "ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES";
+                break;
+            case "2":
+                return "ADG (DESIGN and CONSULTANCY) PUNE - MES";
+                break;
+            case "3":
+                return "ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES";
+                break;
+            case "4":
+                return "ADG (OF and DRDO)  AND CE (R and D) DELHI - MES";
+                break;
+            case "5":
+                return "ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES";
+                break;
+            case "13":
+                return "ADG (Projects) AND CE (CG) Visakhapatnam - MES";
+                break;
+            case "6":
+                return "CENTRAL COMMAND";
+                break;
+            case "7":
+                return "EASTERN COMMAND";
+                break;
+            case "8":
+                return "NORTHERN COMMAND";
+                break;
+            case "9":
+                return "SOUTHERN COMMAND";
+                break;
+            case "10":
+                return "SOUTH WESTERN COMMAND";
+                break;
+            case "11":
+                return "WESTERN COMMAND";
+                break;
+            case "12":
+                return "DGNP MUMBAI - MES";
+                break;
+            default:
+                return "";
+        }
     }
 
     public function actionDeleteaddress() {

@@ -14,7 +14,7 @@ $(document).ready(function () {
     $(".button").click(function () {
         $(this).closest('div.row').remove();
     });
-    
+
     $('#fromdatesearch').datepicker({
         showAnim: "fold",
         dateFormat: "yy-mm-dd",
@@ -25,7 +25,7 @@ $(document).ready(function () {
             $('#todatesearch').datepicker('option', 'minDate', newDate);
         }
     });
-    
+
     $('#todatesearch').datepicker({
         showAnim: "fold",
         dateFormat: "yy-mm-dd",
@@ -221,8 +221,41 @@ $(document).ready(function () {
             $(".todatepicker").removeAttr('disabled');
         }
     });
-    
-    
+
+    $('#feedback').on('submit', function (e) {
+
+        e.preventDefault();
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/feedback',
+            data: $('#feedback').serialize(),
+            beforeSend: function () {
+                $("#signbutton").html('<img src="assets/images/loading.gif" alt="">');
+                $("#signbutton").attr('disabled', 'true');
+            },
+            success: function (response) {
+                if (response == 1) {
+                    var message = 'Thank you for giving your valuable suggestions/feedback.';
+                    swal({
+                        title: "Success!",
+                        text: message,
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 3000,
+                    }
+                    , function () {
+                        window.location.reload();
+                    })
+                            ;
+                } else {
+                    swal("Sorry", 'Your feedback process has been failed. If you want you can try again', "error");
+                }
+                $("#signbutton").text('Submit');
+                $("#signbutton").removeAttr('disabled');
+            }
+        });
+    });
 
     $('.todatepicker').datepicker({
         showAnim: "fold",
@@ -288,6 +321,9 @@ $(document).ready(function () {
                         $("#gengg").hide();
                         $("#curve_chart").html('<img src="/assets/images/loading.gif" alt="">');
                         $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#lightchart").html('<img src="/assets/images/loading.gif" alt="">');
+                        //$("#lightmakechart").html('<img src="/assets/images/loading.gif" alt="">');
+                        $("#l2").hide();
                         if (make != '') {
                             $("#total").html('<img src="/assets/images/loading.gif" alt="">');
                             $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
@@ -315,6 +351,10 @@ $(document).ready(function () {
                                 drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
                             } else {
                                 $("#piechart").html('No Data Available');
+                            }
+                            if (myJSON.user != 6 && product == 2) {
+                                $("#lightchart").show();
+                                drawPiemakeChart(myJSON.lightchart, "lightchart");
                             }
                             $("#u10").html(myJSON.first.aptenderstotal);
                             $("#u20").html(myJSON.first.aptendersquantity);
@@ -869,9 +909,12 @@ $(document).ready(function () {
                 $("#u22").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#u32").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#piechart").html('<img src="/assets/images/loading.gif" alt="">');
+                $("#lightchart").html('<img src="/assets/images/loading.gif" alt="">');
+                //$("#lightmakechart").html('<img src="/assets/images/loading.gif" alt="">');
                 $("#chief").hide();
                 $("#cwengg").hide();
                 $("#gengg").hide();
+                $("#l2").hide();
                 if (make != '') {
                     $("#total").html('<img src="/assets/images/loading.gif" alt="">');
                     $("#quantity").html('<img src="/assets/images/loading.gif" alt="">');
@@ -887,6 +930,7 @@ $(document).ready(function () {
 
 
                 var myJSON = JSON.parse(response);
+                console.log(myJSON);
                 if (myJSON) {
                     if (make != '') {
                         $("#total").html(myJSON.first.total);
@@ -899,6 +943,10 @@ $(document).ready(function () {
                         drawPieChart(myJSON.labelsone, myJSON.valuesone, "piechart");
                     } else {
                         $("#piechart").html('No Data Available');
+                    }
+                    if (myJSON.user != 6 && product == 2) {
+                        $("#lightchart").show();
+                        drawPiemakeChart(myJSON.lightchart, "lightchart");
                     }
                     $("#u10").html(myJSON.first.aptenderstotal);
                     $("#u20").html(myJSON.first.aptendersquantity);

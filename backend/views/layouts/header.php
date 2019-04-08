@@ -112,7 +112,31 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         margin-left: 15px;
         font-size: 11px;
     }
+    #signbutton img {
+        width: 25px;
+        vertical-align: middle;
+    }
 </style>
+<div id="modalfeedback" class="modal">
+    <!-- Modal content-->
+    <div class="modal-content">
+        <div class="modal-header">
+            <h4 class="modal-title">Tell us about your experience with CrIsPdAtA</h4>
+        </div>
+        <div class="modal-body">
+            <form id="feedback" method = "post" enctype="multipart/form-data" action = "">
+                <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                <div class="row">
+                    <div class="input-field col s12">
+                        <textarea id="text" name="text" class="materialize-textarea required address" required=""></textarea>
+                    </div>
+                </div>
+                <button  id="signbutton" type="submit"  class="btn btn-fill">Submit</button>
+            </form>
+        </div>
+    </div>
+
+</div>
 <div class="loader-bg"></div>
 <div class="loader">
     <div class="preloader-wrapper big active">
@@ -218,7 +242,11 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         <a class="waves-effect waves-grey" href="<?= $baseURL . 'site/editprofile' ?>"><i class="material-icons">perm_identity</i>Profile</a>
                     </li>
 
-                    <li class="divider"></li>
+                    <?php if ($user->group_id == 6) { ?>
+                        <li class="no-padding">
+                            <a class="waves-effect waves-grey modal-trigger" href="#modalfeedback"><i class="material-icons">feedback</i>Feedback</a>
+                        </li>
+                    <?php } ?>
                     <li class="no-padding">
 
                         <a href="javascript:{}" onclick="document.getElementById('logout-btn').submit();" class="waves-effect waves-grey"><i class="material-icons">exit_to_app</i>Sign Out</a>
@@ -228,6 +256,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
 
             </div>
         </div>
+
     </aside>
 
     <form method="post" action = "<?= $baseURL ?>site/logout" id = "logout-btn">
@@ -330,7 +359,9 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                 }
 
                 $maketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
-                $aocmaketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $aocmaketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $nonaocmaketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.aoc_status' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
+                $armaketenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->all();
                 ?>
                 <ul class="sidebar-menu collapsible collapsible-accordion" data-collapsible="accordion">
                     <li class="no-padding <?= ($controller == 'site' && $action == 'index') ? 'active' : '' ?>">
@@ -340,11 +371,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         </a>
                     </li>
                     <li class="no-padding <?= ($controller == 'site' && $action == 'tenders') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'aoctenders' || $action == 'atenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= count($maketenders); ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'aoctenders' || $action == 'atenders' || $action == 'archivetenders')) ? 'active' : '' ?>"><i class="material-icons">assignment</i>Tenders (<?= count($maketenders); ?>)<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
-                                <li><a href="/site/aoctenders" class="<?= ($controller == 'site' && $action == 'aoctenders') ? 'active-page' : '' ?>">AOC (<?= count($aocmaketenders); ?>)</a></li>
-                                <li><a href="/site/atenders" class="<?= ($controller == 'site' && $action == 'atenders') ? 'active-page' : '' ?>">Without AOC (<?= count($maketenders) - count($aocmaketenders); ?>)</a></li>
+                                <li><a href="/site/aoctenders" class="<?= ($controller == 'site' && $action == 'aoctenders') ? 'active-page' : '' ?>">Fresh AOCs (<?= count($aocmaketenders); ?>)</a></li>
+                                <li><a href="/site/atenders" class="<?= ($controller == 'site' && $action == 'atenders') ? 'active-page' : '' ?>">Pending AOCs (<?= count($nonaocmaketenders); ?>)</a></li>
+                                <li><a href="/site/archivetenders" class="<?= ($controller == 'site' && $action == 'archivetenders') ? 'active-page' : '' ?>">Archived (<?= count($armaketenders); ?>)</a></li>
                             </ul>
                         </div>
                     </li>
@@ -352,6 +384,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         <a class="waves-effect waves-grey" href="/products/addresses">
                             <i class="material-icons">perm_contact_calendar</i>
                             Office Addresses
+                        </a>
+                    </li>
+                    <li class="no-padding <?= ($controller == 'search' && $action == 'index') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/search/index">
+                            <i class="material-icons">search</i>
+                            Advanced search
                         </a>
                     </li>
                 </ul>

@@ -43,7 +43,7 @@ class MailController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'sendmess', 'uploadawsdata', 'mlogs', 'clogs', 'updatelogs', 'resendmail', 'data', 'getdata'],
+                        'actions' => ['logout', 'index', 'sendmess', 'create-excel-items', 'uploadawsdata', 'mlogs', 'clogs', 'updatelogs', 'resendmail', 'data', 'getdata'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -1419,7 +1419,7 @@ class MailController extends Controller {
                             $allclmakes = '';
                             if (isset($singlemake) && count($singlemake)) {
                                 foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                    $makename = \common\models\Make::find()->where(['id' => $__smake, 'status' => 1])->one();
                                     if (@$makename) {
                                         $clmakename = $makename->make;
                                     }
@@ -1637,7 +1637,7 @@ class MailController extends Controller {
 
 
                             if ($__data['ttype'] == 1) {
-                                $plusquantity = $__data['quantity'];
+                                $plusquantity += $__data['quantity'];
                                 $arrayData = [];
                                 if (in_array($__data['ref'], $tid)) {
                                     $arrayData[] = '';
@@ -1674,7 +1674,7 @@ class MailController extends Controller {
                                 $tid[] = $__data['ref'];
                                 $final[] = $arrayData;
                             } elseif ($__data['ttype'] == 2) {
-                                $plusquantity = $__data['quantity'];
+                                $plusquantity += $__data['quantity'];
                                 $arrayData = [];
                                 if (in_array($__data['ref'], $tid)) {
                                     $arrayData[] = '';
@@ -2047,6 +2047,11 @@ class MailController extends Controller {
                         //$activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
                     }
                 }
+                if (count($final) == $c) {
+                    $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getFill()
+                            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                            ->getStartColor()->setARGB('ADD8E6');
+                }
                 $activeSheet->getStyle('A' . $c . ':' . $end . '' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
                 $activeSheet->getStyle('D' . $p . ':E' . $p . '')->applyFromArray($styleArrayinside);
                 $activeSheet->getStyle('J' . $p . ':M' . $p . '')->applyFromArray($styleArrayinside);
@@ -2182,6 +2187,409 @@ class MailController extends Controller {
                     }
                 }
             }
+        }
+    }
+
+    public function actionCreateExcelItems($id) {
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        $imageURL = Yii::$app->params['IMAGE_URL'];
+        $user = Yii::$app->user->identity;
+        $data = [];
+        $finalmakes = [];
+        $alldetails = [];
+        $newidetails = [];
+        $size = [];
+        $tfit = [];
+        $cfit = [];
+
+        $_tender = \common\models\Tender::find()->where(['id' => $id])->one();
+
+        $tdetails = '';
+        $command = Sitecontroller::actionGetcommand($_tender->command);
+        if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
+            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+        } else {
+            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+        }
+        $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
+        $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
+        if ($user->group_id == 6) {
+            $items = \common\models\Item::find()->where(['tender_id' => $_tender->id, 'tenderfour' => $user->authtype])->all();
+        } else {
+            $items = \common\models\Item::find()->where(['tender_id' => $_tender->id])->all();
+        }
+        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
+        if ($items) {
+            foreach ($items as $_item) {
+                if ($user->group_id == 6) {
+                    $type = @$user->authtype;
+                    if ($type == 1) {
+                        $make = $user->cables;
+                    } elseif ($type == 2) {
+                        $make = $user->lighting;
+                    } else {
+                        $make = $user->cables;
+                    }
+                    $idetails = \common\models\ItemDetails::find()->where(['item_id' => $_item->id])->andWhere('find_in_set(:key2, make)', [':key2' => $make])->one();
+                } else {
+                    $idetails = \common\models\ItemDetails::find()->where(['item_id' => $_item->id])->one();
+                }
+
+                if ($idetails) {
+                    $imakes = explode(',', $idetails->make);
+                    $descfull = '';
+                    if ($_item->tendertwo != '' && $_item->tendertwo != 0) {
+                        $two = Sitecontroller::actionTendertwo($_item->tendertwo);
+                        $descfull .= $two . ',';
+                    }
+                    if ($_item->tenderthree != '' && $_item->tenderthree != 0) {
+                        $three = Sitecontroller::actionTenderthree($_item->tenderthree);
+                        $descfull .= $three . ',';
+                    }
+                    if ($_item->tenderfour != '' && $_item->tenderfour != 0) {
+                        $four = Sitecontroller::actionTenderfour($_item->tenderfour);
+                        $descfull .= $four . ',';
+                    }
+                    if ($_item->tenderfour == 1) {
+                        if ($_item->tenderfive != '' && $_item->tenderfive != 0) {
+                            $five = Sitecontroller::actionTenderfive($_item->tenderfive);
+                            $descfull .= $five . ',';
+                        }
+                    }
+                    if ($_item->tendersix != '' && $_item->tendersix != 0) {
+                        $six = Sitecontroller::actionTendersix($_item->tendersix);
+                        $descfull .= $six . ',';
+                    }
+                    if ($_item->tenderfour == 1) {
+                        $itemtype = 'Cables';
+                    } elseif ($_item->tenderfour == 2) {
+                        $itemtype = 'Lighting';
+                    } elseif ($_item->tendertwo == 14) {
+                        $itemtype = 'Cement';
+                    } elseif ($_item->tendertwo == 15) {
+                        $itemtype = 'Reinforcement Steel';
+                    } elseif ($_item->tendertwo == 16) {
+                        $itemtype = 'Structural Steel';
+                    } elseif ($_item->tendertwo == 17) {
+                        $itemtype = 'Non Structural Steel';
+                    }
+                    $descfull = rtrim($descfull, ',');
+                    $i = 0;
+                    $allmakes = '';
+                    $makenameall = '';
+                    if (@$imakes) {
+                        foreach ($imakes as $mid) {
+                            //$makename = \common\models\Make::find()->where(['id' => $mid])->one();
+                            //if (@$makename) {
+                            $makenameall .= $mid . ',';
+                            //}
+                        }
+                    }
+                    $allmakes = rtrim($makenameall, ',');
+
+                    if (isset($idetails->description)) {
+                        $size = \common\models\Size::find()->where(['id' => $idetails->description])->one();
+                    }
+                    if (isset($idetails->typefitting) && isset($idetails->capacityfitting)) {
+                        $tfit = \common\models\Fitting::find()->where(['id' => $idetails->typefitting, 'type' => 1])->one();
+                        $cfit = \common\models\Fitting::find()->where(['id' => $idetails->capacityfitting, 'type' => 2])->one();
+                    }
+                    $contractor = \common\models\Contractor::find()->where(['id' => $_tender->contractor])->one();
+                    if ($idetails->core == 1) {
+                        $core = '1 Core';
+                    } elseif ($idetails->core == 2) {
+                        $core = '2 Core';
+                    } elseif ($idetails->core == 3) {
+                        $core = '3 Core';
+                    } elseif ($idetails->core == 4) {
+                        $core = '3.5 Core';
+                    } elseif ($idetails->core == 5) {
+                        $core = '4 Core';
+                    } elseif ($idetails->core == 6) {
+                        $core = '5 Core';
+                    } elseif ($idetails->core == 7) {
+                        $core = '6 Core';
+                    } elseif ($idetails->core == 8) {
+                        $core = '7 Core';
+                    } elseif ($idetails->core == 9) {
+                        $core = '10 Core';
+                    }
+
+                    if (isset($_item->tenderfour)) {
+                        $ttype = $_item->tenderfour;
+                    } else {
+                        $ttype = $_item->tendertwo;
+                    }
+                    if (@$_tender->qvalue) {
+                        $foo = (str_replace(',', '', @$_tender->qvalue) / 100000);
+                        $amount = number_format((float) $foo, 2, '.', '');
+                    } else {
+                        $amount = '';
+                    }
+
+                    $newidetails['itemtender'] = $idetails->itemtender;
+                    $newidetails['tdetails'] = $tdetails;
+                    $newidetails['idetails'] = $descfull;
+                    $newidetails['sizes'] = @$size->size;
+                    $newidetails['units'] = $idetails->units;
+                    $newidetails['quantity'] = $idetails->quantity . '.00';
+                    $newidetails['itype'] = $itemtype;
+                    $newidetails['allmakes'] = $allmakes;
+                    $newidetails['core'] = @$core;
+                    $newidetails['typefitting'] = @$tfit->text;
+                    $newidetails['capacityfitting'] = @$cfit->text;
+                    $newidetails['itemid'] = $idetails->item_id;
+                    $newidetails['firm'] = @$contractor->firm;
+                    $newidetails['cperson'] = @$contractor->name;
+                    $newidetails['caddress'] = @$contractor->address;
+                    $newidetails['ccontact'] = @$contractor->contact;
+                    $newidetails['cemail'] = @$contractor->email;
+                    $newidetails['tid'] = $_tender->id;
+                    $newidetails['cvalue'] = $amount;
+                    $newidetails['ttype'] = $ttype;
+                    $alldetails[] = $newidetails;
+                    $i++;
+                }
+            }
+        }
+        $datatender = [];
+        if ($alldetails) {
+            foreach ($alldetails as $k => $_all) {
+                $tender = \common\models\Tender::find()->where(['id' => $_all['tid']])->one();
+                $datatender[$k] = $alldetails[$k];
+                $datatender[$k]['ref'] = $tender['tender_id'];
+            }
+        }
+
+        if (isset($datatender) && count($datatender)) {
+            foreach ($datatender as $k => $cldata) {
+                $singlemake = [];
+                if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
+                    if (isset($cldata['allmakes'])) {
+                        $singlemake = explode(',', $cldata['allmakes']);
+                        $clmakename = '';
+                        $allclmakes = '';
+                        if (isset($singlemake) && count($singlemake)) {
+                            foreach ($singlemake as $__smake) {
+                                $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                if (@$makename) {
+                                    $clmakename .= $makename->make . ',';
+                                }
+                            }
+                        }
+                        $allclmakes = rtrim($clmakename, ',');
+                    }
+                    $datatender[$k]['allmakes'] = $allclmakes;
+                } else {
+                    if (isset($cldata['allmakes'])) {
+                        $singlemake = explode(',', $cldata['allmakes']);
+                        $clmakename = '';
+                        $allclmakes = '';
+                        if (isset($singlemake) && count($singlemake)) {
+                            foreach ($singlemake as $__smake) {
+                                $makename = \common\models\Make::find()->where(['id' => $__smake, 'status' => 1])->one();
+                                if (@$makename) {
+                                    $clmakename = $makename->make;
+                                }
+                                $cldata['allmakes'] = $clmakename;
+                                unset($datatender[$k]);
+                                $datatender[] = $cldata;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        $plusquantity = 0;
+        $filestosend = [];
+        $tenderids = [];
+        $itemids = [];
+        if (isset($datatender) && count($datatender)) {
+            $mailnum = 1;
+            $header = [];
+            $i = 0;
+            $sno = 1;
+            $tid = [];
+            $firmid = [];
+            $final = [];
+            foreach ($datatender as $k => $__data) {
+                if ($i == 0) {
+                    if ($__data['ttype'] == 1) {
+                        $header[] = "Sr.No." . "\t";
+                        $header[] = "Tender Id" . "\t";
+                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                        $header[] = "Details of Contracting Office" . "\t";
+                        $header[] = "Item Details" . "\t";
+                        $header[] = "Size" . "\t";
+                        $header[] = "Core" . "\t";
+                        $header[] = "Units" . "\t";
+                        $header[] = "Quantity" . "\t";
+                        $header[] = "All Approved Makes In Contract" . "\t";
+                        $header[] = "Name of Contractor" . "\t";
+                        $header[] = "Name of Contact Person" . "\t";
+                        $header[] = "Address of Contractor" . "\t";
+                        $header[] = "Contact Number" . "\t";
+                        $header[] = "E-mail ID" . "\t";
+                    } elseif ($__data['ttype'] == 2) {
+                        $header[] = "Sr.No." . "\t";
+                        $header[] = "Tender Id" . "\t";
+                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                        $header[] = "Details of Contracting Office" . "\t";
+                        $header[] = "Item Details" . "\t";
+                        $header[] = "Type of Fitting" . "\t";
+                        $header[] = "Capacity of Fitting" . "\t";
+                        $header[] = "Units" . "\t";
+                        $header[] = "Quantity" . "\t";
+                        $header[] = "All Approved Makes In Contract" . "\t";
+                        $header[] = "Name of Contractor" . "\t";
+                        $header[] = "Name of Contact Person" . "\t";
+                        $header[] = "Address of Contractor" . "\t";
+                        $header[] = "Contact Number" . "\t";
+                        $header[] = "E-mail ID" . "\t";
+                    } else {
+                        $header[] = "Sr.No." . "\t";
+                        $header[] = "Tender Id" . "\t";
+                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                        $header[] = "Details of Contracting Office" . "\t";
+                        $header[] = "Item Details" . "\t";
+                        $header[] = "All Approved Makes In Contract" . "\t";
+                        $header[] = "Name of Contractor" . "\t";
+                        $header[] = "Name of Contact Person" . "\t";
+                        $header[] = "Address of Contractor" . "\t";
+                        $header[] = "Contact Number" . "\t";
+                        $header[] = "E-mail ID" . "\t";
+                    }
+
+                    $final[] = $header;
+                }
+
+
+                if ($__data['ttype'] == 1) {
+                    $plusquantity += $__data['quantity'];
+                    $arrayData = [];
+                    if (in_array($__data['ref'], $tid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $arrayData[] = $sno;
+                        $arrayData[] = $__data['ref'];
+                        $arrayData[] = $__data['cvalue'];
+                        $arrayData[] = $__data['tdetails'];
+                        $sno++;
+                    }
+                    $arrayData[] = $__data['idetails'];
+                    $arrayData[] = @$__data['sizes'];
+                    $arrayData[] = @$__data['core'];
+                    $arrayData[] = $__data['units'];
+                    $arrayData[] = $__data['quantity'];
+                    $arrayData[] = $__data['allmakes'];
+                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $firmid[] = $__data['firm'];
+                        $arrayData[] = $__data['firm'];
+                        $arrayData[] = $__data['cperson'];
+                        $arrayData[] = $__data['caddress'];
+                        $arrayData[] = $__data['ccontact'];
+                        $arrayData[] = $__data['cemail'];
+                    }
+                    $tid[] = $__data['ref'];
+                    $final[] = $arrayData;
+                } elseif ($__data['ttype'] == 2) {
+                    $plusquantity += $__data['quantity'];
+                    $arrayData = [];
+                    if (in_array($__data['ref'], $tid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $arrayData[] = $sno;
+                        $arrayData[] = $__data['ref'];
+                        $arrayData[] = $__data['cvalue'];
+                        $arrayData[] = $__data['tdetails'];
+                        $sno++;
+                    }
+                    $arrayData[] = $__data['idetails'];
+                    $arrayData[] = @$__data['typefitting'];
+                    $arrayData[] = @$__data['capacityfitting'];
+                    $arrayData[] = $__data['units'];
+                    $arrayData[] = $__data['quantity'];
+                    $arrayData[] = $__data['allmakes'];
+                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $firmid[] = $__data['firm'];
+                        $arrayData[] = $__data['firm'];
+                        $arrayData[] = $__data['cperson'];
+                        $arrayData[] = $__data['caddress'];
+                        $arrayData[] = $__data['ccontact'];
+                        $arrayData[] = $__data['cemail'];
+                    }
+                    $tid[] = $__data['ref'];
+                    $final[] = $arrayData;
+                } else {
+                    $arrayData = [];
+                    if (in_array($__data['ref'], $tid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $arrayData[] = $sno;
+                        $arrayData[] = $__data['ref'];
+                        $arrayData[] = $__data['cvalue'];
+                        $arrayData[] = $__data['tdetails'];
+                        $arrayData[] = $__data['idetails'];
+                        $sno++;
+                    }
+
+                    $arrayData[] = $__data['allmakes'];
+                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                        $arrayData[] = '';
+                    } else {
+                        $firmid[] = $__data['firm'];
+                        $arrayData[] = $__data['firm'];
+                        $arrayData[] = $__data['cperson'];
+                        $arrayData[] = $__data['caddress'];
+                        $arrayData[] = $__data['ccontact'];
+                        $arrayData[] = $__data['cemail'];
+                    }
+                    $tid[] = $__data['ref'];
+                    $final[] = $arrayData;
+                }
+                $i++;
+                $tenderids[] = $__data['tid'];
+                $tarchives[] = $__data['tid'];
+                $itemids[] = $__data['itemid'];
+            }
+            $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
+            $excel = $this->actionCreateexcel($final, $__data['ttype']);
+
+            header('Content-Type: application/vnd.ms-excel');
+            header('Content-Disposition: attachment;filename="' . $__data['ref'] . '.xlsx"');
+            header('Cache-Control: max-age=0');
+            $excel->save('php://output');
+            DIE();
+        } else {
+            Yii::$app->session->setFlash('error', "Items not available for this tender");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
         }
     }
 
