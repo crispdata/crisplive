@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'getcegraph', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -138,9 +138,6 @@ class SiteController extends Controller {
             $valuesone = '';
             $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->all();
             $archivetenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $type])->all();
-
-
-
 //dashboatd
             $finalgraph[] = ['Command', 'All Tenders'];
 //commands
@@ -4398,7 +4395,9 @@ class SiteController extends Controller {
     public function actionSearchtender() {
         $user = Yii::$app->user->identity;
         $val = $_REQUEST['val'];
-//$query = new \yii\sphinx\Query();
+
+        $connection = Yii::$app->getDb();
+
 
         if ($user->group_id == 6) {
             $type = @$user->authtype;
@@ -4409,9 +4408,17 @@ class SiteController extends Controller {
             } else {
                 $make = $user->cables;
             }
-            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['like', 'tenders.tender_id', '%' . $val . '%', false])->andWhere(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tid' => $val])->andWhere(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
         } else {
-            $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (index1)')])->where(['like', 'tender_id', '%' . $val . '%', false])->orderBy(['id' => SORT_DESC])->all();
+           /* $command = $connection->createCommand("Select * from tenders where match(tid) AGAINST (" . $val . ") ORDER BY id DESC;
+");
+            $tenders = $command->queryAll();
+            if(isset($tenders) && count($tenders)){
+                foreach($tenders as $_tender){
+                    $alltenders[] = (object)$_tender;
+                }
+            }*/
+            $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (tid)')])->where(['tid' => $val])->orderBy(['id' => SORT_DESC])->all();
         }
         $contractors = [];
         $pages = [];
@@ -4728,7 +4735,7 @@ class SiteController extends Controller {
                 $make = $user->cables;
             }
 
-            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
         } else {
             $tenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC]);
         }
@@ -4775,12 +4782,25 @@ class SiteController extends Controller {
     }
 
     public function actionArchivetenders() {
-
+        $user = Yii::$app->user->identity;
         $val = @$_POST['sort'];
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['is_archived' => 1])->orderBy(['id' => SORT_DESC]);
+        if ($user->group_id == 6) {
+            $type = @$user->authtype;
+            if ($type == 1) {
+                $make = $user->cables;
+            } elseif ($type == 2) {
+                $make = $user->lighting;
+            } else {
+                $make = $user->cables;
+            }
+
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+        } else {
+            $tenders = \common\models\Tender::find()->where(['is_archived' => 1])->orderBy(['id' => SORT_DESC]);
+        }
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -5257,6 +5277,10 @@ class SiteController extends Controller {
                 $model->work = $_POST['work'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
+                $tid = explode('_', $model->tender_id);
+                if (count($tid)) {
+                    $model->tid = trim(@$tid['2']);
+                }
                 $model->published_date = @$_POST['pdate'];
                 $model->document_date = @$_POST['ddate'];
                 $model->bid_sub_date = @$_POST['subdate'];
@@ -5310,6 +5334,10 @@ class SiteController extends Controller {
                 $model->work = $_POST['work'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
+                $tid = explode('_', $model->tender_id);
+                if (count($tid)) {
+                    $model->tid = trim(@$tid['2']);
+                }
                 $model->published_date = @$_POST['pdate'];
                 $model->document_date = @$_POST['ddate'];
                 $model->bid_sub_date = @$_POST['subdate'];
@@ -7556,7 +7584,7 @@ class SiteController extends Controller {
                 return "ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES";
                 break;
             case "4":
-                return "ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES";
+                return "ADG (OF and DRDO)  AND CE (R and D) DELHI - MES";
                 break;
             case "5":
                 return "ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES";
@@ -10165,7 +10193,9 @@ class SiteController extends Controller {
                 if ($querydata) {
                     $contractor = \common\models\Contractor::find()->where(['id' => $lid])->one();
                     $tender = \common\models\Tender::find()->where(['id' => $_POST['tid']])->one();
-                    if ($contractor->contact != '') {
+                    if ($contractor->contact == '' && $contractor->email == '') {
+                        $tender->on_hold = '1';
+                    } else {
                         $tender->on_hold = '';
                     }
                     $tender->aoc_status = 1;
@@ -10387,6 +10417,22 @@ class SiteController extends Controller {
         $idetails->save();
 
         echo json_encode(['success' => 1]);
+        die();
+    }
+
+    public function actionFeedback() {
+        $user = Yii::$app->user->identity;
+        $data = $_REQUEST;
+        $model = new \common\models\Feedbacks();
+        $model->user_id = $user->id;
+        $model->text = $data['text'];
+        $model->createdon = date('Y-m-d h:i:s');
+        $model->status = 1;
+        if ($model->save()) {
+            echo '1';
+        } else {
+            echo '0';
+        }
         die();
     }
 

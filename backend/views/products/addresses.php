@@ -280,7 +280,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </select>
                                 </div>
                             </div>
-                            <?php }
+                        <?php }
                         ?>
 
                         <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
@@ -309,7 +309,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                         <tr data-id = "<?= $user->id ?>">
                                             <td class = ""><?= $key + 1 ?></td>
-                                            <td class = ""><?= $user->command ?></td>
+                                            <td class = ""><?= str_replace('-MES','',str_replace(' - MES', '', $user->command)); ?></td>
                                             <td class = ""><?= $user->contact ?></td>
                                             <td class = ""><?= $user->email ?></td>
                                             <td class = ""><?= $user->address ?></td>

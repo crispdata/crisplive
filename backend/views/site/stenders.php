@@ -51,7 +51,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         font-size: 30px;
     }
 
-    #contacts_list a{width:100px!important;}
     ::placeholder{color:#9e9e9e;}
     .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
     .modal .modal-content h5{text-align: center;}
@@ -200,7 +199,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             ?>
 
                                             <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
-
+                                            <a href="<?= Url::to(['mail/create-excel-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn m-b-xs">Download Items in Excel</a>
                                             <a onclick="openmodal('modalfiles<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
                                             <?php if ($contractor) { ?>
                                                 <a onclick="openmodal('modalcont<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
@@ -440,13 +439,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <div class="input-field col s12 row">
                                             <select class="validate required materialSelectcontractor browser-default cont<?= $tender->id; ?>" required="" name="contractor" id="contractor">
                                                 <?php /*
-                                                if ($contractors) {
-                                                    foreach ($contractors as $contract) {
-                                                        ?>
-                                                        <option value="<?= $contract->id; ?>"><?= $contract->firm . ' - ' . $contract->address; ?></option>
-                                                        <?php
-                                                    }
-                                                }*/
+                                                  if ($contractors) {
+                                                  foreach ($contractors as $contract) {
+                                                  ?>
+                                                  <option value="<?= $contract->id; ?>"><?= $contract->firm . ' - ' . $contract->address; ?></option>
+                                                  <?php
+                                                  }
+                                                  } */
                                                 ?>
 
                                             </select>

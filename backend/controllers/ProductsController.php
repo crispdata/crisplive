@@ -945,18 +945,27 @@ class ProductsController extends Controller {
                 }
                 $addressavailable = $address->one();
 
-                if ($addressavailable) {
-                    Yii::$app->session->setFlash('error', "Address already existed");
-                } else {
-                    $files = \Yii::$app
-                            ->db
-                            ->createCommand()
-                            ->insert('addresses', $model)
-                            ->execute();
+                /* if ($addressavailable) {
+                  Yii::$app->session->setFlash('error', "Address already existed");
+                  } else {
+                  $files = \Yii::$app
+                  ->db
+                  ->createCommand()
+                  ->insert('addresses', $model)
+                  ->execute();
 
-                    if ($files) {
-                        Yii::$app->session->setFlash('success', "Address successfully added");
-                    }
+                  if ($files) {
+                  Yii::$app->session->setFlash('success', "Address successfully added");
+                  }
+                  } */
+                $files = \Yii::$app
+                        ->db
+                        ->createCommand()
+                        ->insert('addresses', $model)
+                        ->execute();
+
+                if ($files) {
+                    Yii::$app->session->setFlash('success', "Address successfully added");
                 }
             }
             return $this->redirect(array('products/addaddress'));
@@ -1056,7 +1065,7 @@ class ProductsController extends Controller {
                 return "ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES";
                 break;
             case "4":
-                return "ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES";
+                return "ADG (OF and DRDO)  AND CE (R and D) DELHI - MES";
                 break;
             case "5":
                 return "ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES";

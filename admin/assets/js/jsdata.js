@@ -222,7 +222,40 @@ $(document).ready(function () {
         }
     });
 
+    $('#feedback').on('submit', function (e) {
 
+        e.preventDefault();
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/feedback',
+            data: $('#feedback').serialize(),
+            beforeSend: function () {
+                $("#signbutton").html('<img src="assets/images/loading.gif" alt="">');
+                $("#signbutton").attr('disabled', 'true');
+            },
+            success: function (response) {
+                if (response == 1) {
+                    var message = 'Thank you for giving your valuable suggestions/feedback.';
+                    swal({
+                        title: "Success!",
+                        text: message,
+                        type: "success",
+                        showCancelButton: false,
+                        showConfirmButton: false,
+                        timer: 3000,
+                    }
+                    , function () {
+                        window.location.reload();
+                    })
+                            ;
+                } else {
+                    swal("Sorry", 'Your feedback process has been failed. If you want you can try again', "error");
+                }
+                $("#signbutton").text('Submit');
+                $("#signbutton").removeAttr('disabled');
+            }
+        });
+    });
 
     $('.todatepicker').datepicker({
         showAnim: "fold",

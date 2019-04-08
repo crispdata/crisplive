@@ -118,6 +118,10 @@ $config = [
                 [
                     'pattern' => 'products/addaddress/<id:\d+>',
                     'route' => 'products/addaddress'
+                ],
+                [
+                    'pattern' => 'mail/create-excel-items/<id:\d+>',
+                    'route' => 'mail/create-excel-items'
                 ]
             ]
         ],

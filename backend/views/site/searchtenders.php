@@ -268,7 +268,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 }
                                                 ?>
                                                 <a href="<?= $baseURL ?>site/view-items?id=<?= $tender->id; ?>" class="waves-effect waves-light btn blue">View Items</a>
-
+                                                <a href="<?= Url::to(['mail/create-excel-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn m-b-xs">Download Items in Excel</a>
                                                 <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
 
                                             </td>

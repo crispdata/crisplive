@@ -159,8 +159,16 @@ class SearchController extends Controller {
                     }
                 }
             } else {
-                if ($user->group_id != 4 && $user->group_id != 5) {
-                    $tenders = \common\models\Tender::find()->where(['status' => '1']);
+                if ($user->group_id == 6) {
+                    $type = @$user->authtype;
+                    if ($type == 1) {
+                        $make = $user->cables;
+                    } elseif ($type == 2) {
+                        $make = $user->lighting;
+                    } else {
+                        $make = $user->cables;
+                    }
+                    $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
                 } else {
                     $tenders = \common\models\Tender::find()->where(['status' => '1']);
                 }
@@ -185,9 +193,9 @@ class SearchController extends Controller {
 
             if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
                 $tenders->andWhere(['or',
-                    ['like', 'work', '%' . @$_REQUEST['keyword'] . '%', false],
-                    ['like', 'reference_no', '%' . @$_REQUEST['keyword'] . '%', false],
-                    ['like', 'tender_id', '%' . @$_REQUEST['keyword'] . '%', false]
+                    ['like', 'tenders.work', '%' . @$_REQUEST['keyword'] . '%', false],
+                    ['like', 'tenders.reference_no', '%' . @$_REQUEST['keyword'] . '%', false],
+                    ['like', 'tenders.tender_id', '%' . @$_REQUEST['keyword'] . '%', false]
                 ]);
             }
             if (isset($_REQUEST['contype']) && $_REQUEST['contype'] != '') {
@@ -846,7 +854,7 @@ class SearchController extends Controller {
                         'graphs' => $finalgraph,
                         'lightchart' => @$lightchart,
                         'lightmakechart' => @$lightmakechart,
-                        'type'=>$type,
+                        'type' => $type,
                         'graphsce' => ''
             ]);
         } else {

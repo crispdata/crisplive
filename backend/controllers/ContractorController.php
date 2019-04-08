@@ -42,7 +42,7 @@ class ContractorController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'updatecontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
+                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'updatetenders', 'updatecontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -290,6 +290,18 @@ class ContractorController extends Controller {
                 $fname = str_replace('M/S ', '', $fname);
                 $_contractor->firmname = trim($fname);
                 $_contractor->save();
+            }
+        }
+    }
+
+    public function actionUpdatetenders() {
+        $tenders = \common\models\Tender::find()->all();
+        
+        if ($tenders) {
+            foreach ($tenders as $_tender) {
+                $tid = explode('_',$_tender->tender_id);
+                $_tender->tid = trim($tid['2']);
+                $_tender->save();
             }
         }
     }
