@@ -88,17 +88,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <td class = ""><?= @$client->make ?></td>
                                         <td class = "tenderids"><?= $tenderids ?></td>
                                         <td class = "files">
-                                            <?php
-                                            $files = explode(',', $_log->filename);
-                                            $filepaths = explode(',', $_log->filepath);
-                                            if ($files) {
-                                                foreach ($files as $k=> $_file) {
-                                                    ?>
-                                                    <a href="<?= $filepaths[$k] ?>" style="word-wrap: break-word;"><?= $_file ?></a><br>
-                                                    <?php
-                                                }
-                                            }
-                                            ?>
+                                             <a href="<?= $_log->filepath ?>" style="word-wrap: break-word; cursor: pointer;"><?= $_log->filename ?></a>
                                         </td>
                                         <td class=""><?= date('d F Y', strtotime($_log->createdon)); ?></td>
                                         <td class=""><a onclick="resendmail('<?= @$client->email; ?>', '<?= $_log->filename ?>', '<?= $_log->filepath ?>')" class="waves-effect waves-light btn blue">Resend Mail</a></td>

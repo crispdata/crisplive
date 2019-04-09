@@ -1236,8 +1236,7 @@ class MailController extends Controller {
         $cfit = [];
         $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC])->all();
 
-
-        if ($tenders) {
+        if (isset($tenders) && count($tenders)) {
             foreach ($tenders as $_tender) {
                 $tdetails = '';
                 $command = Sitecontroller::actionGetcommand($_tender->command);
@@ -1368,413 +1367,418 @@ class MailController extends Controller {
                     }
                 }
             }
-        }
 
-        if ($alldetails) {
-            foreach ($alldetails as $k => $_all) {
-                $makename = \common\models\Make::find()->where(['id' => $_all['make']])->one();
-                $tender = \common\models\Tender::find()->where(['id' => $_all['tid']])->one();
-                $datatender[$k] = $alldetails[$k];
-                $datatender[$k]['ref'] = $tender['tender_id'];
-                $datatender[$k]['mid'] = @$makename->id;
-                $datatender[$k]['makename'] = @$makename->make;
-                $datatender[$k]['email'] = @$makename->email;
-            }
-        }
 
-        if (@$datatender) {
-            foreach ($datatender as $_make) {
-                if (array_key_exists($_make['make'], $data)) {
-                    $data[$_make['make']][] = $_make;
-                } else {
-                    $data[$_make['make']][] = $_make;
+            if ($alldetails) {
+                foreach ($alldetails as $k => $_all) {
+                    $makename = \common\models\Make::find()->where(['id' => $_all['make'], 'status' => 1])->one();
+                    $tender = \common\models\Tender::find()->where(['id' => $_all['tid']])->one();
+                    if (@$makename) {
+                        $datatender[$k] = $alldetails[$k];
+                        $datatender[$k]['ref'] = $tender['tender_id'];
+                        $datatender[$k]['mid'] = @$makename->id;
+                        $datatender[$k]['makename'] = @$makename->make;
+                        $datatender[$k]['email'] = @$makename->email;
+                    }
                 }
             }
-        }
 
-        if (isset($data) && count($data)) {
-            foreach ($data as $k => $_cldata) {
-                foreach ($_cldata as $key => $cldata) {
-                    $singlemake = [];
-                    if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
-                        if (isset($cldata['allmakes'])) {
-                            $singlemake = explode(',', $cldata['allmakes']);
-                            $clmakename = '';
-                            $allclmakes = '';
-                            if (isset($singlemake) && count($singlemake)) {
-                                foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
-                                    if (@$makename) {
-                                        $clmakename .= $makename->make . ',';
-                                    }
-                                }
-                            }
-                            $allclmakes = rtrim($clmakename, ',');
-                        }
-                        $data[$k][$key]['allmakes'] = $allclmakes;
+            if (@$datatender) {
+                foreach ($datatender as $_make) {
+                    if (array_key_exists($_make['make'], $data)) {
+                        $data[$_make['make']][] = $_make;
                     } else {
-                        if (isset($cldata['allmakes'])) {
-                            $singlemake = explode(',', $cldata['allmakes']);
-                            $clmakename = '';
-                            $allclmakes = '';
-                            if (isset($singlemake) && count($singlemake)) {
-                                foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake, 'status' => 1])->one();
-                                    if (@$makename) {
-                                        $clmakename = $makename->make;
+                        $data[$_make['make']][] = $_make;
+                    }
+                }
+            }
+
+            if (isset($data) && count($data)) {
+                foreach ($data as $k => $_cldata) {
+                    foreach ($_cldata as $key => $cldata) {
+                        $singlemake = [];
+                        if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
+                            if (isset($cldata['allmakes'])) {
+                                $singlemake = explode(',', $cldata['allmakes']);
+                                $clmakename = '';
+                                $allclmakes = '';
+                                if (isset($singlemake) && count($singlemake)) {
+                                    foreach ($singlemake as $__smake) {
+                                        $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                        if (@$makename) {
+                                            $clmakename .= $makename->make . ',';
+                                        }
                                     }
-                                    $cldata['allmakes'] = $clmakename;
-                                    unset($data[$k][$key]);
-                                    $data[$k][] = $cldata;
+                                }
+                                $allclmakes = rtrim($clmakename, ',');
+                            }
+                            $data[$k][$key]['allmakes'] = $allclmakes;
+                        } else {
+                            if (isset($cldata['allmakes'])) {
+                                $singlemake = explode(',', $cldata['allmakes']);
+                                $clmakename = '';
+                                $allclmakes = '';
+                                if (isset($singlemake) && count($singlemake)) {
+                                    foreach ($singlemake as $__smake) {
+                                        $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                        if (@$makename) {
+                                            $clmakename = $makename->make;
+                                            $cldata['allmakes'] = $clmakename;
+                                            unset($data[$k][$key]);
+                                            $data[$k][] = $cldata;
+                                        }
+                                    }
                                 }
                             }
                         }
                     }
                 }
             }
-        }
 
-        $clients = \common\models\Clients::find()->where(['type' => [1, 3], 'status' => 1])->all();
+            $clients = \common\models\Clients::find()->where(['type' => [1, 3], 'status' => 1])->all();
 
-        if ($data) {
-            foreach ($data as $k => $civil) {
-                foreach ($civil as $key => $_civil) {
-                    if ($_civil['ttype'] == 14 || $_civil['ttype'] == 15 || $_civil['ttype'] == 16 || $_civil['ttype'] == 17) {
-                        $civildata[$k][$key] = $_civil;
+            if ($data) {
+                foreach ($data as $k => $civil) {
+                    foreach ($civil as $key => $_civil) {
+                        if ($_civil['ttype'] == 14 || $_civil['ttype'] == 15 || $_civil['ttype'] == 16 || $_civil['ttype'] == 17) {
+                            $civildata[$k][$key] = $_civil;
+                        }
                     }
                 }
             }
-        }
 
-        $filestosend = [];
-        $tenderids = [];
-        $tarchives = [];
-        $itemids = [];
-        if (isset($civildata) && count($civildata)) {
-            $mailnum = 1;
-            foreach ($civildata as $k => $_data) {
-                $header = [];
-                $filestosend = [];
-                $cdetails = [];
-                $i = 0;
-                $sno = 1;
-                $tid = [];
-                $firmid = [];
-                $final = [];
+            $filestosend = [];
+            $tenderids = [];
+            $tarchives = [];
+            $itemids = [];
+            if (isset($civildata) && count($civildata)) {
+                $mailnum = 1;
+                foreach ($civildata as $k => $_data) {
+                    $header = [];
+                    $filestosend = [];
+                    $cdetails = [];
+                    $i = 0;
+                    $sno = 1;
+                    $tid = [];
+                    $firmid = [];
+                    $final = [];
 
-                foreach ($_data as $key => $__data) {
+                    foreach ($_data as $key => $__data) {
 
-                    if ($i == 0) {
+                        if ($i == 0) {
+                            if ($__data['ttype'] == 14 || $__data['ttype'] == 15 || $__data['ttype'] == 16 || $__data['ttype'] == 17) {
+                                $header[] = "Sr.No." . "\t";
+                                $header[] = "Tender Id" . "\t";
+                                $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                $header[] = "Details of Contracting Office" . "\t";
+                                $header[] = "Item Details" . "\t";
+                                $header[] = "All Approved Makes In Contract" . "\t";
+                                $header[] = "Name of Contractor" . "\t";
+                                $header[] = "Name of Contact Person" . "\t";
+                                $header[] = "Address of Contractor" . "\t";
+                                $header[] = "Contact Number" . "\t";
+                                $header[] = "E-mail ID" . "\t";
+                            }
+                            $final[] = $header;
+                        }
+
+
                         if ($__data['ttype'] == 14 || $__data['ttype'] == 15 || $__data['ttype'] == 16 || $__data['ttype'] == 17) {
-                            $header[] = "Sr.No." . "\t";
-                            $header[] = "Tender Id" . "\t";
-                            $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                            $header[] = "Details of Contracting Office" . "\t";
-                            $header[] = "Item Details" . "\t";
-                            $header[] = "All Approved Makes In Contract" . "\t";
-                            $header[] = "Name of Contractor" . "\t";
-                            $header[] = "Name of Contact Person" . "\t";
-                            $header[] = "Address of Contractor" . "\t";
-                            $header[] = "Contact Number" . "\t";
-                            $header[] = "E-mail ID" . "\t";
-                        }
-                        $final[] = $header;
-                    }
-
-
-                    if ($__data['ttype'] == 14 || $__data['ttype'] == 15 || $__data['ttype'] == 16 || $__data['ttype'] == 17) {
-                        $arrayData = [];
-                        if (in_array($__data['ref'], $tid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $arrayData[] = $sno;
-                            $arrayData[] = $__data['ref'];
-                            $arrayData[] = $__data['cvalue'];
-                            $arrayData[] = $__data['tdetails'];
-                            $arrayData[] = $__data['idetails'];
-                            $sno++;
-                        }
-
-                        $arrayData[] = $__data['allmakes'];
-                        if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $firmid[] = $__data['firm'];
-                            $arrayData[] = $__data['firm'];
-                            $arrayData[] = $__data['cperson'];
-                            $arrayData[] = $__data['caddress'];
-                            $arrayData[] = $__data['ccontact'];
-                            $arrayData[] = $__data['cemail'];
-                        }
-                        $tid[] = $__data['ref'];
-                        $final[] = $arrayData;
-                    }
-                    $i++;
-                    $tenderids[] = $__data['tid'];
-                    $tarchives[] = $__data['tid'];
-                    $itemids[] = $__data['itemid'];
-                }
-
-                $excelsecond = $this->actionCreateexcel($final, $__data['ttype']);
-
-                /* header('Content-Type: application/vnd.ms-excel');
-                  header('Content-Disposition: attachment;filename="' . $__data['makename'] . '.xls"');
-                  header('Cache-Control: max-age=0');
-                  $excelsecond->save('php://output');
-                  DIE(); */
-
-                $excelsecond->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
-                $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
-                $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
-                $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
-                $cdetails = (object) ['id' => $__data['mid'], 'cemail' => $__data['email']];
-                $mailnum++;
-
-                $mailsent = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $cdetails, 2);
-            }
-        }
-
-
-
-        if (isset($clients) && count($clients)) {
-            foreach ($clients as $_client) {
-                $required = '';
-                $reqdetails = [];
-                $requiredlight = '';
-                $reqdetailslight = [];
-                $required = $_client->cables;
-                $reqdetails = explode(',', $required);
-                $particulardata = [];
-                if (isset($data) && count($data)) {
-                    foreach ($data as $k => $___data) {
-                        if (in_array($k, $reqdetails)) {
-                            $particulardata[] = $___data;
-                        }
-                    }
-                }
-                $requiredlight = $_client->lighting;
-                $reqdetailslight = explode(',', $requiredlight);
-                if (isset($data) && count($data)) {
-                    foreach ($data as $k => $___data) {
-                        if (in_array($k, $reqdetailslight)) {
-                            $particulardata[] = $___data;
-                        }
-                    }
-                }
-
-                $plusquantity = 0;
-                $filestosend = [];
-                $tenderids = [];
-                $itemids = [];
-                if (isset($particulardata) && count($particulardata)) {
-                    $mailnum = 1;
-                    foreach ($particulardata as $k => $_data) {
-                        $header = [];
-                        $i = 0;
-                        $sno = 1;
-                        $tid = [];
-                        $firmid = [];
-                        $final = [];
-                        foreach ($_data as $key => $__data) {
-
-                            if ($i == 0) {
-                                if ($__data['ttype'] == 1) {
-                                    $header[] = "Sr.No." . "\t";
-                                    $header[] = "Tender Id" . "\t";
-                                    $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                                    $header[] = "Details of Contracting Office" . "\t";
-                                    $header[] = "Item Details" . "\t";
-                                    $header[] = "Size" . "\t";
-                                    $header[] = "Core" . "\t";
-                                    $header[] = "Units" . "\t";
-                                    $header[] = "Quantity" . "\t";
-                                    $header[] = "All Approved Makes In Contract" . "\t";
-                                    $header[] = "Name of Contractor" . "\t";
-                                    $header[] = "Name of Contact Person" . "\t";
-                                    $header[] = "Address of Contractor" . "\t";
-                                    $header[] = "Contact Number" . "\t";
-                                    $header[] = "E-mail ID" . "\t";
-                                } elseif ($__data['ttype'] == 2) {
-                                    $header[] = "Sr.No." . "\t";
-                                    $header[] = "Tender Id" . "\t";
-                                    $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                                    $header[] = "Details of Contracting Office" . "\t";
-                                    $header[] = "Item Details" . "\t";
-                                    $header[] = "Type of Fitting" . "\t";
-                                    $header[] = "Capacity of Fitting" . "\t";
-                                    $header[] = "Units" . "\t";
-                                    $header[] = "Quantity" . "\t";
-                                    $header[] = "All Approved Makes In Contract" . "\t";
-                                    $header[] = "Name of Contractor" . "\t";
-                                    $header[] = "Name of Contact Person" . "\t";
-                                    $header[] = "Address of Contractor" . "\t";
-                                    $header[] = "Contact Number" . "\t";
-                                    $header[] = "E-mail ID" . "\t";
-                                } else {
-                                    $header[] = "Sr.No." . "\t";
-                                    $header[] = "Tender Id" . "\t";
-                                    $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                                    $header[] = "Details of Contracting Office" . "\t";
-                                    $header[] = "Item Details" . "\t";
-                                    $header[] = "All Approved Makes In Contract" . "\t";
-                                    $header[] = "Name of Contractor" . "\t";
-                                    $header[] = "Name of Contact Person" . "\t";
-                                    $header[] = "Address of Contractor" . "\t";
-                                    $header[] = "Contact Number" . "\t";
-                                    $header[] = "E-mail ID" . "\t";
-                                }
-
-                                $final[] = $header;
-                            }
-
-
-                            if ($__data['ttype'] == 1) {
-                                $plusquantity += $__data['quantity'];
-                                $arrayData = [];
-                                if (in_array($__data['ref'], $tid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $arrayData[] = $sno;
-                                    $arrayData[] = $__data['ref'];
-                                    $arrayData[] = $__data['cvalue'];
-                                    $arrayData[] = $__data['tdetails'];
-                                    $sno++;
-                                }
-                                $arrayData[] = $__data['idetails'];
-                                $arrayData[] = @$__data['sizes'];
-                                $arrayData[] = @$__data['core'];
-                                $arrayData[] = $__data['units'];
-                                $arrayData[] = $__data['quantity'];
-                                $arrayData[] = $__data['allmakes'];
-                                if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $firmid[] = $__data['firm'];
-                                    $arrayData[] = $__data['firm'];
-                                    $arrayData[] = $__data['cperson'];
-                                    $arrayData[] = $__data['caddress'];
-                                    $arrayData[] = $__data['ccontact'];
-                                    $arrayData[] = $__data['cemail'];
-                                }
-                                $tid[] = $__data['ref'];
-                                $final[] = $arrayData;
-                            } elseif ($__data['ttype'] == 2) {
-                                $plusquantity += $__data['quantity'];
-                                $arrayData = [];
-                                if (in_array($__data['ref'], $tid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $arrayData[] = $sno;
-                                    $arrayData[] = $__data['ref'];
-                                    $arrayData[] = $__data['cvalue'];
-                                    $arrayData[] = $__data['tdetails'];
-                                    $sno++;
-                                }
-                                $arrayData[] = $__data['idetails'];
-                                $arrayData[] = @$__data['typefitting'];
-                                $arrayData[] = @$__data['capacityfitting'];
-                                $arrayData[] = $__data['units'];
-                                $arrayData[] = $__data['quantity'];
-                                $arrayData[] = $__data['allmakes'];
-                                if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $firmid[] = $__data['firm'];
-                                    $arrayData[] = $__data['firm'];
-                                    $arrayData[] = $__data['cperson'];
-                                    $arrayData[] = $__data['caddress'];
-                                    $arrayData[] = $__data['ccontact'];
-                                    $arrayData[] = $__data['cemail'];
-                                }
-                                $tid[] = $__data['ref'];
-                                $final[] = $arrayData;
+                            $arrayData = [];
+                            if (in_array($__data['ref'], $tid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
                             } else {
-                                $arrayData = [];
-                                if (in_array($__data['ref'], $tid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $arrayData[] = $sno;
-                                    $arrayData[] = $__data['ref'];
-                                    $arrayData[] = $__data['cvalue'];
-                                    $arrayData[] = $__data['tdetails'];
-                                    $arrayData[] = $__data['idetails'];
-                                    $sno++;
-                                }
-
-                                $arrayData[] = $__data['allmakes'];
-                                if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                    $arrayData[] = '';
-                                } else {
-                                    $firmid[] = $__data['firm'];
-                                    $arrayData[] = $__data['firm'];
-                                    $arrayData[] = $__data['cperson'];
-                                    $arrayData[] = $__data['caddress'];
-                                    $arrayData[] = $__data['ccontact'];
-                                    $arrayData[] = $__data['cemail'];
-                                }
-                                $tid[] = $__data['ref'];
-                                $final[] = $arrayData;
+                                $arrayData[] = $sno;
+                                $arrayData[] = $__data['ref'];
+                                $arrayData[] = $__data['cvalue'];
+                                $arrayData[] = $__data['tdetails'];
+                                $arrayData[] = $__data['idetails'];
+                                $sno++;
                             }
-                            $i++;
-                            $tenderids[] = $__data['tid'];
-                            $tarchives[] = $__data['tid'];
-                            $itemids[] = $__data['itemid'];
+
+                            $arrayData[] = $__data['allmakes'];
+                            if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                            } else {
+                                $firmid[] = $__data['firm'];
+                                $arrayData[] = $__data['firm'];
+                                $arrayData[] = $__data['cperson'];
+                                $arrayData[] = $__data['caddress'];
+                                $arrayData[] = $__data['ccontact'];
+                                $arrayData[] = $__data['cemail'];
+                            }
+                            $tid[] = $__data['ref'];
+                            $final[] = $arrayData;
                         }
-                        $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
-                        $excel = $this->actionCreateexcel($final, $__data['ttype']);
-
-                        /* header('Content-Type: application/vnd.ms-excel');
-                          header('Content-Disposition: attachment;filename="' . $__data['makename'] . '.xls"');
-                          header('Cache-Control: max-age=0');
-                          $excel->save('php://output');
-                          DIE(); */
-
-                        $excel->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
-                        $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
-                        $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
-                        $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
-                        $mailnum++;
+                        $i++;
+                        $tenderids[] = $__data['tid'];
+                        $tarchives[] = $__data['tid'];
+                        $itemids[] = $__data['itemid'];
                     }
+
+                    $excelsecond = $this->actionCreateexcel($final, $__data['ttype']);
+
+                    /* header('Content-Type: application/vnd.ms-excel');
+                      header('Content-Disposition: attachment;filename="' . $__data['makename'] . '.xls"');
+                      header('Cache-Control: max-age=0');
+                      $excelsecond->save('php://output');
+                      DIE(); */
+
+                    $excelsecond->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
+                    $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
+                    $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
+                    $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
+                    $cdetails = (object) ['id' => $__data['mid'], 'cemail' => $__data['email']];
+                    $mailnum++;
+
+                    $mailsent = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $cdetails, 2);
                 }
-
-                $mail = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $_client, 1);
             }
+
+
+
+            if (isset($clients) && count($clients)) {
+                foreach ($clients as $_client) {
+                    $required = '';
+                    $reqdetails = [];
+                    $requiredlight = '';
+                    $reqdetailslight = [];
+                    $required = $_client->cables;
+                    $reqdetails = explode(',', $required);
+                    $particulardata = [];
+                    if (isset($data) && count($data)) {
+                        foreach ($data as $k => $___data) {
+                            if (in_array($k, $reqdetails)) {
+                                $particulardata[] = $___data;
+                            }
+                        }
+                    }
+                    $requiredlight = $_client->lighting;
+                    $reqdetailslight = explode(',', $requiredlight);
+                    if (isset($data) && count($data)) {
+                        foreach ($data as $k => $___data) {
+                            if (in_array($k, $reqdetailslight)) {
+                                $particulardata[] = $___data;
+                            }
+                        }
+                    }
+
+                    $plusquantity = 0;
+                    $filestosend = [];
+                    $tenderids = [];
+                    $itemids = [];
+                    if (isset($particulardata) && count($particulardata)) {
+                        $mailnum = 1;
+                        foreach ($particulardata as $k => $_data) {
+                            $header = [];
+                            $i = 0;
+                            $sno = 1;
+                            $tid = [];
+                            $firmid = [];
+                            $final = [];
+                            foreach ($_data as $key => $__data) {
+
+                                if ($i == 0) {
+                                    if ($__data['ttype'] == 1) {
+                                        $header[] = "Sr.No." . "\t";
+                                        $header[] = "Tender Id" . "\t";
+                                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                        $header[] = "Details of Contracting Office" . "\t";
+                                        $header[] = "Item Details" . "\t";
+                                        $header[] = "Size" . "\t";
+                                        $header[] = "Core" . "\t";
+                                        $header[] = "Units" . "\t";
+                                        $header[] = "Quantity" . "\t";
+                                        $header[] = "All Approved Makes In Contract" . "\t";
+                                        $header[] = "Name of Contractor" . "\t";
+                                        $header[] = "Name of Contact Person" . "\t";
+                                        $header[] = "Address of Contractor" . "\t";
+                                        $header[] = "Contact Number" . "\t";
+                                        $header[] = "E-mail ID" . "\t";
+                                    } elseif ($__data['ttype'] == 2) {
+                                        $header[] = "Sr.No." . "\t";
+                                        $header[] = "Tender Id" . "\t";
+                                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                        $header[] = "Details of Contracting Office" . "\t";
+                                        $header[] = "Item Details" . "\t";
+                                        $header[] = "Type of Fitting" . "\t";
+                                        $header[] = "Capacity of Fitting" . "\t";
+                                        $header[] = "Units" . "\t";
+                                        $header[] = "Quantity" . "\t";
+                                        $header[] = "All Approved Makes In Contract" . "\t";
+                                        $header[] = "Name of Contractor" . "\t";
+                                        $header[] = "Name of Contact Person" . "\t";
+                                        $header[] = "Address of Contractor" . "\t";
+                                        $header[] = "Contact Number" . "\t";
+                                        $header[] = "E-mail ID" . "\t";
+                                    } else {
+                                        $header[] = "Sr.No." . "\t";
+                                        $header[] = "Tender Id" . "\t";
+                                        $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                        $header[] = "Details of Contracting Office" . "\t";
+                                        $header[] = "Item Details" . "\t";
+                                        $header[] = "All Approved Makes In Contract" . "\t";
+                                        $header[] = "Name of Contractor" . "\t";
+                                        $header[] = "Name of Contact Person" . "\t";
+                                        $header[] = "Address of Contractor" . "\t";
+                                        $header[] = "Contact Number" . "\t";
+                                        $header[] = "E-mail ID" . "\t";
+                                    }
+
+                                    $final[] = $header;
+                                }
+
+
+                                if ($__data['ttype'] == 1) {
+                                    $plusquantity += $__data['quantity'];
+                                    $arrayData = [];
+                                    if (in_array($__data['ref'], $tid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $arrayData[] = $sno;
+                                        $arrayData[] = $__data['ref'];
+                                        $arrayData[] = $__data['cvalue'];
+                                        $arrayData[] = $__data['tdetails'];
+                                        $sno++;
+                                    }
+                                    $arrayData[] = $__data['idetails'];
+                                    $arrayData[] = @$__data['sizes'];
+                                    $arrayData[] = @$__data['core'];
+                                    $arrayData[] = $__data['units'];
+                                    $arrayData[] = $__data['quantity'];
+                                    $arrayData[] = $__data['allmakes'];
+                                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $firmid[] = $__data['firm'];
+                                        $arrayData[] = $__data['firm'];
+                                        $arrayData[] = $__data['cperson'];
+                                        $arrayData[] = $__data['caddress'];
+                                        $arrayData[] = $__data['ccontact'];
+                                        $arrayData[] = $__data['cemail'];
+                                    }
+                                    $tid[] = $__data['ref'];
+                                    $final[] = $arrayData;
+                                } elseif ($__data['ttype'] == 2) {
+                                    $plusquantity += $__data['quantity'];
+                                    $arrayData = [];
+                                    if (in_array($__data['ref'], $tid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $arrayData[] = $sno;
+                                        $arrayData[] = $__data['ref'];
+                                        $arrayData[] = $__data['cvalue'];
+                                        $arrayData[] = $__data['tdetails'];
+                                        $sno++;
+                                    }
+                                    $arrayData[] = $__data['idetails'];
+                                    $arrayData[] = @$__data['typefitting'];
+                                    $arrayData[] = @$__data['capacityfitting'];
+                                    $arrayData[] = $__data['units'];
+                                    $arrayData[] = $__data['quantity'];
+                                    $arrayData[] = $__data['allmakes'];
+                                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $firmid[] = $__data['firm'];
+                                        $arrayData[] = $__data['firm'];
+                                        $arrayData[] = $__data['cperson'];
+                                        $arrayData[] = $__data['caddress'];
+                                        $arrayData[] = $__data['ccontact'];
+                                        $arrayData[] = $__data['cemail'];
+                                    }
+                                    $tid[] = $__data['ref'];
+                                    $final[] = $arrayData;
+                                } else {
+                                    $arrayData = [];
+                                    if (in_array($__data['ref'], $tid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $arrayData[] = $sno;
+                                        $arrayData[] = $__data['ref'];
+                                        $arrayData[] = $__data['cvalue'];
+                                        $arrayData[] = $__data['tdetails'];
+                                        $arrayData[] = $__data['idetails'];
+                                        $sno++;
+                                    }
+
+                                    $arrayData[] = $__data['allmakes'];
+                                    if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                        $arrayData[] = '';
+                                    } else {
+                                        $firmid[] = $__data['firm'];
+                                        $arrayData[] = $__data['firm'];
+                                        $arrayData[] = $__data['cperson'];
+                                        $arrayData[] = $__data['caddress'];
+                                        $arrayData[] = $__data['ccontact'];
+                                        $arrayData[] = $__data['cemail'];
+                                    }
+                                    $tid[] = $__data['ref'];
+                                    $final[] = $arrayData;
+                                }
+                                $i++;
+                                $tenderids[] = $__data['tid'];
+                                $tarchives[] = $__data['tid'];
+                                $itemids[] = $__data['itemid'];
+                            }
+                            $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
+                            $excel = $this->actionCreateexcel($final, $__data['ttype']);
+
+                            /* header('Content-Type: application/vnd.ms-excel');
+                              header('Content-Disposition: attachment;filename="' . $__data['makename'] . '.xls"');
+                              header('Cache-Control: max-age=0');
+                              $excel->save('php://output');
+                              DIE(); */
+
+                            $excel->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
+                            $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
+                            $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
+                            $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
+                            $mailnum++;
+                        }
+                    }
+
+                    $mail = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $_client, 1);
+                }
+            }
+
+            $archived = $this->actionArchivetenders($tarchives);
+            Yii::$app->session->setFlash('success', "Mails successfully sent");
+            return $this->redirect(array('mail/index'));
+        } else {
+            Yii::$app->session->setFlash('error', "Tenders not available");
+            return $this->redirect(array('mail/index'));
         }
-
-        $archived = $this->actionArchivetenders($tarchives);
-
-        Yii::$app->session->setFlash('success', "Mails successfully sent");
-        return $this->redirect(array('mail/index'));
     }
 
     public function actionResendmail() {
