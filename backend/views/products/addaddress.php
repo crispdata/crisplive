@@ -265,7 +265,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <input id="contact" type="text" name = "contact" class="validate required" value="<?= @$address->contact; ?>">
+                                    <input id="contact" type="text" name = "contact" class="validate required" value='<?= @$address->contact; ?>'>
                                     <label for="contact">Contact No.</label>
                                 </div>
 

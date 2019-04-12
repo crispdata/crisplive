@@ -148,7 +148,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->qvalue ?></td>
-                                            <td class = ""><span style="display:none;"><?= $contractor->firm ?></span><?= $tender->aoc_date ?></td>
+                                            <td class = ""><span style="display:none;"><?= @$contractor->firm ?></span><?= $tender->aoc_date ?></td>
                                             <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                             <td>
                                                 <?php
@@ -348,31 +348,31 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                             <div class="col s6">
                                                 <h4>Firm Name</h4>
-                                                <?= $contractor->firm; ?>
+                                                <?= @$contractor->firm; ?>
                                             </div>
 
                                             <div class="col s6">
                                                 <h4>Name</h4>
-                                                <?= $contractor->name; ?>
+                                                <?= @$contractor->name; ?>
                                             </div>
                                         </div>
                                         <div class="row">
 
                                             <div class="col s6">
                                                 <h4>Address</h4>
-                                                <?= $contractor->address; ?>
+                                                <?= @$contractor->address; ?>
                                             </div>
 
                                             <div class="col s6">
                                                 <h4>Contact No.</h4>
-                                                <?= $contractor->contact; ?>
+                                                <?= @$contractor->contact; ?>
                                             </div>
                                         </div>
                                         <div class="row">
 
                                             <div class="col s6">
                                                 <h4>Email</h4>
-                                                <?= $contractor->email; ?>
+                                                <?= @$contractor->email; ?>
                                             </div>
 
                                         </div>

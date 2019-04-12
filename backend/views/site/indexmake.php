@@ -94,11 +94,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         margin-right: 30px;
         margin-left: 28px;
     }
-    i.material-icons {
-        line-height: inherit;
-        width: auto;
-        margin: 0px 5px 0px 0px;
-    }
     #curve_chart_ce img {
         width: 100px;
         text-align: center;
@@ -211,6 +206,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         text-align: center!important;
         text-decoration: none;
     }
+    
+    #filebutton img {
+        width: 25px;
+        vertical-align: middle;
+    }
 </style>
 
 
@@ -266,7 +266,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
         }
 
-        
+
 
         function drawChartpie() {
 
@@ -1304,7 +1304,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                         </div>
                     </div>
-                    
+
                     <div class="row no-m-t no-m-b"  id = "light-type" <?= ($type == 2) ? '' : 'style=display:none' ?>>
                         <div class="col s12 m12 l12">
                             <div class="card invoices-card products">
@@ -1356,6 +1356,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
             </main>
         </div>
+        
 
 
 
@@ -1383,224 +1384,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
         <?php
     }
-} elseif ($user->group_id == 5) {
-    ?>
-    <main class="mn-inner">
-        <div class="middle-content">
-            <div class="row departmentview">
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <span class="card-title"></span>
-                            <span class="stats-counter"><span class="counter"><a href="#modal" class="modal-trigger">Tenders</a></span><small></small></span>
-                        </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <span class="card-title"></span>
-                            <span class="stats-counter"><span class="counter"><a href="/site/e-m">Products</a></span><small></small></span>
-
-                        </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <span class="card-title"></span>
-                            <span class="stats-counter"><span class="counter"><a href="/contractor/allcontractors">Contractors</a></span><small></small></span>
-                        </div>
-                        <div class="progress stats-card-progress">
-                            <div class="determinate" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div></div></main>
-    <div id="modal" class="modal dview">
-        <div class="modal-content">
-            <h4>Choose an option</h4>
-            <div class="row">
-                <div class="input-field dview col s5">
-                    <a href="/search/index">
-                        Advanced search</a>
-                </div>
-                <div class="input-field dview col s5">
-                    <a href="/search/stats">Tender stats</a>
-                </div>
-            </div>
-
-        </div>
-
-    </div>
-<?php } else {
-    ?>
-    <!--main class="mn-inner">
-        <div class="row">
-            <div class="col s6">
-                <div class="page-title">Dashboard</div>
-            </div>
-            <div class="col s12 m12 l12">
-                <div class="card">
-                    <div class="card-content">
-
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '1']) ?>">ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '2']) ?>">ADG (DESIGN and CONSULTANCY) PUNE - MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '3']) ?>">ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '4']) ?>">ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '5']) ?>">ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '13']) ?>">ADG (PROJECTS) AND CE (CG) VISAKHAPATNAM - MES</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '6']) ?>">CENTRAL COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '7']) ?>">EASTERN COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '8']) ?>">NORTHERN COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '9']) ?>">SOUTHERN COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '10']) ?>">SOUTH WESTERN COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '11']) ?>">WESTERN COMMAND</a>
-                        <a class="col s12 waves-effect waves-light btn blue m-b-xs" href="<?= Url::to(['site/approvetenders', 'c' => '12']) ?>">DGNP MUMBAI - MES</a>
-
-
-                    </div></div></div></div></main-->
-    <main class="mn-inner">
-        <div class="middle-content">
-            <div class="row departmentview card-content">
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/tenders">
-                                <span class="card-title leftside">All Tenders</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $alltenders; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/atenders">
-                                <span class="card-title leftside">Approved Tenders</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $approvedtenders; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress green">
-                            <div class="determinate green" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/utenders">
-                                <span class="card-title leftside">Unapproved Tenders</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $unapprovedtenders; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress red">
-                            <div class="determinate red" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/aoctenders">
-                                <span class="card-title leftside">AOC Tenders</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $aoctenders; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/archivetenders">
-                                <span class="card-title leftside">Archived Tenders</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $archivedtenders; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress green">
-                            <div class="determinate green" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="contractor/allcontractors">
-                                <span class="card-title leftside">All Contractors</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dcontractors; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress red">
-                            <div class="determinate red" style="width: 70%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'mail/clogs' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Mails Sent</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dlogs; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="<?= ($user->group_id != 3) ? 'site/dealers' : 'javascript:void(0)' ?>">
-                                <span class="card-title leftside">All Clients</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $dmans + $dcons + $ddeals; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress green">
-                            <div class="determinate green" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/e-m">
-                                <span class="card-title leftside">E/M Makes</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $emmakes; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress red">
-                            <div class="determinate red" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-                <div class="col s12 m12 l4">
-                    <div class="card stats-card">
-                        <div class="card-content">
-                            <a href="site/civil">
-                                <span class="card-title leftside">Civil Makes</span>
-                                <span class="stats-counter"><span class="counter upper leftside"><?= $civilmakes; ?></span></span>
-                            </a>
-                        </div>
-                        <div class="progress stats-card-progress blue">
-                            <div class="determinate blue" style="width: 100%"></div>
-                        </div>
-                    </div>
-                </div>
-            </div></div></main>
-<?php } ?>
+}
+?>
 
 

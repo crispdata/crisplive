@@ -18,7 +18,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
         border-color: unset;
     }
-    #contacts_list a{width:65px!important;}
+   
 </style>
 <script>
     function GetFileSize() {
@@ -287,7 +287,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                     </form>
 
-                    <?php if (@$addresses) { ?>
+                    <?php if (@$addresses || count($_POST)) { ?>
                         <table id = "current-project" class="responsive-table">
                             <thead>
                                 <tr>
