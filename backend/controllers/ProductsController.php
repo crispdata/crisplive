@@ -901,12 +901,8 @@ class ProductsController extends Controller {
                     ]);
                 }
                 $addressavailable = $address->one();
-                if ($addressavailable) {
-                    Yii::$app->session->setFlash('error', "Address already existed");
-                } else {
-                    if ($model->save()) {
-                        Yii::$app->session->setFlash('success', "Address successfully updated");
-                    }
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Address successfully updated");
                 }
                 return $this->redirect(array('products/addresses'));
             } else {
@@ -1045,6 +1041,7 @@ class ProductsController extends Controller {
                     $_address->command = $officename;
                 }
             }
+          
         } else {
             $alladdress = [];
         }

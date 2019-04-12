@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4410,14 +4410,14 @@ class SiteController extends Controller {
             }
             $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tid' => $val])->andWhere(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->all();
         } else {
-           /* $command = $connection->createCommand("Select * from tenders where match(tid) AGAINST (" . $val . ") ORDER BY id DESC;
-");
-            $tenders = $command->queryAll();
-            if(isset($tenders) && count($tenders)){
-                foreach($tenders as $_tender){
-                    $alltenders[] = (object)$_tender;
-                }
-            }*/
+            /* $command = $connection->createCommand("Select * from tenders where match(tid) AGAINST (" . $val . ") ORDER BY id DESC;
+              ");
+              $tenders = $command->queryAll();
+              if(isset($tenders) && count($tenders)){
+              foreach($tenders as $_tender){
+              $alltenders[] = (object)$_tender;
+              }
+              } */
             $tenders = \common\models\Tender::find()->from([new \yii\db\Expression('{{%tenders}} USE INDEX (tid)')])->where(['tid' => $val])->orderBy(['id' => SORT_DESC])->all();
         }
         $contractors = [];
@@ -10434,6 +10434,69 @@ class SiteController extends Controller {
             echo '0';
         }
         die();
+    }
+
+    public function actionFile() {
+        $user = Yii::$app->user->identity;
+        require $_SERVER['DOCUMENT_ROOT'] . '/vendor/autoload.php';
+        try {
+// You may need to change the region. It will say in the URL when the bucket is open
+// and on creation.
+            $s3 = S3Client::factory(
+                            array(
+                                'credentials' => array(
+                                    'key' => Yii::$app->params['IAM_KEY'],
+                                    'secret' => Yii::$app->params['IAM_SECRET']
+                                ),
+                                'version' => 'latest',
+                                'region' => 'us-east-2',
+                            )
+            );
+        } catch (Exception $e) {
+// We use a die, so if this fails. It stops here. Typically this is a REST call so this would
+// return a json object.
+            die("Error: " . $e->getMessage());
+        }
+
+
+        if (count($_FILES['tfile']['name']) > 0) {
+            for ($i = 0; $i < count($_FILES['tfile']['name']); $i++) {
+
+                $file_name = time() . $_FILES['tfile']['name'][$i];
+                $file_tmp = $_FILES['tfile']['tmp_name'][$i];
+                move_uploaded_file($file_tmp, "assets/files/" . $file_name);
+
+                $keyName = 'files/' . $file_name;
+                $pathInS3 = 'http://s3.us-east-2.amazonaws.com/' . Yii::$app->params['bucketName'] . '/' . $keyName;
+
+                $file = $_SERVER['DOCUMENT_ROOT'] . "/admin/assets/files/" . $file_name;
+
+                $uploader = new MultipartUploader($s3, $file, [
+                    'bucket' => Yii::$app->params['bucketName'],
+                    'key' => $keyName,
+                    'ACL' => 'public-read-write'
+                ]);
+
+                $fileupload = $uploader->upload();
+                $model = new \common\models\Files();
+                if ($fileupload) {
+                    $model->file = $pathInS3;
+                    unlink('assets/files/' . $file_name);
+                }
+                $model->user_id = $user->id;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                $model->save();
+            }
+        }
+
+        if (count($_FILES['tfile']['name']) > 1) {
+            Yii::$app->session->setFlash('success', "Files successfully uploaded");
+        } else {
+            Yii::$app->session->setFlash('success', "File successfully uploaded");
+        }
+
+         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
     }
 
 }

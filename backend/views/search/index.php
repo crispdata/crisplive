@@ -689,9 +689,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                                                 <?php
                                                             } elseif ($tender->aoc_status != 1 && $tender->is_archived != 1) {
-                                                                if ($user->group_id == 4 || $user->group_id == 5) {
+                                                                if ($user->group_id == 4 || $user->group_id == 5 || $user->group_id == 6) {
                                                                     ?>
-                                                                    <a href="javascript:void(0);" class="waves-effect waves-light btn blue">AOC</a>
+                                                                    <a class="waves-effect waves-light btn blue">AOC</a>
                                                                 <?php } else {
                                                                     ?>
                                                                     <a href="#modalaoc<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">AOC</a>
@@ -730,7 +730,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     <?php if ($contractor) { ?>
                                                         <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
                                                     <?php } ?>
-                                                    <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5)) { ?>
+                                                    <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6)) { ?>
                                                         <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                     <?php } ?>
 

@@ -116,6 +116,57 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         width: 25px;
         vertical-align: middle;
     }
+    .feedback {
+        background-color: #31B0D5;
+        color: white;
+        float: left;
+        padding: 9px 15px;
+        border-radius: 45px;
+        border-color: #46b8da;
+        font-size: 15px;
+        /* margin-left: 15px; */
+        cursor: pointer;
+        -webkit-border-radius: 45px;
+        -webkit-animation: glowing 1500ms infinite;
+        -moz-animation: glowing 1500ms infinite;
+        -o-animation: glowing 1500ms infinite;
+        animation: glowing 1500ms infinite;
+    }
+    
+    .feedback i{margin-top: 5px!important;}
+    .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
+    .modal .modal-content h5{text-align: center;}
+
+    @-webkit-keyframes glowing {
+        0% { background-color: #B20000; -webkit-box-shadow: 0 0 3px #B20000; }
+        50% { background-color: #FF0000; -webkit-box-shadow: 0 0 40px #FF0000; }
+        100% { background-color: #B20000; -webkit-box-shadow: 0 0 3px #B20000; }
+    }
+
+    @-moz-keyframes glowing {
+        0% { background-color: #B20000; -moz-box-shadow: 0 0 3px #B20000; }
+        50% { background-color: #FF0000; -moz-box-shadow: 0 0 40px #FF0000; }
+        100% { background-color: #B20000; -moz-box-shadow: 0 0 3px #B20000; }
+    }
+
+    @-o-keyframes glowing {
+        0% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
+        50% { background-color: #FF0000; box-shadow: 0 0 40px #FF0000; }
+        100% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
+    }
+
+    @keyframes glowing {
+        0% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
+        50% { background-color: #FF0000; box-shadow: 0 0 40px #FF0000; }
+        100% { background-color: #B20000; box-shadow: 0 0 3px #B20000; }
+    }
+
+    #mybutton {
+        position: fixed;
+        bottom: 10px;
+        right: 10px;
+        z-index:1;
+    }
 </style>
 <div id="modalfeedback" class="modal">
     <!-- Modal content-->
@@ -533,4 +584,36 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
             </div>
         </div>
     </aside>
+    <?php if ($user->group_id == 6) { ?>
+        <div id="file" class="modal">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h4 class="modal-title">Would you like to upload any file?</h4>
+                    <h6 class="modal-title">*You can upload multiple files*</h6>
+                </div>
+                <div class="modal-body">
+                    <form id="feedback" enctype="multipart/form-data" method = "post" action = "<?= $baseURL ?>site/file">
+                        <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                        <div class="row">
+                            <div class="input-field col s12 file-field input-field">
+                                <div class="btn teal lighten-1">
+                                    <span>File</span>
+                                    <input type="file" name="tfile[]" id="file" multiple="" required="">
+                                </div>
+                                <div class="file-path-wrapper">
+                                    <input class="file-path validate" type="text">
+                                </div>
+                            </div>
+                        </div>
+                        <button  id="filebutton" type="submit"  class="btn btn-fill">Submit</button>
+                    </form>
+                </div>
+            </div>
+
+        </div>
+        <div id="mybutton">
+            <a class="feedback modal-trigger" href="#file"><i class="material-icons">cloud_upload</i></a>
+        </div>
+    <?php } ?>
 
