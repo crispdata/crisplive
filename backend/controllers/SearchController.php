@@ -831,13 +831,30 @@ class SearchController extends Controller {
                     }
                 }
 
+
+               
+                $makes = \common\models\Make::find()->where(['mtype' => $type, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+                if (isset($makes) && count($makes)) {
+                    foreach ($makes as $_make) {
+                        $tendersmake = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->leftJoin('tenders', 'items.tender_id = tenders.id')->where(['items.tenderfour' => $type])->andWhere(['tenders.status' => 1])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $_make->id]);
+                        $makequantity = $tendersmake->sum('quantity');
+                        $piemakes[] = [(string) $_make->make, (int) $makequantity];
+                    }
+                }
+                usort($piemakes, function($a, $b) {
+                    return $b['1'] - $a['1'];
+                });
+                $title[] = ['type','value'];
+                
+                $finalarrmakes = array_merge($title,$piemakes);
+
                 $labelsone = 'ALL MAKES';
                 $valuesone = $onequantity;
 
                 $balanced = (count($tenders) - count($archivetenders));
                 $balancedq = ($onequantity - $twoquantity);
                 $balancedprice = ($eprice - $epriceone);
-                $makes = \common\models\Make::find()->where(['mtype' => $type, 'status' => 1])->orderBy(['make' => SORT_ASC])->all();
+
                 $sizes = \common\models\Size::find()->where(['mtypeone' => 1, 'mtypetwo' => 1, 'mtypethree' => 1, 'status' => 1])->all();
                 $finalarr[] = ['title' => 'All Tenders', 'total' => count($tenders), 'quantity' => $onequantity, 'value' => $this->actionMoneyformat(round($eprice))];
                 $finalarr[] = ['title' => 'Archived Tenders', 'total' => count($archivetenders), 'quantity' => $twoquantity, 'value' => $this->actionMoneyformat(round($epriceone))];
@@ -853,6 +870,7 @@ class SearchController extends Controller {
                         'values' => $valuesone,
                         'graphs' => $finalgraph,
                         'lightchart' => @$lightchart,
+                        'piemakes' => @$finalarrmakes,
                         'lightmakechart' => @$lightmakechart,
                         'type' => $type,
                         'graphsce' => ''
@@ -971,7 +989,7 @@ class SearchController extends Controller {
             }
             $offset = ($page - 1) * $fval;
 
-            if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '' && !isset($page)) {
+            if (isset($_REQUEST['keyword']) && $_REQUEST['keyword'] != '') {
                 $tendersall = \common\models\Tender::find()->select('tenderfiles.file as file, tenders.tender_id,tenders.id')->leftJoin('tenderfiles', 'tenders.id = tenderfiles.tender_id')->where(['tenders.status' => '1', 'tenders.aoc_status' => 1, 'tenderfiles.type' => 2]);
                 $fromdate = @$_REQUEST['fromdate'];
                 $todate = @$_REQUEST['todate'];
@@ -1027,6 +1045,7 @@ class SearchController extends Controller {
 
                 $alltenders = $tendersall->orderBy(['tenderfiles.id' => SORT_DESC])->asArray()->all();
                 $tids = [];
+                $items = [];
 
                 if (isset($alltenders) && count($alltenders)) {
                     foreach ($alltenders as $_tender) {
@@ -1056,7 +1075,7 @@ class SearchController extends Controller {
                           }
                           echo '</ol>'; */
                         foreach ($worksheetData as $worksheet) {
-                            $range = 'A1:' . $worksheet['lastColumnLetter'] . $worksheet['totalRows'];
+                            $range = 'A7:' . $worksheet['lastColumnLetter'] . $worksheet['totalRows'];
                             break;
                         }
                         $dataArray = $data->getActiveSheet()
@@ -1069,8 +1088,10 @@ class SearchController extends Controller {
                         );
 
                         $dataArray = array_map('array_values', $dataArray);
+
                         if ($this->actionInarray($_REQUEST['keyword'], $dataArray)) {
                             $tids[] = $_tender['id'];
+                            $items[$_tender['id']] = $this->actionInarray($_REQUEST['keyword'], $dataArray);
                         }
                     }
                 }
@@ -1180,6 +1201,7 @@ class SearchController extends Controller {
             } else {
                 return $this->render('items', [
                             'tenders' => $models,
+                            'srnos' => $items,
                             'pages' => $pages,
                             'total' => $countQuery->count(),
                             'type' => 'All',
@@ -1193,15 +1215,14 @@ class SearchController extends Controller {
     }
 
     public function actionInarray($needle, $haystack, $strict = false) {
+        $itemnos = [];
         foreach ($haystack as $key => $item) {
-            foreach ($item as $value) {
-                if (stripos($value, $needle) !== false) {
-                    return true;
-                }
+
+            if (stripos($item[1], $needle) !== false) {
+                $itemnos[] = $item[0];
             }
         }
-
-        return false;
+        return $itemnos;
     }
 
 }

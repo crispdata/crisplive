@@ -202,6 +202,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <?php if (isset($details) && count($details)) { ?>
         google.charts.setOnLoadCallback(drawChartpie);
         google.charts.setOnLoadCallback(drawChart);
+        google.charts.setOnLoadCallback(drawChartPieMake);
     <?php if ($type == 2) { ?>
             google.charts.setOnLoadCallback(drawChartlightpie);
     <?php } ?>
@@ -345,6 +346,42 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
             var chart = new google.visualization.PieChart(document.getElementById('lightchart'));
+
+            chart.draw(data, options);
+
+            google.visualization.events.addListener(chart, 'onmouseover', function (entry) {
+                chart.setSelection([{row: entry.row}]);
+            });
+
+            google.visualization.events.addListener(chart, 'onmouseout', function (entry) {
+                chart.setSelection([]);
+            });
+
+        }
+
+        function drawChartPieMake() {
+
+            var data = google.visualization.arrayToDataTable(<?php echo json_encode($piemakes); ?>);
+
+            var options = {
+                displayExactValues: true,
+                'showRowNumber': false,
+                'allowHtml': true,
+                backgroundColor: '',
+                pieSliceText: 'value-and-percentage',
+                tooltip: {trigger: 'selection'},
+                chartArea: {
+                    left: "3%",
+                    top: "3%",
+                    height: "94%",
+                    width: "94%"
+                },
+                sliceVisibilityThreshold: 0
+
+            };
+
+
+            var chart = new google.visualization.PieChart(document.getElementById('piemake'));
 
             chart.draw(data, options);
 
@@ -1405,6 +1442,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="card-content">
                                 <span class="card-title">stats of Quantities of all fittings</span>
                                 <div id="lightchart" style="width: 100%; height: 300px;"></div>
+                            </div>
+                            <div class="progress stats-card-progress indigo">
+                                <div class="determinate indigo" style="width: 100%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="row no-m-t no-m-b"  id = "light">
+                    <div class="col s12 m12 l12">
+                        <div class="card server-card piechart">
+                            <div class="card-content">
+                                <span class="card-title">stats of all Makes</span>
+                                <div id="piemake" style="width: 100%; height: 300px;"></div>
                             </div>
                             <div class="progress stats-card-progress indigo">
                                 <div class="determinate indigo" style="width: 100%"></div>

@@ -122,6 +122,8 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         float: left;
         padding: 9px 15px;
         border-radius: 45px;
+        margin-bottom: 5px;
+        margin-right :5px;
         border-color: #46b8da;
         font-size: 15px;
         /* margin-left: 15px; */
@@ -132,7 +134,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         -o-animation: glowing 1500ms infinite;
         animation: glowing 1500ms infinite;
     }
-    
+
     .feedback i{margin-top: 5px!important;}
     .modal .modal-content h4{margin-bottom: 0px;color:#00ACC1;}
     .modal .modal-content h5{text-align: center;}
@@ -166,13 +168,49 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         bottom: 10px;
         right: 10px;
         z-index:1;
+        float: left;
+        width:4%;
     }
 </style>
+<script>
+    function GetFileSize() {
+        var imageSizeArr = 0;
+        var imageSize = document.getElementById('fileall');
+        var imageCount = imageSize.files.length;
+        for (var i = 0; i < imageSize.files.length; i++)
+        {
+            var imageSizesingle = imageSize.files[i].size;
+            var returnsize = Math.round((imageSizesingle / 1024));
+            if (returnsize > 10000) {
+                swal("", "Please upload file size less than 10MB", "warning");
+                return false;
+            } else {
+                $("#filesupload").submit();
+            }
+        }
+
+        // VALIDATE OR CHECK IF ANY FILE IS SELECTED.
+        /*if (fi.files.length > 0) {
+         // RUN A LOOP TO CHECK EACH SELECTED FILE.
+         for (var i = 0; i <= fi.files.length - 1; i++) {
+         
+         var fsize = fi.files.item(i).size;      // THE SIZE OF THE FILE.
+         var returnsize = Math.round((fsize / 1024));
+         if (returnsize > 1000) {
+         swal("", "Please upload file size less than 1MB", "warning");
+         return false;
+         } else {
+         $("#feedback").submit();
+         }
+         }
+         }*/
+    }
+</script>
 <div id="modalfeedback" class="modal">
     <!-- Modal content-->
     <div class="modal-content">
         <div class="modal-header">
-            <h4 class="modal-title">Tell us about your experience with CrIsPdAtA</h4>
+            <h4 class="modal-title">Share your experience about CrIsPdAtA</h4>
         </div>
         <div class="modal-body">
             <form id="feedback" method = "post" enctype="multipart/form-data" action = "">
@@ -434,7 +472,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     <li class="no-padding <?= ($controller == 'products' && $action == 'addresses') ? 'active' : '' ?>">
                         <a class="waves-effect waves-grey" href="/products/addresses">
                             <i class="material-icons">perm_contact_calendar</i>
-                            Office Addresses
+                            MES Office Addresses
                         </a>
                     </li>
                     <li class="no-padding <?= ($controller == 'search' && $action == 'index') ? 'active' : '' ?>">
@@ -589,31 +627,31 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Would you like to upload any file?</h4>
-                    <h6 class="modal-title">*You can upload multiple files*</h6>
+                    <h4 class="modal-title">Please upload Product Catalogs and Price Lists files</h4>
+                    <h6 class="modal-title">*You can upload multiple files and File Size Limit - 10MB*</h6>
                 </div>
                 <div class="modal-body">
-                    <form id="feedback" enctype="multipart/form-data" method = "post" action = "<?= $baseURL ?>site/file">
+                    <form id="filesupload" enctype="multipart/form-data" method = "post" onsubmit="return GetFileSize()" action = "<?= $baseURL ?>site/file">
                         <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                         <div class="row">
                             <div class="input-field col s12 file-field input-field">
                                 <div class="btn teal lighten-1">
                                     <span>File</span>
-                                    <input type="file" name="tfile[]" id="file" multiple="" required="">
+                                    <input type="file" name="tfile[]" id="fileall" multiple="" required="">
                                 </div>
                                 <div class="file-path-wrapper">
                                     <input class="file-path validate" type="text">
                                 </div>
                             </div>
                         </div>
-                        <button  id="filebutton" type="submit"  class="btn btn-fill">Submit</button>
+                        <input class="btn btn-fill" name="submit" type="submit" value="Submit">
                     </form>
                 </div>
             </div>
-
         </div>
         <div id="mybutton">
             <a class="feedback modal-trigger" href="#file"><i class="material-icons">cloud_upload</i></a>
+            <a class="feedback modal-trigger" href="#modalfeedback"><i class="material-icons">feedback</i></a>
         </div>
     <?php } ?>
 

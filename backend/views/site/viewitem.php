@@ -139,7 +139,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
 
         <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-items">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
-            <input type="hidden" name="tid" value="<?php echo $tid; ?>">
+            <input type="hidden" name="tid" value="<?php echo $tid; ?>"/>
             <?php
             if ($user->group_id == 3) {
                 if ($stop_date >= date('Y-m-d H:i:s') && $tdetails->status == 0) {

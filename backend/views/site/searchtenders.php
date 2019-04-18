@@ -3,6 +3,7 @@
 
 use backend\controllers\SiteController;
 use yii\widgets\LinkPager;
+use yii\helpers\Url;
 
 $this->title = 'Search Tenders';
 $user = Yii::$app->user->identity;
@@ -210,12 +211,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table id = "current-project" class="responsive-table">
                             <thead>
                                 <tr>
-                                    <th data-field="email">Tender Id</th>
+                                    <th data-field="email" width="100px">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
-                                    <th data-field="email">Cost of Tender</th>
-                                    <th data-field="email">Bid end date</th>
-                                    <th data-field="email">Bid open date</th>
-                                    <th data-field="email">Status</th>
+                                    <th data-field="email" width="100px">Cost of Tender</th>
+                                    <th data-field="email" width="100px">Bid end date</th>
+                                    <th data-field="email" width="100px">Bid open date</th>
+                                    <th data-field="email" width="100px">Status</th>
                                     <th data-field="email">Actions</th>
                                 </tr>
                             </thead>

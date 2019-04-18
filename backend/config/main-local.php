@@ -108,8 +108,8 @@ $config = [
                     'route' => 'site/delete-item'
                 ],
                 [
-                    'pattern' => 'site/approvetenders/<c:\d+>',
-                    'route' => 'site/approvetenders'
+                    'pattern' => 'site/aoctenders/<c:\d+>',
+                    'route' => 'site/aoctenders'
                 ],
                 [
                     'pattern' => 'products/uploadfile/<id:\d+>',

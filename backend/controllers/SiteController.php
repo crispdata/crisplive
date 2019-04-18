@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer','getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4726,6 +4726,8 @@ class SiteController extends Controller {
         $filter = @$_GET['filter'];
 
         if ($user->group_id == 6) {
+            $command = @$_GET['c'];
+            $cid = @$_POST['commandid'];
             $type = @$user->authtype;
             if ($type == 1) {
                 $make = $user->cables;
@@ -4735,7 +4737,11 @@ class SiteController extends Controller {
                 $make = $user->cables;
             }
 
-            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            if (isset($command)) {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.command' => $command, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            } else {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            }
         } else {
             $tenders = \common\models\Tender::find()->where(['aoc_status' => 1])->orderBy(['id' => SORT_DESC]);
         }
@@ -4768,7 +4774,7 @@ class SiteController extends Controller {
         $contractors = [];
 
         if ($val) {
-            return $this->redirect(array('site/aoctenders?filter=' . $val . ''));
+            return $this->redirect(array('site/aoctenders/' . $cid . '?filter=' . $val . ''));
         } else {
             return $this->render('aoctenders', [
                         'tenders' => $models,
@@ -5800,6 +5806,93 @@ class SiteController extends Controller {
             $data .= '<option value="33">CE WC and CE DELHI ZONE-MES</option>';
             $data .= '<option value="34">CE WC AND CE JALANDHAR ZONE - MES</option>';
             $data .= '<option value="35">CE WC AND CE PATHANKOT ZONE - MES</option>';
+        } elseif ($value == 1) {
+            $data .= '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
+            $data .= '<option value="37">GE (CG) KOCHI - MES</option>';
+            $data .= '<option value="57">GE (CG) PORBANDAR - MES</option>';
+            $data .= '<option value="38">GE DAMAN - MES</option>';
+        } elseif ($value == 3) {
+            $data .= '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+            $data .= '<option value="59">GE (I)(FY) AVADI - MES</option>';
+            $data .= '<option value="39">AGE (I) FY EDDUMAILARAM - MES</option>';
+            $data .= '<option value="40">GE (I) (FY) ISHAPORE - MES</option>';
+            $data .= '<option value="41">GE (I) (P) (FY) ITARSI - MES</option>';
+            $data .= '<option value="42">GE(I)(P) Fy KANPUR - MES</option>';
+            $data .= '<option value="43">GE (I) (P) FY KIRKEE - MES</option>';
+        } elseif ($value == 4) {
+            $data .= '<option value="44">AGE(I) R and D Haldwani - MES</option>';
+            $data .= '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
+            $data .= '<option value="45">AGE(I) R and D Manali - MES</option>';
+            $data .= '<option value="61">AGE(I) R and D Delhi - MES</option>';
+            $data .= '<option value="62">GE(I) R and D Chandigarh - MES</option>';
+            $data .= '<option value="46">GE(I) R and D Chandipur - MES</option>';
+            $data .= '<option value="47">GE(I) R and D Dehradun - MES</option>';
+            $data .= '<option value="48">GE(I) R and D Kanpur - MES</option>';
+        } elseif ($value == 5) {
+            $data .= '<option value="49">AGE (I) RND AVADI - MES</option>';
+            $data .= '<option value="50">AGE (I) RND KOCHI - MES</option>';
+            $data .= '<option value="51">AGE (I) RND VISHAKHAPATNAM - MES</option>';
+            $data .= '<option value="52">GE (I) RND (E) BANGALORE - MES</option>';
+            $data .= '<option value="53">GE (I) RND KANCHANBAGH - MES</option>';
+            $data .= '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
+            $data .= '<option value="54">GE (I) RND PASHAN - MES</option>';
+            $data .= '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
+            $data .= '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
+        } elseif ($value == 13) {
+            $data .= '<option value="64">GE (I)(CG) Chennai - MES</option>';
+        }
+        echo json_encode(['data' => $data]);
+        die;
+    }
+    
+    public function actionGetcengineeraddress() {
+        $value = $_REQUEST['value'];
+        if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13) {
+            $data = '<option value="" selected>Select GE</option>';
+        } else {
+            $data = '<option value="" selected>Select CE</option>';
+        }
+        if ($value == 6) {
+            $data .= '<option value="1">CE (AF) ALLAHABAD - MES</option>';
+            $data .= '<option value="2">CE BAREILLY ZONE - MES</option>';
+            $data .= '<option value="3">CE JABALPUR ZONE - MES</option>';
+            $data .= '<option value="4">CE LUCKNOW ZONE - MES</option>';
+        } elseif ($value == 7) {
+            $data .= '<option value="5">CCE (ARMY) NO 1 DINJAN - MES</option>';
+            $data .= '<option value="6">CCE (ARMY ) No 2 MISSAMARI - MES</option>';
+            $data .= '<option value="7">CCE (ARMY) NO 3 NARANGI - MES</option>';
+            $data .= '<option value="8">CCE (NEP) NEW DELHI - MES</option>';
+            $data .= '<option value="9">CE (AF) SHILLONG - MES</option>';
+            $data .= '<option value="10">CE KOLKATA ZONE - MES</option>';
+            $data .= '<option value="11">CE (NAVY) VIZAG - MES</option>';
+            $data .= '<option value="12">CE SHILLONG ZONE - MES</option>';
+            $data .= '<option value="13">CE SILIGURI ZONE - MES</option>';
+            $data .= '<option value="14">DGNP (VIZAG) - MES</option>';
+        } elseif ($value == 8) {
+            $data .= '<option value="15">CE 31 ZONE - MES</option>';
+            $data .= '<option value="16">CE (AF) UDHAMPUR - MES</option>';
+            $data .= '<option value="17">CE LEH ZONE - MES</option>';
+            $data .= '<option value="18">CE UDHAMPUR ZONE - MES</option>';
+        } elseif ($value == 9) {
+            $data .= '<option value="19">CE (A and N) ZONE - MES</option>';
+            $data .= '<option value="20">CE (AF) BANGALORE - MES</option>';
+            $data .= '<option value="21">CE (AF) NAGPUR - MES</option>';
+            $data .= '<option value="22">CE BHOPAL ZONE  - MES</option>';
+            $data .= '<option value="23">CE CHENNAI ZONE  - MES</option>';
+            $data .= '<option value="24">CE JODHPUR ZONE - MES</option>';
+            $data .= '<option value="25">CE (NAVY) KOCHI - MES</option>';
+            $data .= '<option value="26">CE( NAVY )MUMBAI - MES</option>';
+            $data .= '<option value="27">CE PUNE ZONE - MES</option>';
+        } elseif ($value == 10) {
+            $data .= '<option value="28">CE (AF) GANDHINAGAR - MES</option>';
+            $data .= '<option value="29">CE BATHINDA ZONE - MES</option>';
+            $data .= '<option value="30">CE JAIPUR JAIPUR - MES</option>';
+        } elseif ($value == 11) {
+            $data .= '<option value="31">CE(AF) WAC PALAM-MES</option>';
+            $data .= '<option value="32">CE CHANDIGARH ZONE - MES</option>';
+            $data .= '<option value="33">CE DELHI ZONE-MES</option>';
+            $data .= '<option value="34">CE JALANDHAR ZONE - MES</option>';
+            $data .= '<option value="35">CE PATHANKOT ZONE - MES</option>';
         } elseif ($value == 1) {
             $data .= '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
             $data .= '<option value="37">GE (CG) KOCHI - MES</option>';
@@ -6886,12 +6979,7 @@ class SiteController extends Controller {
 
     public function actionChangecommand() {
         $user = Yii::$app->user->identity;
-        if (isset($_POST['c']) && $_POST['c'] != '') {
-            $tenders = \common\models\Tender::find()->where(['command' => $_POST['c']])->orderBy(['id' => SORT_DESC])->all();
-        } else {
-            $tenders = \common\models\Tender::find()->orderBy(['id' => SORT_DESC])->all();
-        }
-        return $this->redirect(array('site/approvetenders/' . $_POST['c'] . ''));
+        return $this->redirect(array('site/aoctenders/' . $_POST['c'] . ''));
     }
 
     public function actionCreateMakeEm() {
@@ -7948,6 +8036,109 @@ class SiteController extends Controller {
             $data[] = '<option value="33">CE WC and CE DELHI ZONE-MES</option>';
             $data[] = '<option value="34">CE WC AND CE JALANDHAR ZONE - MES</option>';
             $data[] = '<option value="35">CE WC AND CE PATHANKOT ZONE - MES</option>';
+        } elseif ($value == 1) {
+            $data[] = '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
+            $data[] = '<option value="37">GE (CG) KOCHI - MES</option>';
+            $data[] = '<option value="57">GE (CG) PORBANDAR - MES</option>';
+            $data[] = '<option value="38">GE DAMAN - MES</option>';
+        } elseif ($value == 3) {
+            $data[] = '<option value="58">GE (I)(P) Fy AMBAJHARI - MES</option>';
+            $data[] = '<option value="59">GE (I)(FY) AVADI - MES</option>';
+            $data[] = '<option value="39">AGE (I) FY EDDUMAILARAM - MES</option>';
+            $data[] = '<option value="40">GE (I) (FY) ISHAPORE - MES</option>';
+            $data[] = '<option value="41">GE (I) (P) (FY) ITARSI - MES</option>';
+            $data[] = '<option value="42">GE(I)(P) Fy KANPUR - MES</option>';
+            $data[] = '<option value="43">GE (I) (P) FY KIRKEE - MES</option>';
+        } elseif ($value == 4) {
+            $data[] = '<option value="44">AGE(I) R and D Haldwani - MES</option>';
+            $data[] = '<option value="60">AGE(I) R and D Jodhpur - MES</option>';
+            $data[] = '<option value="45">AGE(I) R and D Manali - MES</option>';
+            $data[] = '<option value="61">AGE(I) R and D Delhi - MES</option>';
+            $data[] = '<option value="62">GE(I) R and D Chandigarh - MES</option>';
+            $data[] = '<option value="46">GE(I) R and D Chandipur - MES</option>';
+            $data[] = '<option value="47">GE(I) R and D Dehradun - MES</option>';
+            $data[] = '<option value="48">GE(I) R and D Kanpur - MES</option>';
+        } elseif ($value == 5) {
+            $data[] = '<option value="49">AGE (I) RND AVADI - MES</option>';
+            $data[] = '<option value="50">AGE (I) RND KOCHI - MES</option>';
+            $data[] = '<option value="51">AGE (I) RND VISHAKHAPATNAM - MES</option>';
+            $data[] = '<option value="52">GE (I) RND (E) BANGALORE - MES</option>';
+            $data[] = '<option value="53">GE (I) RND KANCHANBAGH - MES</option>';
+            $data[] = '<option value="63">GE (I) RND GIRINAGAR - MES</option>';
+            $data[] = '<option value="54">GE (I) RND PASHAN - MES</option>';
+            $data[] = '<option value="55">GE (I) RND RCI HYDERABAD - MES</option>';
+            $data[] = '<option value="56">GE (I) RND (W) BANGALORE - MES</option>';
+        } elseif ($value == 13) {
+            $data[] = '<option value="64">GE (I)(CG) Chennai - MES</option>';
+        }
+
+        $i = 0;
+        if (!empty($data)) {
+            foreach ($data as $_data) {
+                $i++;
+                preg_match_all('/"(.*?)"/s', $_data, $matches);
+                preg_match_all('/>(.*?)</s', $_data, $mvalue);
+                if ($matches['1']['0'] == $vid) {
+                    $newarr[] = '<option value="' . $vid . '" selected>' . $mvalue['1']['0'] . '</option>';
+                } else {
+                    $newarr[] = $_data;
+                }
+            }
+        }
+
+        if (!empty($newarr)) {
+            foreach ($newarr as $_newarr) {
+                $finaldata .= $_newarr;
+            }
+        }
+        echo $finaldata;
+    }
+    
+    public function actionGetcengineeraddressbycommand($id, $vid) {
+        $value = $id;
+        $finaldata = '';
+        $data = [];
+        if ($value == 6) {
+            $data[] = '<option value="1">CE (AF) ALLAHABAD - MES</option>';
+            $data[] = '<option value="2">CE BAREILLY ZONE - MES</option>';
+            $data[] = '<option value="3">CE JABALPUR ZONE - MES</option>';
+            $data[] = '<option value="4">CE LUCKNOW ZONE - MES</option>';
+        } elseif ($value == 7) {
+            $data[] = '<option value="5">CCE (ARMY) NO 1 DINJAN - MES</option>';
+            $data[] = '<option value="6">CCE (ARMY ) No 2 MISSAMARI - MES</option>';
+            $data[] = '<option value="7">CCE (ARMY) NO 3 NARANGI - MES</option>';
+            $data[] = '<option value="8">CCE (NEP) NEW DELHI - MES</option>';
+            $data[] = '<option value="9">CE (AF) SHILLONG - MES</option>';
+            $data[] = '<option value="10">CE KOLKATA ZONE - MES</option>';
+            $data[] = '<option value="11">CE (NAVY) VIZAG - MES</option>';
+            $data[] = '<option value="12">CE SHILLONG ZONE - MES</option>';
+            $data[] = '<option value="13">CE SILIGURI ZONE - MES</option>';
+            $data[] = '<option value="14">DGNP (VIZAG) - MES</option>';
+        } elseif ($value == 8) {
+            $data[] = '<option value="15">CE 31 ZONE - MES</option>';
+            $data[] = '<option value="16">CE (AF) UDHAMPUR - MES</option>';
+            $data[] = '<option value="17">CE LEH ZONE - MES</option>';
+            $data[] = '<option value="18">CE UDHAMPUR ZONE - MES</option>';
+        } elseif ($value == 9) {
+            $data[] = '<option value="19">CE (A and N) ZONE - MES</option>';
+            $data[] = '<option value="20">CE (AF) BANGALORE - MES</option>';
+            $data[] = '<option value="21">CE (AF) NAGPUR - MES</option>';
+            $data[] = '<option value="22">CE BHOPAL ZONE  - MES</option>';
+            $data[] = '<option value="23">CE CHENNAI ZONE  - MES</option>';
+            $data[] = '<option value="24">CE JODHPUR ZONE - MES</option>';
+            $data[] = '<option value="25">CE (NAVY) KOCHI - MES</option>';
+            $data[] = '<option value="26">CE( NAVY )MUMBAI - MES</option>';
+            $data[] = '<option value="27">CE PUNE ZONE - MES</option>';
+        } elseif ($value == 10) {
+            $data[] = '<option value="28">CE (AF) GANDHINAGAR - MES</option>';
+            $data[] = '<option value="29">CE BATHINDA ZONE - MES</option>';
+            $data[] = '<option value="30">CE JAIPUR JAIPUR - MES</option>';
+        } elseif ($value == 11) {
+            $data[] = '<option value="31">CE(AF) WAC PALAM-MES</option>';
+            $data[] = '<option value="32">CE CHANDIGARH ZONE - MES</option>';
+            $data[] = '<option value="33">CE DELHI ZONE-MES</option>';
+            $data[] = '<option value="34">CE JALANDHAR ZONE - MES</option>';
+            $data[] = '<option value="35">CE PATHANKOT ZONE - MES</option>';
         } elseif ($value == 1) {
             $data[] = '<option value="36">AGE (I) B/R JAKHAU - MES</option>';
             $data[] = '<option value="37">GE (CG) KOCHI - MES</option>';
@@ -10496,7 +10687,7 @@ class SiteController extends Controller {
             Yii::$app->session->setFlash('success', "File successfully uploaded");
         }
 
-         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
     }
 
 }

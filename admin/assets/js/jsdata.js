@@ -2034,6 +2034,55 @@ function addrow(num) {
 
 }
 
+function getcengineeraddress(value) {
+
+    $("#cengineer").prop('selectedIndex', 0);
+    $("#cengineer").material_select();
+    $("#ce").hide();
+
+    $("#cwengineer").prop('selectedIndex', 0);
+    $("#cwengineer").material_select();
+    $("#cwe").hide();
+
+    $("#gengineer").prop('selectedIndex', 0);
+    $("#gengineer").material_select();
+    $("#ge").hide();
+
+    var arr = ['2', '12'];
+    if (arr.indexOf(value) < 0) {
+        $("#ce").show();
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getcengineeraddress',
+            dataType: "json",
+            data: {'value': value, '_csrf-backend': csrf_token},
+            success: function (resultData) {
+                var arrz = ['1', '3', '4', '5'];
+                if (arrz.indexOf(value) >= 0) {
+                    $("#ge").show();
+                    $("#gengineer").html(resultData.data);
+                    $("#cwe").hide();
+                    $("#ce").hide();
+                    $("#gengineer").material_select();
+                } else {
+                    $("#cengineer").html(resultData.data);
+                    $("#cwe").hide();
+                    $("#ge").hide();
+                    $("#cengineer").material_select();
+                }
+            }
+        });
+    } else {
+        $("#cengineer").material_select('destroy');
+        $("#ce").hide();
+        $("#cwengineer").material_select('destroy');
+        $("#cwe").hide();
+        $("#gengineer").material_select('destroy');
+        $("#ge").hide();
+
+    }
+}
+
 function getcengineer(value) {
 
     $("#cengineer").prop('selectedIndex', 0);
