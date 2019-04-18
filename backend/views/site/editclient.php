@@ -131,7 +131,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <label for="mobile">Mobile Number</label>
                             </div>
                             <div class="input-field col s12">
-                                <input name="cemail" id="email" class="contact-email form-control" type="email" value="<?= $client->cemail ?>" placeholder="E-mail Id*" required="">
+                                <input name="cemail" id="email" class="contact-email form-control" type="text" value="<?= $client->cemail ?>" placeholder="E-mail Id*" required="">
                                 <label for="email">Email Address</label>
                             </div>
                             <?php if ($client->type == 3 || $client->type == 1) { ?>

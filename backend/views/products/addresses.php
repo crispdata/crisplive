@@ -64,7 +64,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <input type="hidden" value="<?= @$address->id; ?>" name="id">
                         <div class="input-fields col s12">
                             <label>Select Command</label>
-                            <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
+                            <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineeraddress(this.value)">
                                 <option value="" selected>Select Command</option>
                                 <option value="0" <?php
                                 if (@$_POST['command'] == 0 && @$_POST['command'] != '') {
@@ -140,6 +140,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </select>
                         </div>
                         <?php
+                      
                         if ((@$_POST['cengineer'] == 0 || @$_POST['cengineer'] == null) && (@$_POST['gengineer'] == 0 || @$_POST['gengineer'] == null)) {
                             $arrcommands = [1, 2, 3, 4, 5, 13];
                             $getcengineers = \common\models\Cengineer::find()->where(['command' => @$_POST['command']])->all();
@@ -149,18 +150,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <div class="input-field col s12">
                                         <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
                                             <option value="">Select CE</option>
-                                            <?php SiteController::actionGetcengineerbycommand(@$_POST['command'], ''); ?>
+                                            <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'], ''); ?>
                                         </select>
                                     </div>
                                 </div>
                                 <?php
                             } elseif (@$getcengineers && (in_array(@$_POST['command'], $arrcommands))) {
+                              
                                 ?>
                                 <div id="ge">
                                     <div class="input-field col s12">
                                         <select class="validate required materialSelect" name="gengineer" id="gengineer">
                                             <option value="">Select GE</option>
-                                            <?php SiteController::actionGetcengineerbycommand(@$_POST['command'], ''); ?>
+                                            <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'],''); ?>
                                         </select>
                                     </div>
                                 </div>  
@@ -173,7 +175,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="cengineer" id="cengineer" onchange="getcwengineer(this.value)">
                                         <option value="">Select CE</option>
-                                        <?php SiteController::actionGetcengineerbycommand(@$_POST['command'], $_POST['cengineer']); ?>
+                                        <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'], $_POST['cengineer']); ?>
                                     </select>
                                 </div>
                             </div>
@@ -199,7 +201,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="cwengineer" id="cwengineer" onchange="getgengineer(this.value)">
                                         <option value="">Select CE</option>
-                                        <?php SiteController::actionGetcengineerbycommand(@$_POST['command'], $_POST['cwengineer']); ?>
+                                        <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'], $_POST['cwengineer']); ?>
                                     </select>
                                 </div>
                             </div>
@@ -208,7 +210,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="gengineer" id="gengineer">
                                         <option value="">Select CE</option>
-                                        <?php SiteController::actionGetcengineerbycommand(@$_POST['command'], $_POST['gengineer']); ?>
+                                        <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'], $_POST['gengineer']); ?>
                                     </select>
                                 </div>
                             </div>
@@ -262,6 +264,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         }
 
                         if ((@$_POST['cengineer'] != 0 || @$_POST['cengineer'] != null) && (@$_POST['cwengineer'] != 0 || @$_POST['cwengineer'] != null) && @$_POST['gengineer'] != 0) {
+                           
                             ?>
 
                             <div id="ge">
@@ -277,6 +280,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <div class="input-field col s12">
                                     <select class="validate required materialSelect" name="gengineer" id="gengineer">
                                         <option value="" disabled selected>Select GE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div id="ce" style="display: none;">
+                                <div class="input-field col s12">
+                                    <select class="validate required materialSelect" name="cengineer" id="cengineer">
+                                        <option value="" disabled selected>Select CE</option>
                                     </select>
                                 </div>
                             </div>

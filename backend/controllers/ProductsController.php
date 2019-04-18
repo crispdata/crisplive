@@ -981,10 +981,14 @@ class ProductsController extends Controller {
     public function actionAddresses() {
 
         if (isset($_POST['submit'])) {
+           
             $addresses = \common\models\Addresses::find()->where(['status' => 1]);
-            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
+            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && @$_REQUEST['cengineer'] == '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['gengineer'] == '') {
                 $addresses->andWhere(['and',
-                    ['command' => $_REQUEST['command']]
+                    ['command' => $_REQUEST['command']],
+                    ['cengineer' => null],
+                    ['cwengineer' => null],
+                    ['gengineer' => null]
                 ]);
             }
             if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
@@ -1009,6 +1013,13 @@ class ProductsController extends Controller {
                 ]);
             }
             if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+                $addresses->andWhere(['and',
+                    ['cengineer' => null],
+                    ['cwengineer' => null],
+                    ['gengineer' => $_REQUEST['gengineer']]
+                ]);
+            }
+            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['cengineer'] == '') {
                 $addresses->andWhere(['and',
                     ['cengineer' => null],
                     ['cwengineer' => null],
@@ -1041,7 +1052,6 @@ class ProductsController extends Controller {
                     $_address->command = $officename;
                 }
             }
-          
         } else {
             $alladdress = [];
         }

@@ -105,7 +105,32 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         text-align: center!important;
         text-decoration: none;
     }
+    div#message {
+        float: left;
+        width: 100%;
+        color: red;
+        font-size: 20px;
+        text-align: center;
+    }
+    #message img {
+        width: 20px;
+    }
+    span.srno {
+        background-color: #E4E4E4;
+        border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 5px;
+        margin-left: 5px;
+        width: auto;
+        float: left;
+    }
 </style>
+<script>
+    function ShowMessage() {
+        $("#message").html('We are fetching tenders for you. It will take some time....... <img src="/assets/images/loading.gif" alt="">');
+        $("#itemsearch").submit();
+    }
+</script>
 <main class="mn-inner">
     <div class="row">
         <div class="col s12">
@@ -135,7 +160,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             <div class="card">
                 <div class="card-content card-tenders">
                     <div class="row fullrow">
-                        <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/items">
+                        <form id="itemsearch" name="myform" class="col s12" enctype="multipart/form-data" onsubmit="return ShowMessage()" method = "get" action = "<?= $baseURL ?>search/items">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Keyword</b></h5></div>
@@ -164,7 +189,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                             </div>
-                           
+
 
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Offices</b></h5></div>
@@ -417,6 +442,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
                             </div>
                         </form>
+                        <div id="message"></div>
                         <?php if (@$tenders) {
                             ?>
                             <form id="sort-data" method = "post" action = "<?= str_replace('/admin', '', Yii::$app->request->url) ?>">
@@ -444,6 +470,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <th data-field="email" width="120px">Cost of Tender</th>
                                         <th data-field="email" width="120px">Awarded Cost</th>
                                         <th data-field="email" width="100px">Bid end date</th>
+                                        <th data-field="email">Item Sr Nos</th>
                                         <th data-field="email">Status</th>
                                         <th data-field="email">Actions</th>
                                     </tr>
@@ -489,6 +516,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <td class = ""><?= $tender->cvalue ?></td>
                                                 <td class = ""><?= ($tender->qvalue) ? $tender->qvalue : '---' ?></td>
                                                 <td class = ""><?= $tender->bid_end_date ?></td>
+                                                <td class = ""><?= "<span class='srno'>" . implode('</span><span class="srno">', $srnos[$tender->id]) . "</span>" ?></td>
                                                 <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                                 <td>
                                                     <?php

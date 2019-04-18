@@ -145,7 +145,7 @@ class MailController extends Controller {
             $makes = implode(',', @$requestdata['lighting']);
         }
 
-        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->all();
+        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->all();
 
         if ($tenders) {
             foreach ($tenders as $_tender) {
@@ -1812,8 +1812,6 @@ class MailController extends Controller {
 
         $totalfiles = count($allnames);
 
-
-
         $htmlfilepath = Yii::getAlias('@common/mail/home-link.php');
         $textfilepath = '';
         $ses = new \SimpleEmailService(Yii::$app->params['IAM_KEY'], Yii::$app->params['IAM_SECRET']);
@@ -1825,11 +1823,19 @@ class MailController extends Controller {
             $m->addAttachmentFromFile($allnames[$i], "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', time() . $allnames[$i])) . ".xlsx", 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             unlink("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', time() . $allnames[$i])) . ".xlsx");
         }
-
-        $allemails = explode(',', $email);
-        if (isset($allemails) && count($allemails)) {
-            foreach ($allemails as $_email) {
-                $m->addTo($_email);
+        
+        if (isset($email) && $email != '') {
+            $allmails = explode(',', $email);
+            if (isset($allmails) && count($allmails)) {
+                foreach ($allmails as $_mail) {
+                    if ($_mail) {
+                        $m->addTo($_mail);
+                    } else {
+                        $m->addTo('sajstyles21@gmail.com');
+                    }
+                }
+            } else {
+                $m->addTo('sajstyles21@gmail.com');
             }
         } else {
             $m->addTo('sajstyles21@gmail.com');
@@ -2159,14 +2165,14 @@ class MailController extends Controller {
     }
 
     public function actionMlogs() {
-        $logs = \common\models\Logs::find()->where(['status' => 1, 'type' => 2])->all();
+        $logs = \common\models\Logs::find()->where(['status' => 1, 'type' => 2])->orderBy(['createdon' => SORT_DESC])->all();
         return $this->render('mlogs', [
                     'logs' => $logs,
         ]);
     }
 
     public function actionClogs() {
-        $logs = \common\models\Logs::find()->where(['status' => 1, 'type' => 1])->all();
+        $logs = \common\models\Logs::find()->where(['status' => 1, 'type' => 1])->orderBy(['createdon' => SORT_DESC])->all();
         return $this->render('clogs', [
                     'logs' => $logs,
         ]);
