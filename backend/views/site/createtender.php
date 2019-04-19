@@ -17,7 +17,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .row{margin-bottom: 0px;}
 </style>
 <script>
-    function GetFileSize() {
+    function GetFileSizeTender() {
         var fi = document.getElementById('file'); // GET THE FILE INPUT.
         var com = document.forms["myform"]["command"].value;
         var work = document.forms["myform"]["work"].value;
@@ -102,7 +102,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 <div class="card-content">
 
                     <div class="row">
-                        <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "post" onsubmit="return GetFileSize()" action = "<?= $baseURL ?>site/create-tender">
+                        <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "post" onsubmit="return GetFileSizeTender()" action = "<?= $baseURL ?>site/create-tender">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <input type="hidden" value="<?= @$tender->id; ?>" name="id">
                             <div class="row">
@@ -299,7 +299,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                             <div class="row">
                                 <div class="input-field col s6">
-                                    <textarea name="work" id="work" class="materialize-textarea validate required" required=""><?= @$tender->work; ?></textarea>
+                                    <textarea name="work" id="work" class="materialize-textarea validate required"><?= @$tender->work; ?></textarea>
                                     <label for="work">Name of work</label>
                                 </div>
 

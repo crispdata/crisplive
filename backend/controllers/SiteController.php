@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer','getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4151,6 +4151,20 @@ class SiteController extends Controller {
         }
     }
 
+    function actionGetlocation($apiKey, $ip = null) {
+        $url = "https://api.ipgeolocation.io/ipgeo?apiKey=" . $apiKey . "&ip=" . $ip;
+        $cURL = curl_init();
+
+        curl_setopt($cURL, CURLOPT_URL, $url);
+        curl_setopt($cURL, CURLOPT_HTTPGET, true);
+        curl_setopt($cURL, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($cURL, CURLOPT_HTTPHEADER, array(
+            'Content-Type: application/json',
+            'Accept: application/json'
+        ));
+        return curl_exec($cURL);
+    }
+
     /**
      * Login action.
      *
@@ -4179,6 +4193,45 @@ class SiteController extends Controller {
         $model->is_admin = 1;
         $model->authtype = @$post['LoginForm']['authtype'];
         if ($model->load(Yii::$app->request->post()) && $model->login()) {
+            $user = Yii::$app->user->identity;
+
+            if ($user->group_id == 6) {
+                if (!empty($_SERVER['HTTP_CLIENT_IP'])) {
+                    //ip from share internet
+                    $ip = $_SERVER['HTTP_CLIENT_IP'];
+                } elseif (!empty($_SERVER['HTTP_X_FORWARDED_FOR'])) {
+                    //ip pass from proxy
+                    $ip = $_SERVER['HTTP_X_FORWARDED_FOR'];
+                } else {
+                    $ip = $_SERVER['REMOTE_ADDR'];
+                }
+
+                $ip_data = @json_decode(file_get_contents("http://www.geoplugin.net/json.gp?ip=" . $ip));
+                if ($ip_data && $ip_data->geoplugin_countryName != null) {
+                    $location = $ip_data->geoplugin_city . ', ' . $ip_data->geoplugin_countryName;
+                }
+
+                $checkuser = \common\models\Userlogins::find()->where(['user_id' => $user->UserId])->one();
+                if ($checkuser) {
+                    $checkuser->ip = $ip;
+                    $checkuser->location = @$location;
+                    $checkuser->count = ($checkuser->count + 1);
+                    $checkuser->lastloggedin = date('Y-m-d h:i:s');
+                    $checkuser->save();
+                } else {
+                    $userlogin = new \common\models\Userlogins();
+                    $userlogin->user_id = $user->UserId;
+                    $userlogin->ip = $ip;
+                    $userlogin->location = @$location;
+                    $userlogin->loggedin = 1;
+                    $userlogin->count = 1;
+                    $userlogin->createdon = date('Y-m-d h:i:s');
+                    $userlogin->lastloggedin = date('Y-m-d h:i:s');
+                    $userlogin->status = 1;
+                    $userlogin->save();
+                }
+            }
+
             return $this->goHome();
         }
 
@@ -5844,7 +5897,7 @@ class SiteController extends Controller {
         echo json_encode(['data' => $data]);
         die;
     }
-    
+
     public function actionGetcengineeraddress() {
         $value = $_REQUEST['value'];
         if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13) {
@@ -8093,7 +8146,7 @@ class SiteController extends Controller {
         }
         echo $finaldata;
     }
-    
+
     public function actionGetcengineeraddressbycommand($id, $vid) {
         $value = $id;
         $finaldata = '';
@@ -10653,7 +10706,7 @@ class SiteController extends Controller {
         if (count($_FILES['tfile']['name']) > 0) {
             for ($i = 0; $i < count($_FILES['tfile']['name']); $i++) {
 
-                $file_name = time() . $_FILES['tfile']['name'][$i];
+                $file_name = time() . '-' . $_FILES['tfile']['name'][$i];
                 $file_tmp = $_FILES['tfile']['tmp_name'][$i];
                 move_uploaded_file($file_tmp, "assets/files/" . $file_name);
 
