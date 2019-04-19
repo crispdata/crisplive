@@ -73,7 +73,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <tr data-id = "<?= $fit->id ?>">
                                             <td class = ""><?= $key + 1 ?></td>
                                             <td class = ""><img src="<?= ProductsController::actionFileimages($fit->file); ?>" alt="<?= $fname ?>"><a class="file" download href="<?= $fit->file; ?>"><?= $fname ?></a></td>
-                                            <td class = ""><?= $department->name ?></td>
+                                            <td class = ""><?= @$department->name ?></td>
                                             <td>
 
                                                 <a href="<?= Url::to(['products/uploadfile', 'id' => $fit->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
