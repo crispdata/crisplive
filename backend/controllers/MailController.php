@@ -145,7 +145,8 @@ class MailController extends Controller {
             $makes = implode(',', @$requestdata['lighting']);
         }
 
-        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->all();
+        $fromdate = date('Y-m-d', strtotime('-40 days'));
+        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', date('Y-m-d')])->all();
 
         if ($tenders) {
             foreach ($tenders as $_tender) {
@@ -1766,9 +1767,8 @@ class MailController extends Controller {
                             $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
                             $mailnum++;
                         }
+                        $mail = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $_client, 1);
                     }
-
-                    $mail = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $_client, 1);
                 }
             }
 
@@ -1823,7 +1823,7 @@ class MailController extends Controller {
             $m->addAttachmentFromFile($allnames[$i], "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', time() . $allnames[$i])) . ".xlsx", 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             unlink("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', time() . $allnames[$i])) . ".xlsx");
         }
-        
+
         if (isset($email) && $email != '') {
             $allmails = explode(',', $email);
             if (isset($allmails) && count($allmails)) {

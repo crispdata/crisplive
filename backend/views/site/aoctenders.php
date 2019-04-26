@@ -285,6 +285,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <?php if ($tender->is_archived != 1 && $user->group_id != 6) { ?>
                                                     <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                 <?php } ?>
+                                                <?php if ($user->group_id != 3 && $tender->is_archived != 1) { ?>    
+                                                    <a onclick="movearchive(<?= $tender->id; ?>)" id="tenderarc<?= $tender->id; ?>" class="waves-effect waves-light btn blue proj-delete">Archive</a>    
+                                                <?php } ?>
 
 
                                             </td>
@@ -466,6 +469,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     </div>
                                 </div>
+                                
 
 
                             </div>

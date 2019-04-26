@@ -1740,6 +1740,36 @@ function getparenttwotypes(value) {
 
 }
 
+function addrate(num, itemid) {
+    var newnum = (parseInt(num) + parseInt(1));
+    var dt = new Date();
+    var time = dt.getHours() + dt.getMinutes() + dt.getSeconds();
+    var rand = Math.floor((Math.random() * 100) + 1);
+    var id = rand + time;
+    var rowitems = "<div class='row added rateinfo' id='inforates" + newnum + id + "' ><div class='input-field col s6' id='contractorsdiv" + id + "'><select class='validate required contype materialSelectcon ratelist" + id + " browser-default' required='' name='cont[]' ><option value='' disabled required>No Contractors</option></select></div><div class='input-field col s3'><input id='rate" + id + "' type='number' name = 'rate[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='rate" + id + "'>Rate</label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deleteratebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
+    $("#allrates" + itemid + "").append(rowitems);
+    $('select.materialSelectcon').select2({
+        closeOnSelect: true,
+        placeholder: 'Select Contractor',
+        allowClear: true,
+        ajax: {
+            headers: {
+                "Authorization": "Bearer " + csrf_token,
+                "Content-Type": "application/json",
+            },
+            type: 'get',
+            url: baseUrl + 'contractor/getcontractors',
+            dataType: 'json',
+            data: function (params) {
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true,
+        }
+    });
+}
 
 function addrow(num) {
     var selected = $('#tenderfour :selected').val();
@@ -3032,7 +3062,17 @@ function getsixdatasub(value, id) {
     $("#itembutton" + id + "").show();
 }
 
+function deleterate(id, iid, itemid) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/deleterate',
+        dataType: "json",
+        data: {id: id, 'iid': iid, itemid: itemid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
 
+        }
+    });
+}
 
 function deletebutton(id, num) {
     if (id) {
@@ -3067,6 +3107,13 @@ function deletebutton(id, num) {
          $('#tenderfour').prop('selectedIndex', 0);
          $('#tenderfive').prop('selectedIndex', 0);
          $('#tendersix').prop('selectedIndex', 0);*/
+    }
+}
+
+function deleteratebutton(id, num) {
+    if (id) {
+        $('#inforates' + num + id + '').remove();
+        $('.ratelist' + id + '').prop('selectedIndex', 0);
     }
 }
 

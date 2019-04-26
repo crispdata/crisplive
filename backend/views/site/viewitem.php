@@ -79,6 +79,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
         cursor: pointer;
     }
     .singlemake img{width:15px;}
+    .select2-container{width:409px!important;}
 </style>
 <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 <script>
@@ -112,6 +113,15 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
             scrollTop: $(document).height()                       // Scroll to top of body
         }, 500);
     });
+</script>
+<script>
+    function Validatedata(iid) {
+        if (!$("#allrates" + iid + " .contype").length) {
+            swal("", "No rates entered", "warning");
+            return false;
+        }
+
+    }
 </script>
 <main class="mn-inner">
     <div class="row">
@@ -232,6 +242,10 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                                                 <?php
                                                             }
                                                         }
+                                                        if ($user->group_id == 1) {
+                                                            ?>
+                                                            <a href="#modalrate<?= $idetail->id; ?>" class="waves-effect waves-light btn pink modal-trigger">Rates</a>
+                                                        <?php }
                                                         ?>
 
                                                         <a href="<?= Url::to(['site/edit-item', 'id' => $idetail->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
@@ -255,6 +269,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                         </div>
                                     </div>
 
+
                                     <?php
                                     $i++;
                                 }
@@ -268,6 +283,56 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
         </form>
     </div>
 </main>
+<?php
+if (@$idetails) {
+    $i = 0;
+    foreach ($idetails as $key => $idetail) {
+        $allrates = \common\models\Itemrates::find()->where(['iid' => $idetail->id, 'item_id' => $idetail->item_id])->orderBy(['id' => SORT_ASC])->all();
+        ?>
+        <div id="modalrate<?= $idetail->id; ?>" class="modal">
+            <div class="modal-content"> 
+                <h5>Rates By Contractors</h5>
+                <div class="row" id="ratebutton">
+                    <a class="waves-effect waves-light btn blue m-b-xs" id="addrate<?= $idetail->id ?>" onclick="addrate('0', '<?= $idetail->id ?>')" >Add Rate</a>
+                </div>
+                <form id="create-rate" name="myform" class="col s12" method = "post" onsubmit="return Validatedata(<?= $idetail->id ?>)"  action = "<?= $baseURL ?>site/create-rates">
+                    <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                    <input type="hidden" name="iid" value="<?= $idetail->id ?>">
+                    <input type="hidden" name="itemid" value="<?= $idetail->item_id ?>">
+                    <div class="allrates" id="allrates<?= $idetail->id ?>">
+                        <?php
+                        $p = 1;
+                        if (isset($allrates) && count($allrates)) {
+                            foreach ($allrates as $_rate) {
+                                $contractor = \common\models\Contractor::find()->where(['id' => $_rate->contractor])->one();
+                                ?>
+                                <div class="row" id="cont<?= $_rate->id . '-' . $_rate->iid ?>">
+                                    <div class='input-field col s6 row' id='contractorsdiv<?= $p ?>'>
+                                        <select class='validate required contype materialSelectcon browser-default' required='' name='cont[]' >
+                                            <option value='<?= $contractor->id ?>' required><?= $contractor->firm ?></option>
+                                        </select>
+                                    </div>
+                                    <div class='input-field col s3'>
+                                        <input id='rate<?= $p ?>' type='number' name = 'rate[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value='<?= $_rate->rate ?>'>
+                                        <label for='rate<?= $p ?>'>Rate</label>
+                                    </div> 
+                                    <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' id="del<?= $_rate->id . '-' . $_rate->iid ?>" onclick='deleterate("<?= $_rate->id ?>", "<?= $_rate->iid ?>", "<?= $_rate->item_id ?>")'>Delete</a>
+                                    </div>
+                                </div>
+                                <?php
+                                $p++;
+                            }
+                        }
+                        ?>
+                    </div>
+                    <input class="waves-effect waves-light btn blue m-b-xs" id="itemsubmit" name="submit" type="submit" value="Submit">
+                </form>
+            </div>
+        </div>
+        <?php
+    }
+}
+?>
 
 <a href="javascript:" id="return-to-top"><i class="icon-chevron-up"></i></a>
 <a href="javascript:" id="return-to-bottom"><i class="icon-chevron-down"></i></a>

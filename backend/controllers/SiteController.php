@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -5334,6 +5334,7 @@ class SiteController extends Controller {
                 $model->cwengineer = @$_POST['cwengineer'];
                 $model->gengineer = @$_POST['gengineer'];
                 $model->work = $_POST['work'];
+                $model->ddfavour = $_POST['ddfavour'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
                 $tid = explode('_', $model->tender_id);
@@ -5391,6 +5392,7 @@ class SiteController extends Controller {
                 $model->cwengineer = @$_POST['cwengineer'];
                 $model->gengineer = @$_POST['gengineer'];
                 $model->work = $_POST['work'];
+                $model->ddfavour = $_POST['ddfavour'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
                 $tid = explode('_', $model->tender_id);
@@ -6558,6 +6560,7 @@ class SiteController extends Controller {
         } elseif ($value == 115) {
             $data .= '<option value="267">GE (AF) Adampur-MES</option>';
             $data .= '<option value="268">GE (P) (AF) No 2 CHANDIGARH-MES</option>';
+            $data .= '<option value="362">GE (AF) CHANDIGARH-MES</option>';
         } elseif ($value == 116) {
             $data .= '<option value="269">GE (AF) FARIDABAD - MES</option>';
             $data .= '<option value="270">GE (AF) GURGAON - MES</option>';
@@ -6595,6 +6598,7 @@ class SiteController extends Controller {
             $data .= '<option value="290">GE NEW DELHI-MES</option>';
             $data .= '<option value="291">GE (S) NEW DELHI-MES</option>';
             $data .= '<option value="353">GE (P) WEST DELHI-MES</option>';
+            $data .= '<option value="360">GE (S) Delhi Cantt 10 -MES</option>';
         } elseif ($value == 124) {
             $data .= '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
             $data .= '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
@@ -6632,6 +6636,7 @@ class SiteController extends Controller {
             $data .= '<option value="316">GE PALAMPUR - MES</option>';
         } elseif ($value == 126) {
             $data .= '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
+            $data .= '<option value="361">GE(U)P and M DELHI CANTT - MES</option>';
         }
         echo json_encode(['data' => $data]);
         die;
@@ -6966,6 +6971,7 @@ class SiteController extends Controller {
                 }
             }
         }
+
         return $this->render('viewitem', [
                     'idetails' => $idetails,
                     'tid' => $tid,
@@ -9136,6 +9142,7 @@ class SiteController extends Controller {
         } elseif ($value == 115) {
             $data[] = '<option value="267">GE (AF) Adampur-MES</option>';
             $data[] = '<option value="268">GE (P) (AF) No 2 CHANDIGARH-MES</option>';
+            $data[] = '<option value="362">GE (AF) CHANDIGARH-MES</option>';
         } elseif ($value == 116) {
             $data[] = '<option value="269">GE (AF) FARIDABAD - MES</option>';
             $data[] = '<option value="270">GE (AF) GURGAON - MES</option>';
@@ -9173,6 +9180,7 @@ class SiteController extends Controller {
             $data[] = '<option value="290">GE NEW DELHI-MES</option>';
             $data[] = '<option value="291">GE (S) NEW DELHI-MES</option>';
             $data[] = '<option value="353">GE (P) WEST DELHI-MES</option>';
+            $data[] = '<option value="360">GE (S) Delhi Cantt 10 -MES</option>';
         } elseif ($value == 124) {
             $data[] = '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
             $data[] = '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
@@ -9210,6 +9218,7 @@ class SiteController extends Controller {
             $data[] = '<option value="316">GE PALAMPUR - MES</option>';
         } elseif ($value == 126) {
             $data[] = '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
+            $data[] = '<option value="361">GE(U)P and M DELHI CANTT - MES</option>';
         }
         $i = 0;
         if (!empty($data)) {
@@ -9632,6 +9641,7 @@ class SiteController extends Controller {
             } elseif ($value == 115) {
                 $data[] = '<option value="267">GE (AF) Adampur-MES</option>';
                 $data[] = '<option value="268">GE (P) (AF) No 2 CHANDIGARH-MES</option>';
+                $data[] = '<option value="362">GE (AF) CHANDIGARH-MES</option>';
             } elseif ($value == 116) {
                 $data[] = '<option value="269">GE (AF) FARIDABAD - MES</option>';
                 $data[] = '<option value="270">GE (AF) GURGAON - MES</option>';
@@ -9669,6 +9679,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="290">GE NEW DELHI-MES</option>';
                 $data[] = '<option value="291">GE (S) NEW DELHI-MES</option>';
                 $data[] = '<option value="353">GE (P) WEST DELHI-MES</option>';
+                $data[] = '<option value="360">GE (S) Delhi Cantt 10 -MES</option>';
             } elseif ($value == 124) {
                 $data[] = '<option value="354">AGE (I)(U) B and R DELHI CNATT-MES</option>';
                 $data[] = '<option value="292">GE(U)ELECTRIC SUPPLY DELHI CANTT-MES</option>';
@@ -9706,6 +9717,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="316">GE PALAMPUR - MES</option>';
             } elseif ($value == 126) {
                 $data [] = '<option value="358">GE(U)ELECTRIC SUPPLY DELHI CANTT - MES</option>';
+                $data [] = '<option value="361">GE(U)P and M DELHI CANTT - MES</option>';
             }
             $i = 0;
             if (!empty($data)) {
@@ -10741,6 +10753,79 @@ class SiteController extends Controller {
         }
 
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
+    public function actionGengineers($ddfavour) {
+        $data = '<option value="">Select DD in favour of</option>';
+
+        $gengineers = \common\models\Gengineer::find()->where(['status' => 1])->all();
+        $cwegengineers = \common\models\Cwengineer::find()->where(['status' => 1])->all();
+        $cengineers = \common\models\Cengineer::find()->where(['status' => 1])->all();
+        if (isset($gengineers)) {
+            foreach ($gengineers as $gengineer) {
+                $select = '';
+                if ($ddfavour == $gengineer->gid) {
+                    $select = 'selected';
+                }
+                $data .= '<option value="' . $gengineer->gid . '" ' . $select . '>' . $gengineer->text . '</option>';
+            }
+        }
+        if (isset($cwegengineers)) {
+            foreach ($cwegengineers as $gengineer) {
+                $select = '';
+                if ($ddfavour == $gengineer->cid) {
+                    $select = 'selected';
+                }
+                $data .= '<option value="' . $gengineer->cid . '" ' . $select . '>' . $gengineer->text . '</option>';
+            }
+        }
+        if (isset($cengineers)) {
+            foreach ($cengineers as $_cengineer) {
+                $select = '';
+                if ($ddfavour == $_cengineer->cid) {
+                    $select = 'selected';
+                }
+                $data .= '<option value="' . $_cengineer->cid . '" ' . $select . '>' . $_cengineer->text . '</option>';
+            }
+        }
+        echo $data;
+    }
+
+    public function actionCreateRates() {
+        $data = @$_POST;
+        $user = Yii::$app->user->identity;
+      
+        if (isset($data) && count($data)) {
+            foreach ($data['cont'] as $k => $_data) {
+               
+                $rate = \common\models\Itemrates::find()->where(['iid' => $data['iid'], 'item_id' => $data['itemid'], 'contractor' => @$_data, 'rate' => @$data['rate'][$k]])->one();
+                if (!@$rate) {
+                    $model = new \common\models\Itemrates();
+                    $model->iid = $data['iid'];
+                    $model->item_id = $data['itemid'];
+                    $model->contractor = $_data;
+                    $model->rate = $data['rate'][$k];
+                    $model->user_id = $user->id;
+                    $model->createdon = date('Y-m-d h:i:s');
+                    $model->status = 1;
+                    $model->save();
+                }
+            }
+        }
+
+        Yii::$app->session->setFlash('success', "Rates successfully uploaded");
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
+    public function actionDeleterate() {
+        $iid = @$_REQUEST['iid'];
+        $id = @$_REQUEST['id'];
+        $itemid = @$_REQUEST['itemid'];
+        $rate = \common\models\Itemrates::deleteAll(['id' => $id, 'iid' => $iid, 'item_id' => $itemid]);
+        if ($rate) {
+            echo json_encode(['success' => 1]);
+            die();
+        }
     }
 
 }
