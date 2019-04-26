@@ -60,6 +60,7 @@ $(document).ready(function () {
     $('.materialSelecttypefit').select2({closeOnSelect: true, placeholder: 'Select Type'});
     $('.materialSelectcapacityfit').select2({closeOnSelect: true, placeholder: 'Select Capacity'});
     $('.materialSelectaccessoryone').select2({closeOnSelect: true, placeholder: 'Select Accessory'});
+    $('select.ddfavour').select2({closeOnSelect: true});
     $('select.contact-authtypes').select2();
     $('#multiple').select2({
         placeholder: 'Select Multiple States'

@@ -50,7 +50,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <title><?= Html::encode($this->title) ?> - Data Management Company, Mohali, India</title>
         <?php $this->head() ?>
         <!-- Start of Async Drift Code -->
-        <script>
+        <!--script>
             "use strict";
 
             !function () {
@@ -76,7 +76,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             }();
             drift.SNIPPET_VERSION = '0.3.1';
             drift.load('28hhzcnerh2y');
-        </script>
+        </script-->
         <!-- End of Async Drift Code -->
     </head>
     <body oncontextmenu="return false">

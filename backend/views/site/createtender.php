@@ -295,7 +295,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                 </div>
                             <?php } ?>
-
+                            <div class="row">
+                                <div class="input-fields col s12 row">
+                                     <label for="ddfavour">Select DD in favour of</label>
+                                    <select class="ddfavour materialSelect browser-default" name="ddfavour" id="ddfavour">
+                                        <?php SiteController::actionGengineers(@$tender->ddfavour); ?>
+                                    </select>
+                                </div>
+                            </div>
 
                             <div class="row">
                                 <div class="input-field col s6">

@@ -14,8 +14,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .btn, .btn-flat {
         font-size: 11px;
     }
-    #contacts_list a{width:65px!important;}
-
 </style>
 
 <main class="mn-inner">

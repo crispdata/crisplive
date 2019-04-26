@@ -14,7 +14,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .btn, .btn-flat {
         font-size: 11px;
     }
-    #contacts_list a{width:65px!important;}
+   
 
 </style>
 
@@ -80,18 +80,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $tids = explode(',', $_log->tid);
                                     $tids = array_unique($tids);
                                     $total = count($tids);
+                                   
                                     if ($tids) {
                                         $t = 1;
                                         foreach ($tids as $_tid) {
                                             $tdetail = \common\models\Tender::find()->where(['id' => $_tid])->one();
                                             if ($total == $t) {
-                                                $tenderids .= $tdetail->tender_id;
+                                                $tenderids .= @$tdetail->tender_id;
                                             } else {
                                                 $tenderids .= $tdetail->tender_id . ', ';
                                             }
                                             $t++;
                                         }
                                     }
+                                 
                                     ?>
                                     <tr data-id = "<?= $_log->id ?>">
                                         <td class = ""><?= $key + 1 ?></td>

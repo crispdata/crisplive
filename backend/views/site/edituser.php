@@ -220,7 +220,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <?php } ?>
 
                             <div class="input-field col s12">
-                                <input id="password" type="password" name = "password" class="validate" value="<?= $user->password; ?>">
+                                <input id="password" type="text" name = "password" autocomplete="off" class="validate" value="<?= $user->password; ?>">
                                 <label for="password">Password</label>
                             </div>
 
