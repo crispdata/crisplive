@@ -73,9 +73,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         foreach ($tids as $_tid) {
                                             $tdetail = \common\models\Tender::find()->where(['id' => $_tid])->one();
                                             if ($total == $t) {
-                                                $tenderids .= $tdetail->tender_id;
+                                                $tenderids .= @$tdetail->tender_id;
                                             } else {
-                                                $tenderids .= $tdetail->tender_id . ', ';
+                                                $tenderids .= @$tdetail->tender_id . ', ';
                                             }
                                             $t++;
                                         }

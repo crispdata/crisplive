@@ -1771,6 +1771,168 @@ function addrate(num, itemid) {
     });
 }
 
+function addcontractor(num, tid) {
+    var newnum = (parseInt(num) + parseInt(1));
+    var dt = new Date();
+    var time = dt.getHours() + dt.getMinutes() + dt.getSeconds();
+    var rand = Math.floor((Math.random() * 100) + 1);
+    var id = rand + time;
+    $("#addrate" + tid + "").removeAttr('onclick');
+    $("#addrate" + tid + "").attr('onclick', 'addcontractor("' + newnum + '","' + tid + '")');
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getcolumns',
+        data: {'tid': tid, newnum: newnum, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#rateboxes" + tid + "").append(resultData);
+            $('select.materialSelectcon').select2({
+                closeOnSelect: true,
+                placeholder: 'Select Contractor',
+                allowClear: true,
+                ajax: {
+                    headers: {
+                        "Authorization": "Bearer " + csrf_token,
+                        "Content-Type": "application/json",
+                    },
+                    type: 'get',
+                    url: baseUrl + 'contractor/getcontractors',
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            term: params.term || '',
+                            page: params.page || 1
+                        }
+                    },
+                    cache: true,
+                }
+            });
+        }
+    });
+
+
+
+}
+
+function repeatcontractor(num, tid) {
+    $("#" + tid + num + "").html('<img src="/assets/images/loading.gif" alt="">');
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getrepeatcolumns',
+        data: {'tid': tid, newnum: num, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+            $("#" + tid + num + "").html(resultData);
+            $('select.materialSelectcon').select2({
+                closeOnSelect: true,
+                placeholder: 'Select Contractor',
+                allowClear: true,
+                ajax: {
+                    headers: {
+                        "Authorization": "Bearer " + csrf_token,
+                        "Content-Type": "application/json",
+                    },
+                    type: 'get',
+                    url: baseUrl + 'contractor/getcontractors',
+                    dataType: 'json',
+                    data: function (params) {
+                        return {
+                            term: params.term || '',
+                            page: params.page || 1
+                        }
+                    },
+                    cache: true,
+                }
+            });
+        }
+    });
+
+
+
+}
+
+function showcolumns(cid, tid, newnum) {
+    var valcont = $('#allconts' + tid + '').val();
+    if (valcont.indexOf(cid) != -1) {
+        alert('Contractor already added');
+        repeatcontractor(newnum, tid);
+        return false;
+    }
+    $("#select" + tid + newnum + "").prop("disabled", true);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getallcolumns',
+        data: {'tid': tid, cid: cid, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#box" + tid + newnum + "").html('<img src="/assets/images/loading.gif" alt="">');
+        },
+        success: function (resultData) {
+            if ($('#allconts' + tid + '').val() === '') {
+                $('#allconts' + tid + '').val($('#allconts' + tid + '').val() + cid);
+            } else {
+                $('#allconts' + tid + '').val($('#allconts' + tid + '').val() + ',' + cid);
+            }
+            $("#box" + tid + newnum + "").html(resultData);
+            $("#box" + tid + newnum + "").append('<a class="waves-effect waves-light btn red m-b-xs deletebox" id="delstatic' + tid + newnum + '" onclick="delcontractorstatic(' + cid + ',' + tid + ',' + newnum + ')">Delete</a>');
+            $("#contid" + tid + newnum + "").val(cid);
+
+
+        }
+    });
+}
+
+function delcontractor(cid, tid, newnum) {
+    var string = $("#allconts" + tid + "").val();
+    var res = string.replace(cid, "");
+    $("#allconts" + tid + "").val(res);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/delcontractor',
+        data: {'tid': tid, cid: cid, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#del" + tid + newnum + "").html('<img src="/assets/images/loading.gif" alt="">');
+        },
+        success: function (resultData) {
+
+            if (resultData == 1) {
+                $("#upperbox" + tid + newnum + "").remove();
+            } else {
+                alert('Could not delete contractor data');
+            }
+
+        }
+    });
+}
+
+function delcontractorstatic(cid, tid, newnum) {
+    var string = $("#allconts" + tid + "").val();
+    var res = string.replace(cid, "");
+    $("#allconts" + tid + "").val(res);
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/delcontractor',
+        data: {'tid': tid, cid: cid, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#delstatic" + tid + newnum + "").html('<img src="/assets/images/loading.gif" alt="">');
+        },
+        success: function (resultData) {
+
+            $("#" + tid + newnum + "").remove();
+
+        }
+    });
+}
+
+function saverate(rate, cid, iid, itemid, tid) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/saverate',
+        data: {'rate': rate, cid: cid, iid: iid, itemid: itemid, tid: tid, '_csrf-backend': csrf_token},
+        success: function (resultData) {
+
+
+        }
+    });
+}
+
 function addrow(num) {
     var selected = $('#tenderfour :selected').val();
     var subone = $('#tenderfive :selected').val();
@@ -2170,7 +2332,7 @@ function getcwengineer(value) {
     $("#gengineer").prop('selectedIndex', 0);
     $("#gengineer").material_select();
     $("#ge").hide();
-    var arr = ['5', '6', '7', '8', '14', '36'];
+    var arr = ['5', '6', '7', '14', '36'];
     if (arr.indexOf(value) < 0) {
         $("#cwe").show();
         $.ajax({

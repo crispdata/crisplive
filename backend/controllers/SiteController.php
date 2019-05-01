@@ -45,7 +45,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -5745,8 +5745,7 @@ class SiteController extends Controller {
     }
 
     public function actionDeleteTenders() {
-        $url = $_POST["url"];
-        if (count(@$_POST["selected_id"]) > 0) {
+        if (isset($_POST['selected_id']) && count($_POST["selected_id"]) > 0) {
             $all = implode(",", $_POST["selected_id"]);
             $delete = \common\models\Tender::deleteAll(['id' => $_POST["selected_id"]]);
             if ($delete) {
@@ -5760,11 +5759,11 @@ class SiteController extends Controller {
                 $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
                 $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
                 Yii::$app->session->setFlash('success', "Tenders successfully deleted");
-                return $this->redirect(array('site/' . $url . ''));
+                return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
             }
         } else {
-            Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
-            return $this->redirect(array('site/' . $url . ''));
+            Yii::$app->session->setFlash('error', "Please select the tender to perform action");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
         }
     }
 
@@ -5781,7 +5780,7 @@ class SiteController extends Controller {
                 return $this->redirect(array('site/movetoarchive'));
             }
         } else {
-            Yii::$app->session->setFlash('error', "Please select the checkbox to perform action");
+            Yii::$app->session->setFlash('error', "Please select the tender to perform action");
             return $this->redirect(array('site/movetoarchive'));
         }
     }
@@ -6013,6 +6012,8 @@ class SiteController extends Controller {
             $data .= '<option value="17">CWE KANPUR - MES</option>';
             $data .= '<option value="18">CWE LUCKNOW - MES</option>';
             $data .= '<option value="19">CWE MATHURA</option>';
+        } elseif ($value == 8) {
+            $data .= '<option value="141">CCE (NEP) AF Chabua - MES</option>';
         } elseif ($value == 9) {
             $data .= '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data .= '<option value="20">CWE (AF) BORJAR - MES</option>';
@@ -6192,6 +6193,8 @@ class SiteController extends Controller {
             $data .= '<option value="13">GE DEHRADUN - MES</option>';
             $data .= '<option value="320">GE (P)DEHRADUN - MES</option>';
             $data .= '<option value="14">GE PREMNAGAR - MES</option>';
+            $data .= '<option value="370">GE IMA DEHRADUN - MES</option>';
+            $data .= '<option value="371">GE Clement Town DEHRADUN - MES</option>';
         } elseif ($value == 7) {
             $data .= '<option value="15">AGE(I) Raiwala - MES</option>';
             $data .= '<option value="16">GE LANSDOWNE -MES</option>';
@@ -6240,6 +6243,7 @@ class SiteController extends Controller {
             $data .= '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data .= '<option value="44">GE(E/M)LUCKNOW - MES</option>';
             $data .= '<option value="45">GE(WEST)LUCKNOW - MES</option>';
+            $data .= '<option value="363">GE(P)LUCKNOW - MES</option>';
         } elseif ($value == 19) {
             $data .= '<option value="46">GE (E) MATHURA - MES</option>';
             $data .= '<option value="47">GE (W) MATHURA - MES</option>';
@@ -6275,6 +6279,7 @@ class SiteController extends Controller {
             $data .= '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
             $data .= '<option value="67">GE(NAVY)CHENNAI - MES</option>';
             $data .= '<option value="68">GETHIRUNALVELI - MES</option>';
+            $data .= '<option value="365">AGE I NAVY CHENNAI - MES</option>';
         } elseif ($value == 30) {
             $data .= '<option value="69">GE (N and CG) Bhubaneshwar - MES</option>';
             $data .= '<option value="70">GE (P) CHILKA - MES</option>';
@@ -6361,6 +6366,7 @@ class SiteController extends Controller {
             $data .= '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
             $data .= '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
             $data .= '<option value="135">GE (U) UDHAMPUR - MES</option>';
+            $data .= '<option value="367">GE (P) UDHAMPUR - MES</option>';
         } elseif ($value == 54) {
             $data .= '<option value="136">GE BRICHGUNJ - MES</option>';
             $data .= '<option value="334">GE (P) CENTRAL - MES</option>';
@@ -6506,6 +6512,7 @@ class SiteController extends Controller {
             $data .= '<option value="232">GE(AF) BHUJ - MES</option>';
             $data .= '<option value="233">GE (AF) JAMNAGAR - MES</option>';
             $data .= '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
+            $data .= '<option value="369">GE (AF) NALIYA - MES</option>';
         } elseif ($value == 98) {
             $data .= '<option value="232">GE (AF) CHILODA - MES</option>';
             $data .= '<option value="347">GE (AF) BARODA - MES</option>';
@@ -6542,6 +6549,8 @@ class SiteController extends Controller {
             $data .= '<option value="254">GE BHARATPUR - MES</option>';
             $data .= '<option value="255">GE JAIPUR - MES</option>';
             $data .= '<option value="256">GE (U) JAIPUR - MES</option>';
+            $data .= '<option value="364">GE (I)(P) JAIPUR - MES</option>';
+            $data .= '<option value="366">GE (S) JAIPUR - MES</option>';
         } elseif ($value == 109) {
             $data .= '<option value="257">GE ALWAR - MES</option>';
             $data .= '<option value="258">GE KOTA - MES</option>';
@@ -6617,6 +6626,7 @@ class SiteController extends Controller {
             $data .= '<option value="301">GE ENGR PARK JALANDHAR CANTT - MES</option>';
             $data .= '<option value="302">GE KAPURTHLA(P) - MES</option>';
             $data .= '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
+            $data .= '<option value="368">GE NAMS - MES</option>';
         } elseif ($value == 130) {
             $data .= '<option value="304">GE JAMMU - MES</option>';
             $data .= '<option value="305">GE KALUCHAK - MES</option>';
@@ -8381,6 +8391,8 @@ class SiteController extends Controller {
             $data[] = '<option value="17">CWE KANPUR - MES</option>';
             $data[] = '<option value="18">CWE LUCKNOW - MES</option>';
             $data[] = '<option value="19">CWE MATHURA</option>';
+        } elseif ($value == 8) {
+            $data[] = '<option value="141">CCE (NEP) AF Chabua - MES</option>';
         } elseif ($value == 9) {
             $data[] = '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data[] = '<option value="20">CWE (AF) BORJAR - MES</option>';
@@ -8580,6 +8592,8 @@ class SiteController extends Controller {
             $data[] = '<option value="17">CWE KANPUR - MES</option>';
             $data[] = '<option value="18">CWE LUCKNOW - MES</option>';
             $data[] = '<option value="19">CWE MATHURA</option>';
+        } elseif ($value == 8) {
+            $data[] = '<option value="141">CCE (NEP) AF Chabua - MES</option>';
         } elseif ($value == 9) {
             $data[] = '<option value="134">CWE (AF) BAGDOGRA - (AF) Shillong Zone- MES</option>';
             $data[] = '<option value="20">CWE (AF) BORJAR - MES</option>';
@@ -8774,6 +8788,8 @@ class SiteController extends Controller {
             $data[] = '<option value="13">GE DEHRADUN - MES</option>';
             $data[] = '<option value="320">GE (P)DEHRADUN - MES</option>';
             $data[] = '<option value="14">GE PREMNAGAR - MES</option>';
+            $data[] = '<option value="370">GE IMA DEHRADUN - MES</option>';
+            $data[] = '<option value="371">GE Clement Town DEHRADUN - MES</option>';
         } elseif ($value == 7) {
             $data[] = '<option value="15">AGE(I) Raiwala - MES</option>';
             $data[] = '<option value="16">GE LANSDOWNE -MES</option>';
@@ -8822,6 +8838,7 @@ class SiteController extends Controller {
             $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
             $data[] = '<option value="45">GE(WEST)LUCKNOW - MES</option>';
+            $data[] = '<option value="363">GE(P)LUCKNOW - MES</option>';
         } elseif ($value == 19) {
             $data[] = '<option value="46">GE (E) MATHURA - MES</option>';
             $data[] = '<option value="47">GE (W) MATHURA - MES</option>';
@@ -8857,6 +8874,7 @@ class SiteController extends Controller {
             $data[] = '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
             $data[] = '<option value="67">GE(NAVY)CHENNAI - MES</option>';
             $data[] = '<option value="68">GETHIRUNALVELI - MES</option>';
+            $data[] = '<option value="365">AGE I NAVY CHENNAI - MES</option>';
         } elseif ($value == 30) {
             $data[] = '<option value="69">GE (N and CG) Bhubaneshwar - MES</option>';
             $data[] = '<option value="70">GE (P) CHILKA - MES</option>';
@@ -8943,6 +8961,7 @@ class SiteController extends Controller {
             $data[] = '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
             $data[] = '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
             $data[] = '<option value="135">GE (U) UDHAMPUR - MES</option>';
+            $data[] = '<option value="367">GE (P) UDHAMPUR - MES</option>';
         } elseif ($value == 54) {
             $data[] = '<option value="136">GE BRICHGUNJ - MES</option>';
             $data[] = '<option value="334">GE (P) CENTRAL - MES</option>';
@@ -9088,6 +9107,7 @@ class SiteController extends Controller {
             $data[] = '<option value="232">GE(AF) BHUJ - MES</option>';
             $data[] = '<option value="233">GE (AF) JAMNAGAR - MES</option>';
             $data[] = '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
+            $data[] = '<option value="369">GE (AF) NALIYA - MES</option>';
         } elseif ($value == 98) {
             $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
             $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
@@ -9124,6 +9144,8 @@ class SiteController extends Controller {
             $data[] = '<option value="254">GE BHARATPUR - MES</option>';
             $data[] = '<option value="255">GE JAIPUR - MES</option>';
             $data[] = '<option value="256">GE (U) JAIPUR - MES</option>';
+            $data[] = '<option value="364">GE (I)(P) JAIPUR - MES</option>';
+            $data[] = '<option value="366">GE (S) JAIPUR - MES</option>';
         } elseif ($value == 109) {
             $data[] = '<option value="257">GE ALWAR - MES</option>';
             $data[] = '<option value="258">GE KOTA - MES</option>';
@@ -9199,6 +9221,7 @@ class SiteController extends Controller {
             $data[] = '<option value="301">GE ENGR PARK JALANDHAR CANTT - MES</option>';
             $data[] = '<option value="302">GE KAPURTHLA(P) - MES</option>';
             $data[] = '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
+            $data[] = '<option value="368">GE NAMS - MES</option>';
         } elseif ($value == 130) {
             $data[] = '<option value="304">GE JAMMU - MES</option>';
             $data[] = '<option value="305">GE KALUCHAK - MES</option>';
@@ -9273,6 +9296,8 @@ class SiteController extends Controller {
                 $data[] = '<option value="13">GE DEHRADUN - MES</option>';
                 $data[] = '<option value="320">GE (P)DEHRADUN - MES</option>';
                 $data[] = '<option value="14">GE PREMNAGAR - MES</option>';
+                $data[] = '<option value="370">GE IMA DEHRADUN - MES</option>';
+                $data[] = '<option value="371">GE Clement Town DEHRADUN - MES</option>';
             } elseif ($value == 7) {
                 $data[] = '<option value="15">AGE(I) Raiwala - MES</option>';
                 $data[] = '<option value="16">GE LANSDOWNE -MES</option>';
@@ -9321,6 +9346,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
                 $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
                 $data[] = '<option value="45">GE(WEST)LUCKNOW - MES</option>';
+                $data[] = '<option value="363">GE(P)LUCKNOW - MES</option>';
             } elseif ($value == 19) {
                 $data[] = '<option value="46">GE (E) MATHURA - MES</option>';
                 $data[] = '<option value="47">GE (W) MATHURA - MES</option>';
@@ -9356,6 +9382,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="66">GE(MAINT) ARAKKONAM - MES</option>';
                 $data[] = '<option value="67">GE(NAVY)CHENNAI - MES</option>';
                 $data[] = '<option value="68">GETHIRUNALVELI - MES</option>';
+                $data[] = '<option value="365">AGE I NAVY CHENNAI - MES</option>';
             } elseif ($value == 30) {
                 $data[] = '<option value="69">GE (N and CG) Bhubaneshwar - MES</option>';
                 $data[] = '<option value="70">GE (P) CHILKA - MES</option>';
@@ -9442,6 +9469,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="133">GE(NORTH) UDHAMPUR - MES</option>';
                 $data[] = '<option value="134">GE(SOUTH) UDHAMPUR - MES</option>';
                 $data[] = '<option value="135">GE (U) UDHAMPUR - MES</option>';
+                $data[] = '<option value="367">GE (P) UDHAMPUR - MES</option>';
             } elseif ($value == 54) {
                 $data[] = '<option value="136">GE BRICHGUNJ - MES</option>';
                 $data[] = '<option value="334">GE (P) CENTRAL - MES</option>';
@@ -9587,6 +9615,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="232">GE(AF) BHUJ - MES</option>';
                 $data[] = '<option value="233">GE (AF) JAMNAGAR - MES</option>';
                 $data[] = '<option value="346">GE (AF) NALIYA NO. 1 - MES</option>';
+                $data[] = '<option value="369">GE (AF) NALIYA - MES</option>';
             } elseif ($value == 98) {
                 $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
                 $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
@@ -9623,6 +9652,8 @@ class SiteController extends Controller {
                 $data[] = '<option value="254">GE BHARATPUR - MES</option>';
                 $data[] = '<option value="255">GE JAIPUR - MES</option>';
                 $data[] = '<option value="256">GE (U) JAIPUR - MES</option>';
+                $data[] = '<option value="364">GE (I)(P) JAIPUR - MES</option>';
+                $data[] = '<option value="366">GE (S) JAIPUR - MES</option>';
             } elseif ($value == 109) {
                 $data[] = '<option value="257">GE ALWAR - MES</option>';
                 $data[] = '<option value="258">GE KOTA - MES</option>';
@@ -9698,6 +9729,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="301">GE ENGR PARK JALANDHAR CANTT - MES</option>';
                 $data[] = '<option value="302">GE KAPURTHLA(P) - MES</option>';
                 $data[] = '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
+                $data[] = '<option value="368">GE NAMS - MES</option>';
             } elseif ($value == 130) {
                 $data[] = '<option value="304">GE JAMMU - MES</option>';
                 $data[] = '<option value="305">GE KALUCHAK - MES</option>';
@@ -10757,47 +10789,66 @@ class SiteController extends Controller {
 
     public function actionGengineers($ddfavour) {
         $data = '<option value="">Select DD in favour of</option>';
+        $ddengineers = \common\models\Ddengineers::find()->where(['status' => 1])->all();
 
+        if (isset($ddengineers)) {
+            foreach ($ddengineers as $ddengineer) {
+                $select = '';
+                if ($ddfavour == $ddengineer->id) {
+                    $select = 'selected';
+                }
+                $data .= '<option value="' . $ddengineer->id . '" ' . $select . '>' . $ddengineer->text . '</option>';
+            }
+        }
+
+        echo $data;
+    }
+
+    public function actionInsertdd() {
+        $user = Yii::$app->user->identity;
         $gengineers = \common\models\Gengineer::find()->where(['status' => 1])->all();
         $cwegengineers = \common\models\Cwengineer::find()->where(['status' => 1])->all();
         $cengineers = \common\models\Cengineer::find()->where(['status' => 1])->all();
+
         if (isset($gengineers)) {
             foreach ($gengineers as $gengineer) {
-                $select = '';
-                if ($ddfavour == $gengineer->gid) {
-                    $select = 'selected';
-                }
-                $data .= '<option value="' . $gengineer->gid . '" ' . $select . '>' . $gengineer->text . '</option>';
+                $ddmodel = new \common\models\Ddengineers();
+                $ddmodel->text = $gengineer->text;
+                $ddmodel->user_id = $user->id;
+                $ddmodel->createdon = date('Y-m-d h:i:s');
+                $ddmodel->status = 1;
+                $ddmodel->save();
             }
         }
         if (isset($cwegengineers)) {
             foreach ($cwegengineers as $gengineer) {
-                $select = '';
-                if ($ddfavour == $gengineer->cid) {
-                    $select = 'selected';
-                }
-                $data .= '<option value="' . $gengineer->cid . '" ' . $select . '>' . $gengineer->text . '</option>';
+                $ddmodel = new \common\models\Ddengineers();
+                $ddmodel->text = $gengineer->text;
+                $ddmodel->user_id = $user->id;
+                $ddmodel->createdon = date('Y-m-d h:i:s');
+                $ddmodel->status = 1;
+                $ddmodel->save();
             }
         }
         if (isset($cengineers)) {
             foreach ($cengineers as $_cengineer) {
-                $select = '';
-                if ($ddfavour == $_cengineer->cid) {
-                    $select = 'selected';
-                }
-                $data .= '<option value="' . $_cengineer->cid . '" ' . $select . '>' . $_cengineer->text . '</option>';
+                $ddmodel = new \common\models\Ddengineers();
+                $ddmodel->text = $_cengineer->text;
+                $ddmodel->user_id = $user->id;
+                $ddmodel->createdon = date('Y-m-d h:i:s');
+                $ddmodel->status = 1;
+                $ddmodel->save();
             }
         }
-        echo $data;
     }
 
     public function actionCreateRates() {
         $data = @$_POST;
         $user = Yii::$app->user->identity;
-      
+
         if (isset($data) && count($data)) {
             foreach ($data['cont'] as $k => $_data) {
-               
+
                 $rate = \common\models\Itemrates::find()->where(['iid' => $data['iid'], 'item_id' => $data['itemid'], 'contractor' => @$_data, 'rate' => @$data['rate'][$k]])->one();
                 if (!@$rate) {
                     $model = new \common\models\Itemrates();
@@ -10817,6 +10868,33 @@ class SiteController extends Controller {
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
     }
 
+    public function actionSaverate() {
+        $user = Yii::$app->user->identity;
+        $iid = @$_REQUEST['iid'];
+        $rate = @$_REQUEST['rate'];
+        $cid = @$_REQUEST['cid'];
+        $itemid = @$_REQUEST['itemid'];
+        $tid = @$_REQUEST['tid'];
+        $getrate = \common\models\Itemrates::find()->where(['iid' => $iid, 'item_id' => $itemid, 'tid' => $tid, 'contractor' => $cid])->one();
+        if (@$getrate) {
+            $getrate->rate = $rate;
+            $getrate->createdon = date('Y-m-d h:i:s');
+            $getrate->user_id = $user->id;
+            $getrate->save();
+        } else {
+            $model = new \common\models\Itemrates();
+            $model->iid = $iid;
+            $model->item_id = $itemid;
+            $model->tid = $tid;
+            $model->contractor = $cid;
+            $model->rate = $rate;
+            $model->user_id = $user->id;
+            $model->createdon = date('Y-m-d h:i:s');
+            $model->status = 1;
+            $model->save();
+        }
+    }
+
     public function actionDeleterate() {
         $iid = @$_REQUEST['iid'];
         $id = @$_REQUEST['id'];
@@ -10826,6 +10904,69 @@ class SiteController extends Controller {
             echo json_encode(['success' => 1]);
             die();
         }
+    }
+
+    public function actionGetcolumns() {
+        $tid = @$_REQUEST['tid'];
+        $number = @$_REQUEST['newnum'];
+        $html = '';
+
+        $html .= '<div class="input-field col s3 conts" id=' . $tid . $number . '>
+                            <div class="itemid">
+                             <select class="validate required contype materialSelectcon browser-default" id="select' . $tid . $number . '" onchange="showcolumns(this.value,' . $tid . ',' . $number . ')" required="" name="cont[]">
+                                       </select></div>';
+
+        $html .= '<input type="hidden" name="contid" id="contid' . $tid . $number . '" value="">';
+        $html .= '<div id="box' . $tid . $number . '" class="boximg"></div></div>';
+
+
+        echo $html;
+        die();
+    }
+
+    public function actionGetrepeatcolumns() {
+        $tid = @$_REQUEST['tid'];
+        $number = @$_REQUEST['newnum'];
+        $html = '';
+
+        $html .= '<div class="itemid">
+                             <select class="validate required contype materialSelectcon browser-default" id="select' . $tid . $number . '" onchange="showcolumns(this.value,' . $tid . ',' . $number . ')" required="" name="cont[]">
+                                       </select></div>';
+
+        $html .= '<input type="hidden" name="contid" id="contid' . $tid . $number . '" value="">';
+        $html .= '<div id="box' . $tid . $number . '" class="boximg"></div>';
+
+
+        echo $html;
+        die();
+    }
+
+    public function actionGetallcolumns() {
+        $tid = @$_REQUEST['tid'];
+        $cid = @$_REQUEST['cid'];
+        $html = '';
+        $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tid, 'items.tendertwo' => 1])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+        if (isset($idetails) && count($idetails)) {
+            foreach ($idetails as $_item) {
+                $html .= "<div class='itemid'>
+                            <input id='rate" . $_item->id . "' class='rates' type='number' onblur='saverate(this.value," . $cid . "," . $_item->id . "," . $_item->item_id . "," . $tid . ")' name = 'rate[]' min='1' step='1' onkeypress='return event.charCode >= 46 && event.charCode <= 57' required='' class='validate required' value=''>
+                            </div>";
+            }
+        }
+        echo $html;
+        die();
+    }
+
+    public function actionDelcontractor() {
+        $tid = @$_REQUEST['tid'];
+        $cid = @$_REQUEST['cid'];
+        $rate = \common\models\Itemrates::deleteAll(['tid' => $tid, 'contractor' => $cid]);
+        if ($rate) {
+            echo "1";
+        } else {
+            echo "0";
+        }
+        die();
     }
 
 }
