@@ -16,6 +16,60 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .btn, .btn-flat {
         font-size: 11px;
     }
+    .rateboxes {
+        float: left;
+        width: 90%;
+    }
+    input.rates{width:100%;margin:0;}
+    .itemid.itemtenders {
+        /* line-height: 70px; */
+        height:3rem;
+    }
+    .conts img {
+        width: 35px;
+    }
+    .srnos {
+        background-color: #E4E4E4;
+        border-radius: 15px;
+        padding: 10px;
+        margin-bottom: 5px;
+        width: 100%;
+        text-align: center;
+        float: left;
+    }
+    .boximg .itemid {
+        height: 3REM;
+        margin-bottom: 5PX;
+    }
+    .boximg img{float: left; width:50px; margin:70px;}
+    .deletebox img {
+        float: left;
+        width: 30px;
+        margin-left: 75px;
+        margin-top: 4px;
+    }
+    .input-field.col.s1.itemnos {
+        float: left;
+        width: 7%;
+        margin-bottom:25px;
+    }
+    .ratespopup {
+        float: left;
+        width: 95%;
+    }
+    .input-field.col.s3.conts {
+        float: left;
+        width: 18%;
+        margin-bottom: 25px;
+        margin-left: 25px;
+        text-align: center;
+    }
+    .deletebox {
+        float: left;
+        width: 100%;
+        margin-top: 25px;
+    }
+
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
         border-color: unset;
     }
@@ -141,7 +195,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 </select>
             </div>
         </form>
-        <form id="create-item" method = "post" onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-tenders">
+        <form id="create-item" method = "post" novalidate onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-tenders">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
             <?php if ($user->group_id == 1) { ?>
                 <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
@@ -273,6 +327,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
                                                         <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                                         <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
+                                                        <a href="#modalrate<?= $tender->id; ?>" class="waves-effect waves-light btn pink modal-trigger">Rates</a>
                                                         <?php
                                                     }
                                                 }
@@ -469,7 +524,75 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     </div>
                                 </div>
-                                
+                                <div id="modalrate<?= $tender->id; ?>" class="modal ratespopup">
+                                    <div class="modal-content"> 
+                                        <h5>Rates By Contractors</h5>
+                                        <h5>Tender Id - <?= $tender->tender_id ?></h5>
+                                        <a class="waves-effect waves-light btn blue m-b-xs" id="addrate<?= $tender->id ?>" onclick="addcontractor('0', '<?= $tender->id ?>')" >Add Contractor</a>
+                                        <div id="allrates<?= $tender->id ?>" class="allrates">  
+                                            <div class='input-field col s1 itemnos'>
+                                                <div class="itemid itemtenders">
+                                                    Item Sr Nos.
+                                                </div>
+                                                <?php
+                                                $idetails = \common\models\ItemDetails::find()->leftJoin('items', 'itemdetails.item_id = items.id')->where(['items.tender_id' => $tender->id, 'items.tendertwo' => 1])->orderBy(['itemdetails.id' => SORT_ASC])->all();
+                                                $rates = \common\models\Itemrates::find()->where(['tid' => $tender->id])->orderBy(['id' => SORT_ASC])->groupBy(['contractor'])->all();
+                                                if (isset($idetails) && count($idetails)) {
+                                                    foreach ($idetails as $_item) {
+                                                        ?>
+                                                        <div class="itemid itemtenders srnos">
+                                                            <?= $_item->itemtender; ?>
+                                                        </div>
+                                                        <?php
+                                                    }
+                                                }
+                                                ?>
+                                            </div> 
+                                            <div class="rateboxes" id="rateboxes<?= $tender->id ?>">
+
+                                                <?php
+                                                $conts = '';
+                                                if (isset($rates) && count($rates)) {
+                                                    $i = 1;
+
+                                                    foreach ($rates as $_rate) {
+                                                        $conts .= $_rate->contractor . ',';
+                                                        $contractor = \common\models\Contractor::find()->where(['id' => $_rate->contractor])->one();
+                                                        ?>
+                                                        <div class="input-field col s3 conts" id='upperbox<?= $tender->id . $i; ?>'>
+                                                            <div class="itemid">
+                                                                <select class="validate required contype materialSelectcon browser-default" required="" disabled="" name="cont[]">
+                                                                    <option value='<?= $contractor->id ?>'><?= $contractor->firm ?></option>
+                                                                </select></div>
+                                                            <input type="hidden" name="contid" id="contid'<?= $tender->id . $i; ?>'" value="">
+                                                            <div id="boxstatic<?= $tender->id . $i; ?>" class="boximg">
+                                                                <?php
+                                                                if (isset($idetails) && count($idetails)) {
+                                                                    foreach ($idetails as $_item) {
+                                                                        $getrate = \common\models\Itemrates::find()->where(['iid' => $_item->id, 'item_id' => $_item->item_id, 'contractor' => $_rate->contractor])->one();
+                                                                        ?>
+                                                                        <div class="itemid">
+                                                                            <input id='rate<?= $_item->id ?>' class='rates' type='number' onblur='saverate(this.value, "<?= $_rate->contractor ?>", "<?= $_item->id ?>", "<?= $_item->item_id ?>", "<?= $_rate->tid ?>")' name = 'rate[]' min='1' step='1' onkeypress='return event.charCode >= 46 && event.charCode <= 57' value='<?= @$getrate->rate ?>'>
+                                                                        </div>
+                                                                        <?php
+                                                                    }
+                                                                }
+                                                                ?>
+                                                                <a class="waves-effect waves-light btn red m-b-xs deletebox" id="del<?= $tender->id . $i; ?>" onclick="delcontractor(<?= $_rate->contractor ?>,<?= $tender->id ?>,<?= $i ?>)">Delete</a>
+                                                            </div>
+                                                        </div>
+                                                        <?php
+                                                        $i++;
+                                                    }
+                                                }
+                                                ?>
+                                                <input type="hidden" name="allconts" id="allconts<?= $tender->id ?>" value="<?= rtrim($conts, ','); ?>">
+                                            </div>
+                                        </div>
+
+                                    </div>
+                                </div>
+
 
 
                             </div>

@@ -392,7 +392,6 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                     <option value="8">7 Core</option>
                                                     <option value="9">8 Core</option>
                                                     <option value="10">10 Core</option>
-
                                                 </select>
                                             </div>
                                             <div class="input-field col s3" id="typefit">
@@ -426,8 +425,6 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                 <input id="quantity" type="number" name = "quantity[]" min="1" step="1" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required="" class="validate required" value="">
                                                 <label for="quantity">Quantity</label>
                                             </div>
-
-
                                             <div class="input-field col s2">
                                                 <input id="makeid" type="text" name = "makeid[]" class="validate" value="">
                                                 <label for="makeid">CatPart Id</label>

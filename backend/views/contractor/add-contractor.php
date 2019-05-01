@@ -40,9 +40,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width:205px;
         /* text-align: left; */
     }
-    .input-field{height:65px;}
-    .waves-input-wrapper{width: 105px;
-                         padding-left: 24px;}
+   
     </style>
     <main class="mn-inner">
     <div class="row">
@@ -86,26 +84,27 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <label for="name">Name</label>
                                 </div>
                             </div>
+                           
                             <div class="row">
-                                <div class="input-field col s6">
-                                    <textarea id="address" name="address" class="materialize-textarea required"><?= @$contractor->address; ?></textarea>
-                                    <label for="address">Address</label>
-                                </div>
 
+                                <div class="input-field col s6">
+                                    <input id="email" type="text" name = "email" class="validate" value="<?= @$contractor->email; ?>">
+                                    <label for="email">Email-Id</label>
+                                </div>
                                 <div class="input-field col s6">
                                     <input id="contact" type="text" name = "contact" class="validate" value="<?= @$contractor->contact; ?>">
                                     <label for="contact">Contact No.</label>
                                 </div>
                             </div>
-                            <div class="row">
-                                <div class="input-field col s6">
-                                    <input id="email" type="text" name = "email" class="validate" value="<?= @$contractor->email; ?>">
-                                    <label for="email">Email-Id</label>
+                            
+                             <div class="row">
+                                <div class="input-field col s12">
+                                    <textarea id="address" name="address" class="materialize-textarea required"><?= @$contractor->address; ?></textarea>
+                                    <label for="address">Address</label>
                                 </div>
                             </div>
-
-                            <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
-
+                                <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
+                            
                         </form>
                     </div>
                 </div>

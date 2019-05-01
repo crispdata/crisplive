@@ -139,16 +139,19 @@ class MailController extends Controller {
         $uniqueids = [];
         $array = [];
 
-        if (isset($requestdata['cables']) && count($requestdata['cables'])) {
+        if (isset($requestdata['cables']) && count($requestdata['cables']) && $requestdata['authtype'] == 1) {
             $makes = implode(',', @$requestdata['cables']);
         } else {
             $makes = implode(',', @$requestdata['lighting']);
         }
 
-        $fromdate = date('Y-m-d', strtotime('-40 days'));
-        $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', date('Y-m-d')])->all();
+        if (isset($requestdata['fromdate']) && $requestdata['fromdate'] != '' && isset($requestdata['todate']) && $requestdata['todate'] != '') {
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->andWhere(['>=', 'tenders.bid_end_date', $requestdata['fromdate']])->andWhere(['<=', 'tenders.bid_end_date', $requestdata['todate']])->all();
+        } else {
+            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.is_archived' => 1, 'items.tenderfour' => $requestdata['authtype']])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->all();
+        }
 
-        if ($tenders) {
+        if (isset($tenders) && count($tenders)) {
             foreach ($tenders as $_tender) {
                 $tdetails = '';
                 $command = Sitecontroller::actionGetcommand($_tender->command);
@@ -157,9 +160,9 @@ class MailController extends Controller {
                 } else {
                     $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
                 }
-                $cwengineer = \common\models\Cwengineer::find()->where(['cid' => $_tender->cwengineer, 'status' => 1])->one();
-                $gengineer = \common\models\Gengineer::find()->where(['gid' => $_tender->gengineer, 'status' => 1])->one();
-                $items = \common\models\Item::find()->where(['tender_id' => $_tender->id, 'status' => 1])->all();
+                $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
+                $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
+                $items = \common\models\Item::find()->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['items.tender_id' => $_tender->id, 'items.status' => 1])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $makes])->all();
                 $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                 if ($items) {
                     foreach ($items as $_item) {
@@ -208,10 +211,10 @@ class MailController extends Controller {
                             $makenameall = '';
                             if (@$imakes) {
                                 foreach ($imakes as $mid) {
-                                    //$makename = \common\models\Make::find()->where(['id' => $mid])->one();
-                                    //if (@$makename) {
-                                    $makenameall .= $mid . ',';
-                                    //}
+                                    $makename = \common\models\Make::find()->where(['id' => $mid])->one();
+                                    if (@$makename) {
+                                        $makenameall .= $makename->make . ',';
+                                    }
                                 }
                             }
                             $allmakes = rtrim($makenameall, ',');
@@ -249,8 +252,13 @@ class MailController extends Controller {
                                 } else {
                                     $ttype = $_item->tendertwo;
                                 }
-                                $foo = (str_replace(',', '', $_tender->qvalue) / 100000);
-                                $amount = number_format((float) $foo, 2, '.', '');
+
+                                if (@$_tender->qvalue) {
+                                    $foo = (str_replace(',', '', $_tender->qvalue) / 100000);
+                                    $amount = number_format((float) $foo, 2, '.', '');
+                                } else {
+                                    $amount = '';
+                                }
                                 $newidetails['itemtender'] = $idetails->itemtender;
                                 $newidetails['tdetails'] = $tdetails;
                                 $newidetails['idetails'] = $descfull;
@@ -279,411 +287,398 @@ class MailController extends Controller {
                     }
                 }
             }
-        }
 
-        if ($alldetails) {
-            foreach ($alldetails as $k => $_all) {
-                $makename = \common\models\Make::find()->where(['id' => $_all['make']])->one();
-                $tender = \common\models\Tender::find()->where(['id' => $_all['tid']])->one();
-                $datatender[$k] = $alldetails[$k];
-                $datatender[$k]['ref'] = $tender['tender_id'];
-                $datatender[$k]['mid'] = @$makename->id;
-                $datatender[$k]['makename'] = @$makename->make;
-                $datatender[$k]['email'] = @$makename->email;
-            }
-        }
 
-        if (@$datatender) {
-            foreach ($datatender as $_make) {
-                if (array_key_exists($_make['make'], $data)) {
-                    $data[$_make['make']][] = $_make;
-                } else {
-                    $data[$_make['make']][] = $_make;
+            if ($alldetails) {
+                foreach ($alldetails as $k => $_all) {
+                    $makename = \common\models\Make::find()->where(['id' => $_all['make'], 'status' => 1])->one();
+                    $tender = \common\models\Tender::find()->where(['id' => $_all['tid']])->one();
+                    if (@$makename) {
+                        $datatender[$k] = $alldetails[$k];
+                        $datatender[$k]['ref'] = $tender['tender_id'];
+                        $datatender[$k]['mid'] = @$makename->id;
+                        $datatender[$k]['makename'] = @$makename->make;
+                        $datatender[$k]['email'] = @$makename->email;
+                    }
                 }
             }
-        }
 
-        if (isset($data) && count($data)) {
-            foreach ($data as $k => $_cldata) {
-                foreach ($_cldata as $key => $cldata) {
-                    $singlemake = [];
-                    if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
-                        if (isset($cldata['allmakes'])) {
-                            $singlemake = explode(',', $cldata['allmakes']);
-                            $clmakename = '';
-                            $allclmakes = '';
-                            if (isset($singlemake) && count($singlemake)) {
-                                foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
-                                    if (@$makename) {
-                                        $clmakename .= $makename->make . ',';
-                                    }
-                                }
-                            }
-                            $allclmakes = rtrim($clmakename, ',');
-                        }
-                        $data[$k][$key]['allmakes'] = $allclmakes;
+
+            if (@$datatender) {
+                foreach ($datatender as $_make) {
+                    if (array_key_exists($_make['make'], $data)) {
+                        $data[$_make['make']][] = $_make;
                     } else {
-                        if (isset($cldata['allmakes'])) {
-                            $singlemake = explode(',', $cldata['allmakes']);
-                            $clmakename = '';
-                            $allclmakes = '';
-                            if (isset($singlemake) && count($singlemake)) {
-                                foreach ($singlemake as $__smake) {
-                                    $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
-                                    if (@$makename) {
-                                        $clmakename = $makename->make;
+                        $data[$_make['make']][] = $_make;
+                    }
+                }
+            }
+
+            /*if (isset($data) && count($data)) {
+                foreach ($data as $k => $_cldata) {
+                    foreach ($_cldata as $key => $cldata) {
+                        $singlemake = [];
+                        if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
+                            if (isset($cldata['allmakes'])) {
+                                $singlemake = explode(',', $cldata['allmakes']);
+                                $clmakename = '';
+                                $allclmakes = '';
+                                if (isset($singlemake) && count($singlemake)) {
+                                    foreach ($singlemake as $__smake) {
+                                        $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+                                        if (@$makename) {
+                                            $clmakename .= $makename->make . ',';
+                                        }
                                     }
-                                    $cldata['allmakes'] = $clmakename;
-                                    unset($data[$k][$key]);
-                                    $data[$k][] = $cldata;
                                 }
+                                $allclmakes = rtrim($clmakename, ',');
                             }
+                            $data[$k][$key]['allmakes'] = $allclmakes;
+                        }
+                    }
+                }
+            }*/
+
+
+            $required = '';
+            $reqdetails = [];
+            $requiredlight = '';
+            $reqdetailslight = [];
+            $particulardata = [];
+            if (isset($requestdata['cables']) && count($requestdata['cables'])) {
+                $reqdetails = @$requestdata['cables'];
+                if (isset($data) && count($data)) {
+                    foreach ($data as $k => $___data) {
+                        if (in_array($k, $reqdetails)) {
+                            $particulardata[] = $___data;
                         }
                     }
                 }
             }
-        }
-
-
-        $required = '';
-        $reqdetails = [];
-        $requiredlight = '';
-        $reqdetailslight = [];
-        $particulardata = [];
-        if (isset($requestdata['cables']) && count($requestdata['cables'])) {
-            $reqdetails = @$requestdata['cables'];
-            if (isset($data) && count($data)) {
-                foreach ($data as $k => $___data) {
-                    if (in_array($k, $reqdetails)) {
-                        $particulardata[] = $___data;
-                    }
-                }
-            }
-        }
-        if (isset($requestdata['lighting']) && count($requestdata['lighting'])) {
-            $requiredlight = @$requestdata['lighting'];
-            if (isset($data) && count($data)) {
-                foreach ($data as $k => $___data) {
-                    if (in_array($k, $requiredlight)) {
-                        $particulardata[] = $___data;
-                    }
-                }
-            }
-        }
-
-        $plusquantity = 0;
-        $filestosend = [];
-        $tenderids = [];
-        $itemids = [];
-        if (isset($particulardata) && count($particulardata)) {
-            $mailnum = 1;
-            foreach ($particulardata as $k => $_data) {
-                $header = [];
-                $i = 0;
-                $sno = 1;
-                $tid = [];
-                $firmid = [];
-                $final = [];
-                foreach ($_data as $key => $__data) {
-
-                    if ($i == 0) {
-                        if ($__data['ttype'] == 1) {
-                            $header[] = "Sr.No." . "\t";
-                            $header[] = "Tender Id" . "\t";
-                            $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                            $header[] = "Details of Contracting Office" . "\t";
-                            $header[] = "Item Details" . "\t";
-                            $header[] = "Size" . "\t";
-                            $header[] = "Core" . "\t";
-                            $header[] = "Units" . "\t";
-                            $header[] = "Quantity" . "\t";
-                            $header[] = "All Makes In Contract" . "\t";
-                            $header[] = "Name of Contractor" . "\t";
-                            $header[] = "Name of Contact Person" . "\t";
-                            $header[] = "Address of Contractor" . "\t";
-                            $header[] = "Contact Number" . "\t";
-                            $header[] = "E-mail ID" . "\t";
-                        } elseif ($__data['ttype'] == 2) {
-                            $header[] = "Sr.No." . "\t";
-                            $header[] = "Tender Id" . "\t";
-                            $header[] = "Amount of Contract (In Lakhs)" . "\t";
-                            $header[] = "Details of Contracting Office" . "\t";
-                            $header[] = "Item Details" . "\t";
-                            $header[] = "Type of Fitting" . "\t";
-                            $header[] = "Capacity of Fitting" . "\t";
-                            $header[] = "Units" . "\t";
-                            $header[] = "Quantity" . "\t";
-                            $header[] = "All Makes In Contract" . "\t";
-                            $header[] = "Name of Contractor" . "\t";
-                            $header[] = "Name of Contact Person" . "\t";
-                            $header[] = "Address of Contractor" . "\t";
-                            $header[] = "Contact Number" . "\t";
-                            $header[] = "E-mail ID" . "\t";
+            if (isset($requestdata['lighting']) && count($requestdata['lighting'])) {
+                $requiredlight = @$requestdata['lighting'];
+                if (isset($data) && count($data)) {
+                    foreach ($data as $k => $___data) {
+                        if (in_array($k, $requiredlight)) {
+                            $particulardata[] = $___data;
                         }
+                    }
+                }
+            }
+
+            $plusquantity = 0;
+            $filestosend = [];
+            $tenderids = [];
+            $itemids = [];
+            if (isset($particulardata) && count($particulardata)) {
+                $mailnum = 1;
+                foreach ($particulardata as $k => $_data) {
+                    $header = [];
+                    $i = 0;
+                    $sno = 1;
+                    $tid = [];
+                    $firmid = [];
+                    $final = [];
+                    foreach ($_data as $key => $__data) {
+
+                        if ($i == 0) {
+                            if ($__data['ttype'] == 1) {
+                                $header[] = "Sr.No." . "\t";
+                                $header[] = "Tender Id" . "\t";
+                                $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                $header[] = "Details of Contracting Office" . "\t";
+                                $header[] = "Item Details" . "\t";
+                                $header[] = "Size" . "\t";
+                                $header[] = "Core" . "\t";
+                                $header[] = "Units" . "\t";
+                                $header[] = "Quantity" . "\t";
+                                $header[] = "All Makes In Contract" . "\t";
+                                $header[] = "Name of Contractor" . "\t";
+                                $header[] = "Name of Contact Person" . "\t";
+                                $header[] = "Address of Contractor" . "\t";
+                                $header[] = "Contact Number" . "\t";
+                                $header[] = "E-mail ID" . "\t";
+                            } elseif ($__data['ttype'] == 2) {
+                                $header[] = "Sr.No." . "\t";
+                                $header[] = "Tender Id" . "\t";
+                                $header[] = "Amount of Contract (In Lakhs)" . "\t";
+                                $header[] = "Details of Contracting Office" . "\t";
+                                $header[] = "Item Details" . "\t";
+                                $header[] = "Type of Fitting" . "\t";
+                                $header[] = "Capacity of Fitting" . "\t";
+                                $header[] = "Units" . "\t";
+                                $header[] = "Quantity" . "\t";
+                                $header[] = "All Makes In Contract" . "\t";
+                                $header[] = "Name of Contractor" . "\t";
+                                $header[] = "Name of Contact Person" . "\t";
+                                $header[] = "Address of Contractor" . "\t";
+                                $header[] = "Contact Number" . "\t";
+                                $header[] = "E-mail ID" . "\t";
+                            }
 //$datas = '';
 //$datas .= join($header) . "\n";
-                        $final[] = $header;
-                    }
-
-
-                    if ($__data['ttype'] == 1) {
-                        $plusquantity += $__data['quantity'];
-                        $arrayData = [];
-                        if (in_array($__data['ref'], $tid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $arrayData[] = $sno;
-
-                            $arrayData[] = $__data['ref'];
-                            $arrayData[] = $__data['cvalue'];
-                            $arrayData[] = $__data['tdetails'];
-                            $sno++;
+                            $final[] = $header;
                         }
+
+
+                        if ($__data['ttype'] == 1) {
+                            $plusquantity += $__data['quantity'];
+                            $arrayData = [];
+                            if (in_array($__data['ref'], $tid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                            } else {
+                                $arrayData[] = $sno;
+
+                                $arrayData[] = $__data['ref'];
+                                $arrayData[] = $__data['cvalue'];
+                                $arrayData[] = $__data['tdetails'];
+                                $sno++;
+                            }
 //$arrayData[] = $__data['ref'];
-                        $arrayData[] = $__data['idetails'];
+                            $arrayData[] = $__data['idetails'];
 //$arrayData[] = $__data['itemtender'];
-                        $arrayData[] = @$__data['sizes'];
-                        $arrayData[] = @$__data['core'];
-                        $arrayData[] = $__data['units'];
-                        $arrayData[] = $__data['quantity'];
+                            $arrayData[] = @$__data['sizes'];
+                            $arrayData[] = @$__data['core'];
+                            $arrayData[] = $__data['units'];
+                            $arrayData[] = $__data['quantity'];
 //$arrayData[] = $__data['makename'];
-                        $arrayData[] = $__data['allmakes'];
-                        if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $firmid[] = $__data['firm'];
-                            $arrayData[] = $__data['firm'];
-                            $arrayData[] = $__data['cperson'];
-                            $arrayData[] = $__data['caddress'];
-                            $arrayData[] = $__data['ccontact'];
-                            $arrayData[] = $__data['cemail'];
-                        }
-                        $tid[] = $__data['ref'];
-                        $final[] = $arrayData;
+                            $arrayData[] = $__data['allmakes'];
+                            if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                            } else {
+                                $firmid[] = $__data['firm'];
+                                $arrayData[] = $__data['firm'];
+                                $arrayData[] = $__data['cperson'];
+                                $arrayData[] = $__data['caddress'];
+                                $arrayData[] = $__data['ccontact'];
+                                $arrayData[] = $__data['cemail'];
+                            }
+                            $tid[] = $__data['ref'];
+                            $final[] = $arrayData;
 //$datas .= join("\t", $arrayData) . "\n";
-                    } elseif ($__data['ttype'] == 2) {
-                        $plusquantity += $__data['quantity'];
-                        $arrayData = [];
-                        if (in_array($__data['ref'], $tid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $arrayData[] = $sno;
+                        } elseif ($__data['ttype'] == 2) {
+                            $plusquantity += $__data['quantity'];
+                            $arrayData = [];
+                            if (in_array($__data['ref'], $tid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                            } else {
+                                $arrayData[] = $sno;
 
-                            $arrayData[] = $__data['ref'];
-                            $arrayData[] = $__data['cvalue'];
-                            $arrayData[] = $__data['tdetails'];
-                            $sno++;
-                        }
-                        $arrayData[] = $__data['idetails'];
+                                $arrayData[] = $__data['ref'];
+                                $arrayData[] = $__data['cvalue'];
+                                $arrayData[] = $__data['tdetails'];
+                                $sno++;
+                            }
+                            $arrayData[] = $__data['idetails'];
 //$arrayData[] = $__data['itemtender'];
-                        $arrayData[] = @$__data['typefitting'];
-                        $arrayData[] = @$__data['capacityfitting'];
-                        $arrayData[] = $__data['units'];
-                        $arrayData[] = $__data['quantity'];
+                            $arrayData[] = @$__data['typefitting'];
+                            $arrayData[] = @$__data['capacityfitting'];
+                            $arrayData[] = $__data['units'];
+                            $arrayData[] = $__data['quantity'];
 //$arrayData[] = $__data['makename'];
-                        $arrayData[] = $__data['allmakes'];
-                        if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                            $arrayData[] = '';
-                        } else {
-                            $firmid[] = $__data['firm'];
-                            $arrayData[] = $__data['firm'];
-                            $arrayData[] = $__data['cperson'];
-                            $arrayData[] = $__data['caddress'];
-                            $arrayData[] = $__data['ccontact'];
-                            $arrayData[] = $__data['cemail'];
-                        }
-                        $tid[] = $__data['ref'];
-                        $final[] = $arrayData;
+                            $arrayData[] = $__data['allmakes'];
+                            if (in_array($__data['ref'], $tid) && in_array($__data['firm'], $firmid)) {
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                                $arrayData[] = '';
+                            } else {
+                                $firmid[] = $__data['firm'];
+                                $arrayData[] = $__data['firm'];
+                                $arrayData[] = $__data['cperson'];
+                                $arrayData[] = $__data['caddress'];
+                                $arrayData[] = $__data['ccontact'];
+                                $arrayData[] = $__data['cemail'];
+                            }
+                            $tid[] = $__data['ref'];
+                            $final[] = $arrayData;
 //$datas .= join("\t", $row1) . "\n";
+                        }
+                        $i++;
+                        $tenderids[] = $__data['tid'];
+                        $itemids[] = $__data['itemid'];
                     }
-                    $i++;
-                    $tenderids[] = $__data['tid'];
-                    $itemids[] = $__data['itemid'];
-                }
-                $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
+                    $final[] = ['', '', '', '', '', '', '', '', $plusquantity, '', '', '', '', '', ''];
 
-                $spreadsheet = new Spreadsheet();  /* ----Spreadsheet object----- */
+                    $spreadsheet = new Spreadsheet();  /* ----Spreadsheet object----- */
 //$activeSheet = $spreadsheet->getActiveSheet();
 //$spreadsheet->getActiveSheet()->freezePane('D2');
 //$arrayData = $datas;
 
-                $activeSheet = $spreadsheet->getActiveSheet()
-                        ->fromArray(
-                        $final, // The data to set
-                        NULL, // Array values with this value will not be set
-                        'A1'         // Top left coordinate of the worksheet range where
-                );
-                $activeSheet->getStyle('A1:O1')->getFont()->setSize(11);
-                $styleArray = [
-                    'font' => [
-                        'bold' => true,
-                    ],
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
-                    ]
-                ];
-                $activeSheet->getStyle('A1:O1')->applyFromArray($styleArray);
-
-                $styleArrayinside = [
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
-                    ]
-                ];
-
-                $styleArraylimited = [
-                    'alignment' => [
-                        'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
-                        'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
-                    ]
-                ];
-                $styleArrayborder = [
-                    'borders' => [
-                        'outline' => [
-                            'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
-                            'color' => ['rgb' => '808080']
+                    $activeSheet = $spreadsheet->getActiveSheet()
+                            ->fromArray(
+                            $final, // The data to set
+                            NULL, // Array values with this value will not be set
+                            'A1'         // Top left coordinate of the worksheet range where
+                    );
+                    $activeSheet->getStyle('A1:O1')->getFont()->setSize(11);
+                    $styleArray = [
+                        'font' => [
+                            'bold' => true,
                         ],
-                    ],
-                ];
+                        'alignment' => [
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
+                        ]
+                    ];
+                    $activeSheet->getStyle('A1:O1')->applyFromArray($styleArray);
+
+                    $styleArrayinside = [
+                        'alignment' => [
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_LEFT,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
+                        ]
+                    ];
+
+                    $styleArraylimited = [
+                        'alignment' => [
+                            'horizontal' => \PhpOffice\PhpSpreadsheet\Style\Alignment::HORIZONTAL_CENTER,
+                            'vertical' => \PhpOffice\PhpSpreadsheet\Style\Alignment::VERTICAL_TOP
+                        ]
+                    ];
+                    $styleArrayborder = [
+                        'borders' => [
+                            'outline' => [
+                                'style' => \PhpOffice\PhpSpreadsheet\Style\Border::BORDER_THIN,
+                                'color' => ['rgb' => '808080']
+                            ],
+                        ],
+                    ];
 
 
 
-                if ($final) {
-                    $p = 2;
-                    $c = 1;
-                    foreach ($final as $_final) {
-                        if ($p > 2) {
-                            if ($_final['0'] != '') {
+                    if ($final) {
+                        $p = 2;
+                        $c = 1;
+                        foreach ($final as $_final) {
+                            if ($p > 2) {
+                                if ($_final['0'] != '') {
+                                    $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getFill()
+                                            ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
+                                            ->getStartColor()->setARGB('D3D3D3');
+                                    //$activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
+                                }
+                            }
+                            if (count($final) == $c) {
                                 $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getFill()
                                         ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                        ->getStartColor()->setARGB('D3D3D3');
-                                //$activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
+                                        ->getStartColor()->setARGB('ADD8E6');
                             }
+                            $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
+                            $activeSheet->getStyle('D' . $p . ':E' . $p . '')->applyFromArray($styleArrayinside);
+                            $activeSheet->getStyle('J' . $p . ':M' . $p . '')->applyFromArray($styleArrayinside);
+                            $activeSheet->getStyle('A' . $p . ':C' . $p . '')->applyFromArray($styleArraylimited);
+                            $activeSheet->getStyle('F' . $p . ':I' . $p . '')->applyFromArray($styleArraylimited);
+                            $activeSheet->getStyle('N' . $p . ':O' . $p . '')->applyFromArray($styleArraylimited);
+                            $p++;
+                            $c++;
                         }
-                        if (count($final) == $c) {
-                            $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getFill()
-                                    ->setFillType(\PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID)
-                                    ->getStartColor()->setARGB('ADD8E6');
+                    }
+
+                    $path = $_SERVER['DOCUMENT_ROOT'] . '/admin/images/clogo.png';
+                    $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing();
+                    $drawing->setName('Crispdata logo');
+                    $drawing->setPath($path);
+                    $drawing->setHeight(36); // logo height
+                    $activeSheet->getHeaderFooter()->addImage($drawing, \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooter::IMAGE_HEADER_CENTER);
+
+                    //$activeSheet->getStyle()->applyFromArray($styleArrayborder);
+                    //$activeSheet->getStyle('A1:O3')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_DASHDOT, 'color' => ['rgb' => '808080']]]);
+                    $activeSheet->getStyle('C1:C' . $activeSheet->getHighestRow())->getNumberFormat()->setFormatCode('0.00');
+                    $activeSheet->getStyle('I1:I' . $activeSheet->getHighestRow())->getNumberFormat()->setFormatCode('0.00');
+                    $activeSheet->getStyle('D1:D' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('J1:J' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('C1:C' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('E1:E' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('K1:K' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('L1:L' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('M1:M' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('N1:N' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('O1:O' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('A1:A' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('B1:B' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('F1:F' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('G1:G' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('H1:H' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+                    $activeSheet->getStyle('I1:I' . $activeSheet->getHighestRow())
+                            ->getAlignment()->setWrapText(true);
+
+                    $activeSheet->getStyle('A1:O1')
+                            ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE);
+
+
+                    $cellIterator = $activeSheet->getRowIterator()->current()->getCellIterator();
+                    $cellIterator->setIterateOnlyExistingCells(true);
+                    /** @var PHPExcel_Cell $cell */
+                    foreach ($cellIterator as $cell) {
+                        if ($cell->getColumn() == 'D') {
+                            $activeSheet->getColumnDimension('D')->setWidth(30);
+                        } elseif ($cell->getColumn() == 'J') {
+                            $activeSheet->getColumnDimension('J')->setWidth(40);
+                        } elseif ($cell->getColumn() == 'C') {
+                            $activeSheet->getColumnDimension('C')->setWidth(20);
+                        } elseif ($cell->getColumn() == 'E') {
+                            $activeSheet->getColumnDimension('E')->setWidth(20);
+                        } elseif ($cell->getColumn() == 'K' || $cell->getColumn() == 'L' || $cell->getColumn() == 'M' || $cell->getColumn() == 'N' || $cell->getColumn() == 'O') {
+                            $activeSheet->getColumnDimension('K')->setWidth(30);
+                            $activeSheet->getColumnDimension('L')->setWidth(30);
+                            $activeSheet->getColumnDimension('M')->setWidth(30);
+                            $activeSheet->getColumnDimension('N')->setWidth(30);
+                            $activeSheet->getColumnDimension('O')->setWidth(30);
+                        } else {
+                            $activeSheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
                         }
-                        $activeSheet->getStyle('A' . $c . ':O' . $c . '')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_THIN, 'color' => ['rgb' => '808080']]]);
-                        $activeSheet->getStyle('D' . $p . ':E' . $p . '')->applyFromArray($styleArrayinside);
-                        $activeSheet->getStyle('J' . $p . ':M' . $p . '')->applyFromArray($styleArrayinside);
-                        $activeSheet->getStyle('A' . $p . ':C' . $p . '')->applyFromArray($styleArraylimited);
-                        $activeSheet->getStyle('F' . $p . ':I' . $p . '')->applyFromArray($styleArraylimited);
-                        $activeSheet->getStyle('N' . $p . ':O' . $p . '')->applyFromArray($styleArraylimited);
-                        $p++;
-                        $c++;
                     }
-                }
-
-                $path = $_SERVER['DOCUMENT_ROOT'] . '/admin/images/clogo.png';
-                $drawing = new \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooterDrawing();
-                $drawing->setName('Crispdata logo');
-                $drawing->setPath($path);
-                $drawing->setHeight(36); // logo height
-                $activeSheet->getHeaderFooter()->addImage($drawing, \PhpOffice\PhpSpreadsheet\Worksheet\HeaderFooter::IMAGE_HEADER_CENTER);
-
-                //$activeSheet->getStyle()->applyFromArray($styleArrayborder);
-                //$activeSheet->getStyle('A1:O3')->getBorders()->applyFromArray(['allBorders' => ['borderStyle' => Border::BORDER_DASHDOT, 'color' => ['rgb' => '808080']]]);
-                $activeSheet->getStyle('C1:C' . $activeSheet->getHighestRow())->getNumberFormat()->setFormatCode('0.00');
-                $activeSheet->getStyle('I1:I' . $activeSheet->getHighestRow())->getNumberFormat()->setFormatCode('0.00');
-                $activeSheet->getStyle('D1:D' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('J1:J' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('C1:C' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('E1:E' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('K1:K' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('L1:L' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('M1:M' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('N1:N' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('O1:O' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('A1:A' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('B1:B' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('F1:F' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('G1:G' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('H1:H' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-                $activeSheet->getStyle('I1:I' . $activeSheet->getHighestRow())
-                        ->getAlignment()->setWrapText(true);
-
-                $activeSheet->getStyle('A1:O1')
-                        ->getFont()->getColor()->setARGB(\PhpOffice\PhpSpreadsheet\Style\Color::COLOR_BLUE);
-
-
-                $cellIterator = $activeSheet->getRowIterator()->current()->getCellIterator();
-                $cellIterator->setIterateOnlyExistingCells(true);
-                /** @var PHPExcel_Cell $cell */
-                foreach ($cellIterator as $cell) {
-                    if ($cell->getColumn() == 'D') {
-                        $activeSheet->getColumnDimension('D')->setWidth(30);
-                    } elseif ($cell->getColumn() == 'J') {
-                        $activeSheet->getColumnDimension('J')->setWidth(40);
-                    } elseif ($cell->getColumn() == 'C') {
-                        $activeSheet->getColumnDimension('C')->setWidth(20);
-                    } elseif ($cell->getColumn() == 'E') {
-                        $activeSheet->getColumnDimension('E')->setWidth(20);
-                    } elseif ($cell->getColumn() == 'K' || $cell->getColumn() == 'L' || $cell->getColumn() == 'M' || $cell->getColumn() == 'N' || $cell->getColumn() == 'O') {
-                        $activeSheet->getColumnDimension('K')->setWidth(30);
-                        $activeSheet->getColumnDimension('L')->setWidth(30);
-                        $activeSheet->getColumnDimension('M')->setWidth(30);
-                        $activeSheet->getColumnDimension('N')->setWidth(30);
-                        $activeSheet->getColumnDimension('O')->setWidth(30);
-                    } else {
-                        $activeSheet->getColumnDimension($cell->getColumn())->setAutoSize(true);
-                    }
-                }
 
 
 // Create Excel file and sve in your directory
-                $writer = new Xlsx($spreadsheet);
+                    $writer = new Xlsx($spreadsheet);
 
-                header('Content-Type: application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-                header('Content-Disposition: attachment;filename="' . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . '.xlsx"');
-                header('Cache-Control: max-age=0');
-                $writer->save('php://output');
-                die();
-                /* $writer->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
-                  $url = Yii::$app->params['FILE_URL'].'web/pdf/' . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
-                  echo $url;
-                  die(); */
+                    header('Content-Type: application/application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+                    header('Content-Disposition: attachment;filename="' . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . '.xlsx"');
+                    header('Cache-Control: max-age=0');
+                    $writer->save('php://output');
+                    die();
+                    /* $writer->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
+                      $url = Yii::$app->params['FILE_URL'].'web/pdf/' . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
+                      echo $url;
+                      die(); */
 //file_put_contents("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace(' ', '_', $__data['makename']) . ".xlsx", $datas);
-                //$filename = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx";
-                //$filenamenew = "" . $fileURL . "web/pdf/" . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx";
+                    //$filename = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx";
+                    //$filenamenew = "" . $fileURL . "web/pdf/" . str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx";
 //$file = $this->upload($filename);
-                //$filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filename];
-                $mailnum++;
+                    //$filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filename];
+                    $mailnum++;
+                }
+            } else {
+                Yii::$app->session->setFlash('error', "No Data Available!");
+                return $this->redirect(array('mail/data'));
             }
-        } else {
-            Yii::$app->session->setFlash('error', "No Data Available!");
-            return $this->redirect(array('mail/data'));
         }
     }
 
@@ -1518,11 +1513,11 @@ class MailController extends Controller {
                             }
                             $tid[] = $__data['ref'];
                             $final[] = $arrayData;
+                            $tenderids[] = $__data['tid'];
+                            $itemids[] = $__data['itemid'];
                         }
                         $i++;
-                        $tenderids[] = $__data['tid'];
                         $tarchives[] = $__data['tid'];
-                        $itemids[] = $__data['itemid'];
                     }
 
                     $excelsecond = $this->actionCreateexcel($final, $__data['ttype']);
