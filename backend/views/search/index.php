@@ -379,6 +379,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             echo "selected";
                                         }
                             ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                                        <option value="14" <?php
+                                        if (@$_GET['command'] == 14) {
+                                            echo "selected";
+                                        }
+                            ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
                                         <option value="6" <?php
                                         if (@$_GET['command'] == 6) {
                                             echo "selected";
@@ -623,7 +628,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         <th data-field="email" width="120px">Awarded Cost</th>
                                         <th data-field="email" width="100px">Bid end date</th>
                                         <th data-field="email">Status</th>
-                                        <th data-field="email">Actions</th>
+                                        <th data-field="email" width="300px">Actions</th>
                                     </tr>
                                 </thead>
                                 <tbody id="contacts_list">

@@ -101,6 +101,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     echo "selected";
                                 }
                                 ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                                <option value="14" <?php
+                                if (@$_POST['command'] == 14) {
+                                    echo "selected";
+                                }
+                                ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
                                 <option value="6" <?php
                                 if (@$_POST['command'] == 6) {
                                     echo "selected";
@@ -142,7 +147,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <?php
                       
                         if ((@$_POST['cengineer'] == 0 || @$_POST['cengineer'] == null) && (@$_POST['gengineer'] == 0 || @$_POST['gengineer'] == null)) {
-                            $arrcommands = [1, 2, 3, 4, 5, 13];
+                            $arrcommands = [1, 2, 3, 4, 5, 13, 14];
                             $getcengineers = \common\models\Cengineer::find()->where(['command' => @$_POST['command']])->all();
                             if (@$getcengineers && (!in_array(@$_POST['command'], $arrcommands))) {
                                 ?>

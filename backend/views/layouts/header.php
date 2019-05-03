@@ -281,7 +281,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                 </div>
                 <form id="searchform" class="left search col s2 hide-on-small-and-down">
                     <div class="input-field">
-                        <input id="searchdata" type="search" placeholder="Search Tender By Id" autocomplete="off">
+                        <input id="searchdata" type="search" placeholder="Search Tender By Id \n e.g 123456" autocomplete="off">
                         <label for="searchdata"><i class="material-icons search-icon">search</i></label>
                     </div>
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>

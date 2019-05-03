@@ -148,8 +148,8 @@ class SiteController extends Controller {
                 $archivetidsc = [];
                 $archiveiidsc = [];
                 if ($i == 1) {
-                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
-                    $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
+                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
+                    $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
                 } else {
                     $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
                     $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
@@ -671,7 +671,7 @@ class SiteController extends Controller {
                 $iidsc = [];
 
                 if ($i == 1) {
-                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
+                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
                 } else {
                     $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
                 }
@@ -1150,9 +1150,9 @@ class SiteController extends Controller {
         $caquantity = 0;
 
         if ($user->group_id != 6) {
-            if (isset($command) && $command != '' && $command != 14) {
+            if (isset($command) && $command != '' && $command != 15) {
                 if ($command == 1) {
-                    $commall = [1, 3, 4, 5, 13];
+                    $commall = [1, 3, 4, 5, 13, 14];
                 } else {
                     $commall = $command;
                 }
@@ -1196,9 +1196,9 @@ class SiteController extends Controller {
             $iidssix = [];
             $epricemake = 0;
 
-            if (isset($command) && $command != '' && $command != 14) {
+            if (isset($command) && $command != '' && $command != 15) {
                 if ($command == 1) {
-                    $commall = [1, 3, 4, 5, 13];
+                    $commall = [1, 3, 4, 5, 13, 14];
                 } else {
                     $commall = $command;
                 }
@@ -1751,13 +1751,13 @@ class SiteController extends Controller {
                 $iidsc = [];
                 if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
                     if ($i == 1) {
-                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     } else {
                         $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     }
                 } else {
                     if ($i == 1) {
-                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
+                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
                     } else {
                         $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
                     }
@@ -1824,7 +1824,7 @@ class SiteController extends Controller {
               $cengineers = \common\models\Cengineer::find()->where(['command' => [6, 7, 8, 9, 10, 11]])->all();
               } else {
               if ($command == 1) {
-              $commall = [1, 3, 4, 5, 13];
+              $commall = [1, 3, 4, 5, 13, 14];
               } else {
               $commall = $command;
               }
@@ -2230,9 +2230,9 @@ class SiteController extends Controller {
 
                 $lightchart = [];
                 $lightmakechart = [];
-                if (isset($command) && $command != '' && $command != 14) {
+                if (isset($command) && $command != '' && $command != 15) {
                     if ($command == 1) {
-                        $commall = [1, 3, 4, 5, 13];
+                        $commall = [1, 3, 4, 5, 13, 14];
                     } else {
                         $commall = $command;
                     }
@@ -2364,9 +2364,9 @@ class SiteController extends Controller {
             $labelsone = '';
             $valuesone = '';
 
-            if (isset($command) && $command != '' && $command != 14) {
+            if (isset($command) && $command != '' && $command != 15) {
                 if ($command == 1) {
-                    $commall = [1, 3, 4, 5, 13];
+                    $commall = [1, 3, 4, 5, 13, 14];
                 } else {
                     $commall = $command;
                 }
@@ -2402,13 +2402,13 @@ class SiteController extends Controller {
                 $iidsc = [];
                 if (isset($fromdate) && isset($todate) && $fromdate != '' && $todate != '') {
                     if ($i == 1) {
-                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
+                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     } else {
                         $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->andWhere(['>=', 'tenders.bid_end_date', $fromdate])->andWhere(['<=', 'tenders.bid_end_date', $todate])->all();
                     }
                 } else {
                     if ($i == 1) {
-                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
+                        $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
                     } else {
                         $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
                     }
@@ -2476,9 +2476,9 @@ class SiteController extends Controller {
             $iidssix = [];
             $eprice = 0;
 
-            if (isset($command) && $command != '' && $command != 14) {
+            if (isset($command) && $command != '' && $command != 15) {
                 if ($command == 1) {
-                    $commall = [1, 3, 4, 5, 13];
+                    $commall = [1, 3, 4, 5, 13, 14];
                 } else {
                     $commall = $command;
                 }
@@ -2805,9 +2805,9 @@ class SiteController extends Controller {
 
             if (isset($type)) {
 
-                if (isset($command) && $command != '' && $command != 14) {
+                if (isset($command) && $command != '' && $command != 15) {
                     if ($command == 1) {
-                        $commall = [1, 3, 4, 5, 13];
+                        $commall = [1, 3, 4, 5, 13, 14];
                     } else {
                         $commall = $command;
                     }
@@ -2947,6 +2947,8 @@ class SiteController extends Controller {
         $fulliids = [];
         $cquantity = 0;
         $caquantity = 0;
+        $finalgraphce = [];
+        $col = 0;
 
         $mnamegraph = '';
         if (isset($make) && $make != '') {
@@ -2960,14 +2962,14 @@ class SiteController extends Controller {
 //$finalgraphce[] = ['Cheif Engineers', 'Approved Tenders'];
         }
 
-        if (isset($command) && $command == 14) {
+        if (isset($command) && $command == 15) {
             $cengineers = \common\models\Cengineer::find()->where(['command' => [6, 7, 8, 9, 10, 11]])->all();
         } else {
             $cengineers = \common\models\Cengineer::find()->where(['command' => $command])->all();
         }
 
         if ($command == 1) {
-            $comm = ['3', '4', '5', '13'];
+            $comm = ['3', '4', '5', '13', '14'];
             foreach ($comm as $i) {
                 $tidsc = [];
                 $iidsc = [];
@@ -3127,6 +3129,7 @@ class SiteController extends Controller {
         $fulliids = [];
         $cquantity = 0;
         $caquantity = 0;
+        $col = 0;
 
         $mnamegraph = '';
         if (isset($make) && $make != '') {
@@ -3141,8 +3144,10 @@ class SiteController extends Controller {
                 $cvalue = 4;
             } elseif ($rownum == 2) {
                 $cvalue = 5;
-            } else {
+            } elseif ($rownum == 3) {
                 $cvalue = 13;
+            } else {
+                $cvalue = 14;
             }
             $gengineers = \common\models\Cengineer::find()->where(['command' => $cvalue])->all();
 
@@ -3216,7 +3221,7 @@ class SiteController extends Controller {
                     }
                 }
             } else {
-                $finalgraphcwe[] = 0;
+                $finalgraphcwe = [];
             }
         } else {
             if ($mnamegraph != '') {
@@ -3228,7 +3233,7 @@ class SiteController extends Controller {
 
             $cwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $cengineerval])->all();
             if ($command == 1) {
-                $commall = [1, 3, 4, 5, 13];
+                $commall = [1, 3, 4, 5, 13, 14];
             } else {
                 $commall = $command;
             }
@@ -3297,7 +3302,7 @@ class SiteController extends Controller {
                     }
                 }
             } else {
-                $finalgraphcwe[] = 0;
+                $finalgraphcwe = [];
             }
         }
         if (isset($type)) {
@@ -3331,6 +3336,7 @@ class SiteController extends Controller {
         $fulliids = [];
         $cquantity = 0;
         $caquantity = 0;
+        $col = 0;
 
         $mnamegraph = '';
         if (isset($make) && $make != '') {
@@ -3346,7 +3352,7 @@ class SiteController extends Controller {
 
         $cwengineers = \common\models\Cwengineer::find()->where(['cengineer' => $cengineerval])->all();
         if ($command == 1) {
-            $commall = [1, 3, 4, 5, 13];
+            $commall = [1, 3, 4, 5, 13, 14];
         } else {
             $commall = $command;
         }
@@ -3424,7 +3430,7 @@ class SiteController extends Controller {
                 }
             }
         } else {
-            $finalgraphge[] = 0;
+            $finalgraphge = [];
         }
 
         if (isset($type)) {
@@ -3457,9 +3463,9 @@ class SiteController extends Controller {
         $sizes = [];
         $getsizes = [];
 
-        if (isset($command) && $command != '' && $command != 14) {
+        if (isset($command) && $command != '' && $command != 15) {
             if ($command == 1) {
-                $commall = [1, 3, 4, 5, 13];
+                $commall = [1, 3, 4, 5, 13, 14];
             } else {
                 $commall = $command;
             }
@@ -3625,9 +3631,9 @@ class SiteController extends Controller {
 
         if (isset($type)) {
 
-            if (isset($command) && $command != '' && $command != 14) {
+            if (isset($command) && $command != '' && $command != 15) {
                 if ($command == 1) {
-                    $commall = [1, 3, 4, 5, 13];
+                    $commall = [1, 3, 4, 5, 13, 14];
                 } else {
                     $commall = $command;
                 }
@@ -4790,7 +4796,7 @@ class SiteController extends Controller {
                 $make = $user->cables;
             }
 
-            if (isset($command)) {
+            if (isset($command) && $command != 15) {
                 $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.command' => $command, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
             } else {
                 $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
@@ -4847,6 +4853,8 @@ class SiteController extends Controller {
         $filter = @$_GET['filter'];
 
         if ($user->group_id == 6) {
+            $command = @$_GET['c'];
+            $cid = @$_POST['commandid'];
             $type = @$user->authtype;
             if ($type == 1) {
                 $make = $user->cables;
@@ -4855,8 +4863,11 @@ class SiteController extends Controller {
             } else {
                 $make = $user->cables;
             }
-
-            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            if (isset($command) && $command != 15) {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.command' => $command, 'tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            } else {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.aoc_status' => 1, 'tenders.is_archived' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            }
         } else {
             $tenders = \common\models\Tender::find()->where(['is_archived' => 1])->orderBy(['id' => SORT_DESC]);
         }
@@ -5103,6 +5114,8 @@ class SiteController extends Controller {
         $filter = @$_GET['filter'];
 
         if ($user->group_id == 6) {
+            $command = @$_GET['c'];
+            $cid = @$_POST['commandid'];
             $type = @$user->authtype;
             if ($type == 1) {
                 $make = $user->cables;
@@ -5111,8 +5124,11 @@ class SiteController extends Controller {
             } else {
                 $make = $user->cables;
             }
-
-            $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.aoc_status' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            if (isset($command) && $command != 15) {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.command' => $command, 'tenders.aoc_status' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            } else {
+                $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'tenders.aoc_status' => null, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make])->orderBy(['tenders.id' => SORT_DESC])->groupBy('tenders.id');
+            }
         } else {
             $tenders = \common\models\Tender::find()->where(['status' => 1, 'aoc_status' => null])->orderBy(['id' => SORT_DESC]);
         }
@@ -5814,7 +5830,7 @@ class SiteController extends Controller {
 
     public function actionGetcengineer() {
         $value = $_REQUEST['value'];
-        if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13) {
+        if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13 || $value == 14) {
             $data = '<option value="" selected>Select GE</option>';
         } else {
             $data = '<option value="" selected>Select CE</option>';
@@ -5901,7 +5917,7 @@ class SiteController extends Controller {
 
     public function actionGetcengineeraddress() {
         $value = $_REQUEST['value'];
-        if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13) {
+        if ($value == 1 || $value == 2 || $value == 3 || $value == 4 || $value == 5 || $value == 13 || $value == 14) {
             $data = '<option value="" selected>Select GE</option>';
         } else {
             $data = '<option value="" selected>Select CE</option>';
@@ -6239,6 +6255,7 @@ class SiteController extends Controller {
         } elseif ($value == 17) {
             $data .= '<option value="42">GE FATEHGARH - MES</option>';
             $data .= '<option value="325">GE MES KANPUR - MES</option>';
+            $data .= '<option value="372">GE I KANPUR - MES</option>';
         } elseif ($value == 18) {
             $data .= '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data .= '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -6438,6 +6455,7 @@ class SiteController extends Controller {
             $data .= '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
             $data .= '<option value="181">GE (SOUTH) SECUNDERABAD - MES</option>';
             $data .= '<option value="182">GE(UTILITY) SECUNDERABAD - MES</option>';
+            $data .= '<option value="373">GE SOUTH, MUDFORT, SECUNDERABAD - MES</option>';
         } elseif ($value == 76) {
             $data .= '<option value="183">AGE(I) CANNANORE - MES</option>';
             $data .= '<option value="184">AGE(I) TRICHY - MES</option>';
@@ -6627,6 +6645,7 @@ class SiteController extends Controller {
             $data .= '<option value="302">GE KAPURTHLA(P) - MES</option>';
             $data .= '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
             $data .= '<option value="368">GE NAMS - MES</option>';
+            $data .= '<option value="374">GE KAPURTHALA - MES</option>';
         } elseif ($value == 130) {
             $data .= '<option value="304">GE JAMMU - MES</option>';
             $data .= '<option value="305">GE KALUCHAK - MES</option>';
@@ -7048,7 +7067,7 @@ class SiteController extends Controller {
 
     public function actionChangecommand() {
         $user = Yii::$app->user->identity;
-        return $this->redirect(array('site/aoctenders/' . $_POST['c'] . ''));
+        return $this->redirect(array('site/' . $_POST['url'] . '/' . $_POST['c'] . ''));
     }
 
     public function actionCreateMakeEm() {
@@ -7749,6 +7768,9 @@ class SiteController extends Controller {
             case "13":
                 return "ADG (Projects) AND CE (CG) Visakhapatnam - MES";
                 break;
+            case "14":
+                return "ADG (Project) Chennai AND CE (FY) Hyderabad - MES";
+                break;
             case "6":
                 return "CENTRAL COMMAND";
                 break;
@@ -7794,6 +7816,9 @@ class SiteController extends Controller {
                 break;
             case "13":
                 return "CE (CG) Visakhapatnam";
+                break;
+            case "14":
+                return "ADG (Project) Chennai";
                 break;
             case "6":
                 return "CENTRAL";
@@ -8834,6 +8859,7 @@ class SiteController extends Controller {
         } elseif ($value == 17) {
             $data[] = '<option value="42">GE FATEHGARH - MES</option>';
             $data[] = '<option value="325">GE MES KANPUR - MES</option>';
+            $data[] = '<option value="372">GE I KANPUR - MES</option>';
         } elseif ($value == 18) {
             $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
             $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -9033,6 +9059,7 @@ class SiteController extends Controller {
             $data[] = '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
             $data[] = '<option value="181">GE (SOUTH) SECUNDERABAD - MES</option>';
             $data[] = '<option value="182">GE(UTILITY) SECUNDERABAD - MES</option>';
+            $data[] = '<option value="373">GE SOUTH, MUDFORT, SECUNDERABAD - MES</option>';
         } elseif ($value == 76) {
             $data[] = '<option value="183">AGE(I) CANNANORE - MES</option>';
             $data[] = '<option value="184">AGE(I) TRICHY - MES</option>';
@@ -9222,6 +9249,7 @@ class SiteController extends Controller {
             $data[] = '<option value="302">GE KAPURTHLA(P) - MES</option>';
             $data[] = '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
             $data[] = '<option value="368">GE NAMS - MES</option>';
+            $data[] = '<option value="374">GE KAPURTHALA - MES</option>';
         } elseif ($value == 130) {
             $data[] = '<option value="304">GE JAMMU - MES</option>';
             $data[] = '<option value="305">GE KALUCHAK - MES</option>';
@@ -9342,6 +9370,7 @@ class SiteController extends Controller {
             } elseif ($value == 17) {
                 $data[] = '<option value="42">GE FATEHGARH - MES</option>';
                 $data[] = '<option value="325">GE MES KANPUR - MES</option>';
+                $data[] = '<option value="372">GE I KANPUR - MES</option>';
             } elseif ($value == 18) {
                 $data[] = '<option value="43">GE(EAST)LUCKNOW - MES</option>';
                 $data[] = '<option value="44">GE(E/M)LUCKNOW - MES</option>';
@@ -9541,6 +9570,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="180">GE (NORTH) SECUNDERABAD - MES</option>';
                 $data[] = '<option value="181">GE (SOUTH) SECUNDERABAD - MES</option>';
                 $data[] = '<option value="182">GE(UTILITY) SECUNDERABAD - MES</option>';
+                $data[] = '<option value="373">GE SOUTH, MUDFORT, SECUNDERABAD - MES</option>';
             } elseif ($value == 76) {
                 $data[] = '<option value="183">AGE(I) CANNANORE - MES</option>';
                 $data[] = '<option value="184">AGE(I) TRICHY - MES</option>';
@@ -9730,6 +9760,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="302">GE KAPURTHLA(P) - MES</option>';
                 $data[] = '<option value="303">GE (WEST) JALANDHAR CANTT - MES</option>';
                 $data[] = '<option value="368">GE NAMS - MES</option>';
+                $data[] = '<option value="374">GE KAPURTHALA - MES</option>';
             } elseif ($value == 130) {
                 $data[] = '<option value="304">GE JAMMU - MES</option>';
                 $data[] = '<option value="305">GE KALUCHAK - MES</option>';

@@ -16,6 +16,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .btn, .btn-flat {
         font-size: 11px;
     }
+    .addcontractor{float:left;width:160px;text-align: center;}
+    .allrates {
+        float: left;
+        width: 100%;
+    }
+    .addcontractor img {
+        width: 35px;
+    }
     .rateboxes {
         float: left;
         width: 90%;
@@ -41,16 +49,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         height: 3REM;
         margin-bottom: 5PX;
     }
-    .boximg img{float: left; width:50px; margin:70px;}
-    .deletebox img {
+    .boximg {
+        text-align: center;
         float: left;
-        width: 30px;
-        margin-left: 75px;
-        margin-top: 4px;
+        width: 100%;
+    }
+    .boximg img{ margin:10px;}
+    .deletebox img {
+        margin:0!important;
+        float:none!important;
+        width:35px!important;
     }
     .input-field.col.s1.itemnos {
         float: left;
-        width: 7%;
+        width: 10%;
         margin-bottom:25px;
     }
     .ratespopup {
@@ -61,13 +73,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         float: left;
         width: 18%;
         margin-bottom: 25px;
-        margin-left: 25px;
+        margin-left: 20px;
         text-align: center;
     }
     .deletebox {
         float: left;
         width: 100%;
         margin-top: 25px;
+        text-align:center;
     }
 
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
@@ -110,9 +123,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <?php if ($user->group_id == 6) { ?>
             <form id="command-types" class="col s12" method = "post" action = "<?= $baseURL ?>site/changecommand">
                 <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                <input type="hidden" name="url" value="<?= $url ?>">
                 <label>Change Command</label>
                 <select class="validate required materialSelect" id="commanddropdown" name='c'>
                     <option value="" selected>Change Command</option>
+                    <option value="15" <?php
+                    if (@$_GET['c'] == 15) {
+                        echo "selected";
+                    }
+                    ?>>ALL COMMANDS</option>
                     <option value="1" <?php
                     if (@$_GET['c'] == 1) {
                         echo "selected";
@@ -143,6 +162,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         echo "selected";
                     }
                     ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                    <option value="14" <?php
+                    if (@$_GET['c'] == 14) {
+                        echo "selected";
+                    }
+                    ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
                     <option value="6" <?php
                     if (@$_GET['c'] == 6) {
                         echo "selected";
@@ -234,7 +258,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <th data-field="email">Awarded Amount</th>
                                     <th data-field="email" width="100px">AOC Date</th>
                                     <th data-field="email">Status</th>
-                                    <th data-field="email">Actions</th>
+                                    <th data-field="email" width="300px">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="contacts_list">
@@ -327,10 +351,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <a onclick="pop_up('<?= Url::to(['site/create-tender', 'id' => $tender->id]) ?>');" class="waves-effect waves-light btn blue">Edit</a>
                                                         <a href="#modal<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>
                                                         <a href="<?= Url::to(['site/create-item', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">Add Item</a>
-                                                        <a href="#modalrate<?= $tender->id; ?>" class="waves-effect waves-light btn pink modal-trigger">Rates</a>
+
                                                         <?php
                                                     }
                                                 }
+                                                if ($user->group_id != 6) {
+                                                    ?>
+                                                    <a href="#modalrate<?= $tender->id; ?>" class="waves-effect waves-light btn pink modal-trigger">Rates</a>
+                                                <?php }
                                                 ?>
 
                                                 <a href="<?= Url::to(['site/view-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn blue">View Items</a>
@@ -340,7 +368,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                 <?php if ($tender->is_archived != 1 && $user->group_id != 6) { ?>
                                                     <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                 <?php } ?>
-                                                <?php if ($user->group_id != 3 && $tender->is_archived != 1) { ?>    
+                                                <?php if ($user->group_id != 3 && $user->group_id != 6 && $tender->is_archived != 1) { ?>    
                                                     <a onclick="movearchive(<?= $tender->id; ?>)" id="tenderarc<?= $tender->id; ?>" class="waves-effect waves-light btn blue proj-delete">Archive</a>    
                                                 <?php } ?>
 
@@ -528,7 +556,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <div class="modal-content"> 
                                         <h5>Rates By Contractors</h5>
                                         <h5>Tender Id - <?= $tender->tender_id ?></h5>
-                                        <a class="waves-effect waves-light btn blue m-b-xs" id="addrate<?= $tender->id ?>" onclick="addcontractor('0', '<?= $tender->id ?>')" >Add Contractor</a>
+                                        <a class="waves-effect waves-light btn blue m-b-xs addcontractor" id="addrate<?= $tender->id ?>" onclick="addcontractor('0', '<?= $tender->id ?>')" >Add Contractor</a>
                                         <div id="allrates<?= $tender->id ?>" class="allrates">  
                                             <div class='input-field col s1 itemnos'>
                                                 <div class="itemid itemtenders">

@@ -565,7 +565,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 } else if (command == 1) {
                     cengg = 0;
                 }
-                if (cengg >= 0) {
+                if (cengg >= 0 && rownum >= 0 && rownum !== '') {
                     var sizes = '';
                     var types = '';
                     var ctypes = '';
@@ -595,7 +595,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         success: function (response) {
                             var myJSON = JSON.parse(response);
                             if (myJSON) {
-                                if (myJSON.graphcwe[1] != 0) {
+                                if (myJSON.graphcwe.length != 0) {
                                     if (cengg == 0) {
                                         $("#gengg").show();
                                         drawLineChartge(myJSON.graphcwe, "curve_chart_ge");
@@ -823,7 +823,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 } else if (command == 1) {
                     cengg = 0;
                 }
-                if (cengg >= 0) {
+                if (cengg >= 0 && rownum >= 0 && rownum !== '') {
                     var sizes = '';
                     var types = '';
                     var ctypes = '';
@@ -853,7 +853,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         success: function (response) {
                             var myJSON = JSON.parse(response);
                             if (myJSON) {
-                                if (myJSON.graphcwe[1] != 0) {
+                                if (myJSON.graphcwe.length != 0) {
                                     if (cengg == 0) {
                                         $("#gengg").show();
                                         drawLineChartge(myJSON.graphcwe, "curve_chart_ge", myJSON.makename, myJSON.col);
@@ -964,7 +964,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         success: function (response) {
                             var myJSON = JSON.parse(response);
                             if (myJSON) {
-                                if (myJSON.graphge[1] != 0) {
+                                if (myJSON.graphge.length != 0) {
                                     $("#gengg").show();
                                     drawLineChartge(myJSON.graphge, "curve_chart_ge", myJSON.makename, myJSON.col);
                                 } else {
@@ -1074,8 +1074,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="input-field col s12">
                                 <select class="validate required materialSelect" name="command" id="command" required="">
                                     <option value="">Select Command</option>
-                                    <option value="14" selected <?php
-                                    if (@$_POST['command'] == 14) {
+                                    <option value="15" selected <?php
+                                    if (@$_POST['command'] == 15) {
                                         echo "selected";
                                     }
                                     ?>>ALL COMMANDS</option>

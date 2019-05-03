@@ -112,6 +112,14 @@ $config = [
                     'route' => 'site/aoctenders'
                 ],
                 [
+                    'pattern' => 'site/archivetenders/<c:\d+>',
+                    'route' => 'site/archivetenders'
+                ],
+                [
+                    'pattern' => 'site/atenders/<c:\d+>',
+                    'route' => 'site/atenders'
+                ],
+                [
                     'pattern' => 'products/uploadfile/<id:\d+>',
                     'route' => 'products/uploadfile'
                 ],

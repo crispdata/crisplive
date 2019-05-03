@@ -84,7 +84,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <th data-field="email" width="100px">AOC Date</th>
                                 <?php } ?>
                                 <th data-field="email">Status</th>
-                                <th data-field="email">Actions</th>
+                                <th data-field="email" width="300px">Actions</th>
                             </tr>
                         </thead>
                         <tbody id="contacts_list">
@@ -207,7 +207,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <?php if ($contractor) { ?>
                                                 <a onclick="openmodal('modalcont<?= $tender->id; ?>')" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
                                             <?php } ?>
-                                            <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5)) { ?>
+                                            <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6)) { ?>
                                                 <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                             <?php } ?>
 
@@ -280,7 +280,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
 
                                     </div>
-                                    <?php if ($tender->is_archived != 1 && ($user->group_id != 4 && $user->group_id != 5)) { ?>
+                                    <?php if ($tender->is_archived != 1 && ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6)) { ?>
                                         <div class="row">
 
                                             <div class="col s6">

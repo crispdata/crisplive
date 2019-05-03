@@ -335,8 +335,8 @@ class SearchController extends Controller {
                 $archivetidsc = [];
                 $archiveiidsc = [];
                 if ($i == 1) {
-                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
-                    $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => [1, 3, 4, 5, 13], 'items.tenderfour' => $type])->all();
+                    $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
+                    $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => [1, 3, 4, 5, 13, 14], 'items.tenderfour' => $type])->all();
                 } else {
                     $tenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.status' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
                     $archivetenderscommand = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->where(['tenders.is_archived' => 1, 'tenders.command' => $i, 'items.tenderfour' => $type])->all();
@@ -900,6 +900,9 @@ class SearchController extends Controller {
                 break;
             case "13":
                 return "CE (CG) Visakhapatnam";
+                break;
+            case "14":
+                return "ADG (Project) Chennai";
                 break;
             case "6":
                 return "CENTRAL";
