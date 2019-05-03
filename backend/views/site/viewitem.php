@@ -79,7 +79,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
         cursor: pointer;
     }
     .singlemake img{width:15px;}
-    .select2-container{width:409px!important;}
+    .select2-container{width:100%!important;}
 </style>
 <link href="//netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
 <script>
@@ -195,7 +195,7 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                     } else {
                                         if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) {
                                             ?>
-                                            <th data-field="email">Actions</th>
+                                            <th data-field="email" width="200px">Actions</th>
                                             <?php
                                         }
                                     }
@@ -241,12 +241,10 @@ $stop_date = date('Y-m-d H:i:s', strtotime(@$tdetails->createdon . ' +1 day'));
                                                                 <a class="waves-effect waves-light btn blue" onclick='approveitem(<?php echo $idetail->id; ?>)'>Approve</a>
                                                                 <?php
                                                             }
-                                                        }
-                                                        if ($user->group_id == 1) {
-                                                            ?>
+                                                        }?>
+                                                      
                                                             <a href="#modalrate<?= $idetail->id; ?>" class="waves-effect waves-light btn pink modal-trigger">Rates</a>
-                                                        <?php }
-                                                        ?>
+                                                        
 
                                                         <a href="<?= Url::to(['site/edit-item', 'id' => $idetail->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>
                                                         <a href="#modal<?= $idetail->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Delete</a>

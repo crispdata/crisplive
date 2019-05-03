@@ -53,6 +53,92 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         <div class="col s6">
             <div class="page-title"><?= $type ?> Tenders</div>
         </div>
+        <?php if ($user->group_id == 6) { ?>
+            <form id="command-types" class="col s12" method = "post" action = "<?= $baseURL ?>site/changecommand">
+                <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                <input type="hidden" name="url" value="<?= $url ?>">
+                <label>Change Command</label>
+                <select class="validate required materialSelect" id="commanddropdown" name='c'>
+                    <option value="" selected>Change Command</option>
+                    <option value="15" <?php
+                    if (@$_GET['c'] == 15) {
+                        echo "selected";
+                    }
+                    ?>>ALL COMMANDS</option>
+                    <option value="1" <?php
+                    if (@$_GET['c'] == 1) {
+                        echo "selected";
+                    }
+                    ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
+                    <option value="2" <?php
+                    if (@$_GET['c'] == 2) {
+                        echo "selected";
+                    }
+                    ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
+                    <option value="3" <?php
+                    if (@$_GET['c'] == 3) {
+                        echo "selected";
+                    }
+                    ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
+                    <option value="4" <?php
+                    if (@$_GET['c'] == 4) {
+                        echo "selected";
+                    }
+                    ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
+                    <option value="5" <?php
+                    if (@$_GET['c'] == 5) {
+                        echo "selected";
+                    }
+                    ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
+                    <option value="13" <?php
+                    if (@$_GET['c'] == 13) {
+                        echo "selected";
+                    }
+                    ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                    <option value="14" <?php
+                    if (@$_GET['c'] == 14) {
+                        echo "selected";
+                    }
+                    ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
+                    <option value="6" <?php
+                    if (@$_GET['c'] == 6) {
+                        echo "selected";
+                    }
+                    ?>>CENTRAL COMMAND</option>
+                    <option value="7" <?php
+                    if (@$_GET['c'] == 7) {
+                        echo "selected";
+                    }
+                    ?>>EASTERN COMMAND</option>
+                    <option value="8" <?php
+                    if (@$_GET['c'] == 8) {
+                        echo "selected";
+                    }
+                    ?>>NORTHERN COMMAND</option>
+                    <option value="9" <?php
+                    if (@$_GET['c'] == 9) {
+                        echo "selected";
+                    }
+                    ?>>SOUTHERN COMMAND</option>
+                    <option value="10" <?php
+                    if (@$_GET['c'] == 10) {
+                        echo "selected";
+                    }
+                    ?>>SOUTH WESTERN COMMAND</option>
+                    <option value="11" <?php
+                    if (@$_GET['c'] == 11) {
+                        echo "selected";
+                    }
+                    ?>>WESTERN COMMAND</option>
+                    <option value="12" <?php
+                    if (@$_GET['c'] == 12) {
+                        echo "selected";
+                    }
+                    ?>>DGNP MUMBAI - MES</option>
+                </select>
+            </form>
+        <?php }
+        ?>
         <form id="sort-data" method = "post" action = "<?= $baseURL ?>site/<?= $url ?>">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
             <input type="hidden" name="page" value="<?= @$_GET['page'] ?>">
@@ -102,12 +188,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <tr>
                                     <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="email">Tender Id</th>
-                                    <th data-field="name">Details of Contracting Office</th>
-                                    <th data-field="email" width="120px">Cost of Tender</th>
+                                    <th data-field="name" >Details of Contracting Office</th>
+                                    <th data-field="email" >Cost of Tender</th>
                                     <th data-field="email" width="100px">Bid end date</th>
                                     <th data-field="email" width="100px">Bid open date</th>
                                     <th data-field="email">Status</th>
-                                    <th data-field="email">Actions</th>
+                                    <th data-field="email" width="250px ">Actions</th>
                                 </tr>
                             </thead>
                             <tbody id="contacts_list">

@@ -94,6 +94,7 @@ $(document).ready(function () {
                 beforeSend: function () {
                     $(".mn-inner .col .page-title").html('');
                     $(".mn-inner #sort-data").css('display', 'none');
+                    $(".mn-inner #command-types").css('display', 'none');
                     $(".mn-inner .add-contact").css('display', 'none');
                     $(".mn-inner .card.top").css('background-color', '#fff');
                     $(".mn-inner .row.departmentview").css('background-color', '#fff');
@@ -1783,8 +1784,12 @@ function addcontractor(num, tid) {
         type: 'post',
         url: baseUrl + 'site/getcolumns',
         data: {'tid': tid, newnum: newnum, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#addrate" + tid + "").html('<img src="/assets/images/loading.gif" alt="">');
+        },
         success: function (resultData) {
             $("#rateboxes" + tid + "").append(resultData);
+             $("#addrate" + tid + "").html('Add Contractor');
             $('select.materialSelectcon').select2({
                 closeOnSelect: true,
                 placeholder: 'Select Contractor',
@@ -2240,7 +2245,7 @@ function getcengineeraddress(value) {
     $("#gengineer").material_select();
     $("#ge").hide();
 
-    var arr = ['2', '12'];
+    var arr = ['2', '12', '14'];
     if (arr.indexOf(value) < 0) {
         $("#ce").show();
         $.ajax({
@@ -2289,7 +2294,7 @@ function getcengineer(value) {
     $("#gengineer").material_select();
     $("#ge").hide();
 
-    var arr = ['0', '2', '12'];
+    var arr = ['0', '2', '12', '14'];
     if (arr.indexOf(value) < 0) {
         $("#ce").show();
         $.ajax({
