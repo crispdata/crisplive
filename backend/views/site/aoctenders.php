@@ -114,6 +114,21 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .modal .modal-content h5{text-align: center;}
 
 </style>
+<script>
+    function validatedata() {
+        if ($('input[name="selected_id[]"]:checked').length <= 0) {
+            swal("", "Please select any tender", "warning");
+            return false;
+        } else {
+            var result = confirm("Do you really want to perform this action?");
+            if (result) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
+</script>
 <?php //$contractors = \common\models\Contractor::find()->orderBy(['firm' => SORT_ASC])->all();   ?>
 <main class="mn-inner">
     <div class="row">
@@ -219,10 +234,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                 </select>
             </div>
         </form>
-        <form id="create-item" method = "post" novalidate onsubmit="return deleteConfirm();" action = "<?= $baseURL ?>site/delete-tenders">
+        <form id="create-item" method = "post" novalidate onsubmit="return validatedata();" action = "<?= $baseURL ?>site/delete-tenders">
             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
             <?php if ($user->group_id == 1) { ?>
                 <input type="submit" class="waves-effect waves-light btn red m-b-xs add-contact" name="btn_delete" value="Delete Tenders"/>
+            <?php } ?>
+            <?php if ($user->group_id == 6) { ?>
+                <input type="submit" class="btn blue m-b-xs add-contact tooltipped" data-html="true" data-position="bottom" data-delay="0" data-tooltip="Only 100 tenders per excel will be generated" name="download" value="Download Tenders In Excel"/>
             <?php } ?>
             <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?>
                 <a class="waves-effect waves-light btn blue m-b-xs add-contact" href="<?= $baseURL ?>site/create-tender"> Add Tender</a>
@@ -252,7 +270,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <table class="responsive-table bordered">
                             <thead>
                                 <tr>
-                                    <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?><th><input type="checkbox" name="check_all" <?= ($user->group_id != 1) ? 'disabled' : '' ?> id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
+                                    <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><th><input type="checkbox" name="check_all" id="check_all" value=""/><label for="check_all"></label></th><?php } ?>
                                     <th data-field="email">Tender Id</th>
                                     <th data-field="name">Details of Contracting Office</th>
                                     <th data-field="email">Awarded Amount</th>
@@ -298,7 +316,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $stop_date = date('Y-m-d H:i:s', strtotime($tender->createdon . ' +1 day'));
                                         ?>
                                         <tr data-id = "<?= $tender->tender_id ?>">
-                                            <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?><td align="center"><input type="checkbox" name="selected_id[]" <?= ($tender->status == 1 && $user->group_id != 1) ? 'disabled' : '' ?> class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
+                                            <?php if ($user->group_id != 4 && $user->group_id != 5) { ?><td align="center"><input type="checkbox" name="selected_id[]" class="checkbox" id="check<?php echo $tender->id; ?>" value="<?php echo $tender->id; ?>"/><label for="check<?php echo $tender->id; ?>"></label></td><?php } ?> 
                                             <td class = ""><?= $tender->tender_id ?></td>
                                             <td class = ""><?= $tdetails ?></td>
                                             <td class = ""><?= $tender->qvalue ?></td>

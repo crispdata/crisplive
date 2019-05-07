@@ -114,6 +114,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <label for="city">City</label>
                             </div>
                             <div class="input-field col s12">
+                                <input name="gst" class="contact-code form-control" placeholder="GST No." value="<?= $client->gst ?>" id="gst" type="text" required="">
+                                <label for="gst">GST No.</label>
+                            </div>
+                            <div class="input-field col s12">
                                 <input name="pcode" class="contact-code form-control" placeholder="Pincode" value="<?= $client->pcode ?>" id="pincode" type="text" required="">
                                 <label for="pcode">Pin Code</label>
                             </div>
@@ -127,7 +131,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <label for="phone">Contact Number</label>
                             </div>
                             <div class="input-field col s12">
-                                <input name="cnumber" id="mobile" class="contact-number form-control" type="number" value="<?= $client->cnumber ?>" placeholder="Mobile No.*" required="">
+                                <input name="cnumber" id="mobile" class="contact-number form-control" type="text" value="<?= $client->cnumber ?>" placeholder="Mobile No.*">
                                 <label for="mobile">Mobile Number</label>
                             </div>
                             <div class="input-field col s12">

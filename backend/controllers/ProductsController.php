@@ -45,7 +45,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'files', 'addaddress', 'addresses', 'deleteaddress', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'files','xfiles', 'addaddress', 'addresses', 'deleteaddress', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -1116,6 +1116,13 @@ class ProductsController extends Controller {
             Yii::$app->session->setFlash('success', "Address successfully deleted");
             return $this->redirect(array('products/addresses'));
         }
+    }
+    
+    public function actionXfiles() {
+        $clients = \common\models\Clients::find()->where(['type'=>3])->andWhere('find_in_set(:key2, cables)', [':key2' => '10'])->all();
+        echo "<pre/>";
+        print_r($clients);
+        die();
     }
 
 }
