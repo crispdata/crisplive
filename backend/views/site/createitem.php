@@ -309,7 +309,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                         <div id="third" style="display: none;">
                                             <div class="input-fields col s2 row">
                                                 <label>Select Sub Type</label>
-                                                <select class="validate required materialSelect" name="tenderthree" id="tenderthree" required="" onchange="getthirddata(this.value)">
+                                                <select class="validate required materialSelect" name="tenderthree" id="tenderthree" onchange="getthirddata(this.value)">
                                                     <option value="" disabled selected>Select</option>
                                                 </select>
                                             </div>
@@ -317,7 +317,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                         <div id="fourth" style="display: none;">
                                             <div class="input-fields col s2 row">
                                                 <label>Select Sub Type</label>
-                                                <select class="validate required materialSelect" name="tenderfour" id="tenderfour" required="" onchange="getfourdata(this.value)">
+                                                <select class="validate required materialSelect" name="tenderfour" id="tenderfour" onchange="getfourdata(this.value)">
                                                     <option value="" disabled selected>Select</option>
                                                 </select>
                                             </div>

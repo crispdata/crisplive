@@ -344,7 +344,8 @@ $(document).ready(function () {
                             if (make != '') {
                                 $("#total").html(myJSON.first.total);
                                 $("#quantity").html(myJSON.first.quantity);
-                                $("#value").html(myJSON.first.value);
+                                //$("#value").html(myJSON.first.value);
+                                $("#value").html('<a class="btn red" onclick="getpricewithparams(30, 4, ' + product + ',' + make + ',4)">Click Here</a>');
                             }
                             var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
                             if (checkone != 0) {
@@ -359,13 +360,28 @@ $(document).ready(function () {
                             }
                             $("#u10").html(myJSON.first.aptenderstotal);
                             $("#u20").html(myJSON.first.aptendersquantity);
-                            $("#u30").html(myJSON.first.aptendersprice);
+                            //$("#u30").html(myJSON.first.aptendersprice);
+                            if (make != '') {
+                                $("#u30").html('<a class="btn green" onclick="getpricewithparams(30, 1, ' + product + ',' + make + ',0)">Click Here</a>');
+                            } else {
+                                $("#u30").html('<a class="btn green" onclick="getpricewithparams(30, 1, ' + product + ',0,0)">Click Here</a>');
+                            }
                             $("#u11").html(myJSON.first.artenderstotal);
                             $("#u21").html(myJSON.first.artendersquantity);
-                            $("#u31").html(myJSON.first.artendersprice);
+                            //$("#u31").html(myJSON.first.artendersprice);
+                            if (make != '') {
+                                $("#u31").html('<a class="btn blue" onclick="getpricewithparams(31, 2, ' + product + ',' + make + ',1)">Click Here</a>');
+                            } else {
+                                $("#u31").html('<a class="btn blue" onclick="getpricewithparams(31, 2, ' + product + ',0,1)">Click Here</a>');
+                            }
                             $("#u12").html(myJSON.first.bltenderstotal);
                             $("#u22").html(myJSON.first.bltendersquantity);
-                            $("#u32").html(myJSON.first.bltendersprice);
+                            //$("#u32").html(myJSON.first.bltendersprice);
+                            if (make != '') {
+                                $("#u32").html('<a class="btn red" onclick="getpricewithparams(32, 3, ' + product + ',' + make + ',2)">Click Here</a>');
+                            } else {
+                                $("#u32").html('<a class="btn red" onclick="getpricewithparams(32, 3, ' + product + ',0,2)">Click Here</a>');
+                            }
                             if (myJSON.first.artenders == 0) {
                                 $("#cable-size").hide();
                             }
@@ -759,7 +775,8 @@ $(document).ready(function () {
                 if (myJSON) {
                     $("#total").html(myJSON.first.total);
                     $("#quantity").html(myJSON.first.quantity);
-                    $("#value").html(myJSON.first.value);
+                    //$("#value").html(myJSON.first.value);
+                    $("#value").html('<a class="btn red" onclick="getpricewithparams(30, 4, ' + product + ',' + make + ',4)">Click Here</a>');
                     $("#a1").html(myJSON.second.headone);
                     $("#a2").html('0 ' + ext + '');
                     $("#a3").html('0 ' + ext + '');
@@ -936,7 +953,8 @@ $(document).ready(function () {
                     if (make != '') {
                         $("#total").html(myJSON.first.total);
                         $("#quantity").html(myJSON.first.quantity);
-                        $("#value").html(myJSON.first.value);
+                        //$("#value").html(myJSON.first.value);
+                        $("#value").html('<a class="btn red" onclick="getpricewithparams(30, 4, ' + product + ',' + make + ',4)">Click Here</a>');
                     }
                     var checkone = myJSON.valuesone[1] + myJSON.valuesone[2];
                     if (checkone != 0) {
@@ -951,13 +969,28 @@ $(document).ready(function () {
                     }
                     $("#u10").html(myJSON.first.aptenderstotal);
                     $("#u20").html(myJSON.first.aptendersquantity);
-                    $("#u30").html(myJSON.first.aptendersprice);
+                    //$("#u30").html(myJSON.first.aptendersprice);
+                    if (make != '') {
+                        $("#u30").html('<a class="btn green" onclick="getpricewithparams(30, 1, ' + product + ',' + make + ',0)">Click Here</a>');
+                    } else {
+                        $("#u30").html('<a class="btn green" onclick="getpricewithparams(30, 1, ' + product + ',0,0)">Click Here</a>');
+                    }
                     $("#u11").html(myJSON.first.artenderstotal);
                     $("#u21").html(myJSON.first.artendersquantity);
-                    $("#u31").html(myJSON.first.artendersprice);
+                    //$("#u31").html(myJSON.first.artendersprice);
+                    if (make != '') {
+                        $("#u31").html('<a class="btn blue" onclick="getpricewithparams(31, 2, ' + product + ',' + make + ',1)">Click Here</a>');
+                    } else {
+                        $("#u31").html('<a class="btn blue" onclick="getpricewithparams(31, 2, ' + product + ',0,1)">Click Here</a>');
+                    }
                     $("#u12").html(myJSON.first.bltenderstotal);
                     $("#u22").html(myJSON.first.bltendersquantity);
-                    $("#u32").html(myJSON.first.bltendersprice);
+                    //$("#u32").html(myJSON.first.bltendersprice);
+                    if (make != '') {
+                        $("#u32").html('<a class="btn red" onclick="getpricewithparams(32, 3, ' + product + ',' + make + ',2)">Click Here</a>');
+                    } else {
+                        $("#u32").html('<a class="btn red" onclick="getpricewithparams(32, 3, ' + product + ',0,2)">Click Here</a>');
+                    }
                     if (myJSON.first.artenders == 0) {
                         $("#cable-size").hide();
                     }
@@ -1741,6 +1774,52 @@ function getparenttwotypes(value) {
 
 }
 
+function getprice(id, ptype, type, key) {
+    var quantity = $('#u2' + key + '').text();
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'search/getprice',
+        data: {'type': type, ptype: ptype, quantity: quantity, key: key, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            $("#" + id + "").html('<img src="/assets/images/loading.gif" alt="">');
+        },
+        success: function (resultData) {
+            $('#' + id + '').html(resultData);
+        }
+    });
+}
+
+function getpricewithparams(id, ptype, type, make, key) {
+    var command = $("#command option:selected").val();
+    var fromdate = $("#fromdate").val();
+    var todate = $("#todate").val();
+    if (ptype == 4) {
+        var quantity = $('#quantity').text();
+    } else {
+        var quantity = $('#u2' + key + '').text();
+    }
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'search/getpricewithparams',
+        data: {'type': type, ptype: ptype, command: command, fromdate: fromdate, todate: todate, make: make,key:key, quantity: quantity, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+            if (ptype == 4) {
+                $("#value").html('<img src="/assets/images/loading.gif" alt="">');
+            } else {
+                $("#u" + id + "").html('<img src="/assets/images/loading.gif" alt="">');
+            }
+        },
+        success: function (resultData) {
+            if (ptype == 4) {
+                $('#value').html(resultData);
+            } else {
+                $('#u' + id + '').html(resultData);
+            }
+
+        }
+    });
+}
+
 function addrate(num, itemid) {
     var newnum = (parseInt(num) + parseInt(1));
     var dt = new Date();
@@ -1789,7 +1868,7 @@ function addcontractor(num, tid) {
         },
         success: function (resultData) {
             $("#rateboxes" + tid + "").append(resultData);
-             $("#addrate" + tid + "").html('Add Contractor');
+            $("#addrate" + tid + "").html('Add Contractor');
             $('select.materialSelectcon').select2({
                 closeOnSelect: true,
                 placeholder: 'Select Contractor',

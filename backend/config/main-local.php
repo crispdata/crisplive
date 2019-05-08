@@ -112,6 +112,10 @@ $config = [
                     'route' => 'site/aoctenders'
                 ],
                 [
+                    'pattern' => 'site/lasttenders/<c:\d+>',
+                    'route' => 'site/lasttenders'
+                ],
+                [
                     'pattern' => 'site/archivetenders/<c:\d+>',
                     'route' => 'site/archivetenders'
                 ],

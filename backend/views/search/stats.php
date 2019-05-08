@@ -1176,7 +1176,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <span class="card-title leftside"><?= $_log['title']; ?></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                            <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value ?></small></span>
+                                            <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><a class="btn green" onclick="getprice('u3<?= $key ?>', '1', <?= @$_POST['type'] ?>,<?= $key ?>)">Click Here</a></span><small><?= $value ?></small></span>
                                             <?php
                                         }
                                         $i++;
@@ -1211,7 +1211,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <span class="card-title leftside"><?= $_log['title']; ?></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                            <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value ?></small></span>
+                                            <span class="stats-counter"><span class="counter upper leftside" id="u3<?= $key ?>"><a class="btn blue" onclick="getprice('u3<?= $key ?>', '2', <?= @$_POST['type'] ?>,<?= $key ?>)">Click Here</a></span><small><?= $value ?></small></span>
                                             <?php
                                         }
                                         $i++;
@@ -1242,7 +1242,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <span class="card-title leftside"><?= $_log['title']; ?></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u1<?= $key ?>"><?= $_log['total']; ?></span><small>Tenders</small></span>
                                             <span class="stats-counter"><span class="counter upper leftside" id="u2<?= $key ?>"><?= $_log['quantity']; ?></span><small><?= $head ?></small></span>
-                                            <span class="stats-counter quantitys"><span class="counter upper leftside" id="u3<?= $key ?>"><?= Sitecontroller::actionConvertnumber($_log['value']); ?></span><small><?= $value; ?></small></span>
+                                            <span class="stats-counter quantitys"><span class="counter upper leftside" id="u3<?= $key ?>"><a class="btn red" onclick="getprice('u3<?= $key ?>', '3', <?= @$_POST['type'] ?>,<?= $key ?>)">Click Here</a></span><small><?= $value; ?></small></span>
                                             <?php
                                         }
                                         $i++;
