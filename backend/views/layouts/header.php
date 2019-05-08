@@ -171,6 +171,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         float: left;
         width:4%;
     }
+    
 </style>
 <script>
     function GetFileSize() {
@@ -281,11 +282,14 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                 </div>
                 <form id="searchform" class="left search col s2 hide-on-small-and-down">
                     <div class="input-field">
-                        <input id="searchdata" type="search" placeholder="Search Tender By Id \n e.g 123456" autocomplete="off">
+                        <input id="searchdata" type="search" placeholder="Search Tender By Id" autocomplete="off">
                         <label for="searchdata"><i class="material-icons search-icon">search</i></label>
                     </div>
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
+                <?php if($user->group_id == 6){?>
+                    <a href="/site/lasttenders" class="btn green asearch">Contracts awarded last week</a>
+                <?php }?>
                 <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?>
                     <a href="/search/index" class="btn green asearch">Advanced Search</a>
                 <?php }
@@ -598,6 +602,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 Users
                             </a>
                         </li>
+                       
 
                     <?php } ?>
                     <li class="no-padding <?= ($controller == 'search' && $action == 'items') ? 'active' : '' ?>">
@@ -627,7 +632,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
             <!-- Modal content-->
             <div class="modal-content">
                 <div class="modal-header">
-                    <h4 class="modal-title">Please upload Product Catalogs and Price Lists files</h4>
+                    <h4 class="modal-title">Please upload Product Catalogue and Price Lists</h4>
                     <h6 class="modal-title">*You can upload multiple files and File Size Limit - 10MB*</h6>
                 </div>
                 <div class="modal-body">

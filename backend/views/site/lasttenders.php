@@ -133,7 +133,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <main class="mn-inner">
     <div class="row">
         <div class="col s6">
-            <div class="page-title"><?= $type ?> Tenders</div>
+            <div class="page-title">All Contracts awarded between <?= date('d M Y',strtotime('-7 days')) ?> and <?= date('d M Y') ?></div>
         </div>
         <?php if ($user->group_id == 6) { ?>
             <form id="command-types" class="col s12" method = "post" action = "<?= $baseURL ?>site/changecommand">

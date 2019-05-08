@@ -138,7 +138,6 @@ $rootURL = Yii::$app->params['ROOT_URL'];
     input#itemsubmit {
         float: left;
         width: 100%;
-        padding: 11px;
     }
 </style>
 <script>
@@ -291,7 +290,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                     <div class="col s12">
                                         <div class="input-fields col s2 row">
                                             <label>Select type of work</label>
-                                            <select class="validate required materialSelect" name="tenderone" id="tenderone" onchange="getdata(this.value)">
+                                            <select class="validate required materialSelect" name="tenderone" id="tenderone" required="" onchange="getdata(this.value)">
                                                 <option value="" disabled selected>Select</option>
                                                 <option value="1">E/M</option>
                                                 <option value="2">Civil</option>
@@ -301,7 +300,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                         <div id="second" style="display: none;">
                                             <div class="input-fields col s2 row">
                                                 <label>Select Sub Type</label>
-                                                <select class="validate required materialSelect" name="tendertwo" id="tendertwo" onchange="getseconddata(this.value)">
+                                                <select class="validate required materialSelect" name="tendertwo" id="tendertwo" required="" onchange="getseconddata(this.value)">
                                                     <option value="" disabled selected>Select</option>
                                                 </select>
                                             </div>
@@ -441,7 +440,7 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                             </div>
 
                             <div id="submitbutton">
-                                <input class="waves-effect waves-light btn blue m-b-xs" id="itemsubmit" name="submit" type="submit" value="Submit">
+                                <input class="btn blue m-b-xs" id="itemsubmit" name="submit" type="submit" value="Submit">
                             </div>
                         </form>
 

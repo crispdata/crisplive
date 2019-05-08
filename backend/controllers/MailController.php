@@ -314,30 +314,30 @@ class MailController extends Controller {
                 }
             }
 
-            /*if (isset($data) && count($data)) {
-                foreach ($data as $k => $_cldata) {
-                    foreach ($_cldata as $key => $cldata) {
-                        $singlemake = [];
-                        if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
-                            if (isset($cldata['allmakes'])) {
-                                $singlemake = explode(',', $cldata['allmakes']);
-                                $clmakename = '';
-                                $allclmakes = '';
-                                if (isset($singlemake) && count($singlemake)) {
-                                    foreach ($singlemake as $__smake) {
-                                        $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
-                                        if (@$makename) {
-                                            $clmakename .= $makename->make . ',';
-                                        }
-                                    }
-                                }
-                                $allclmakes = rtrim($clmakename, ',');
-                            }
-                            $data[$k][$key]['allmakes'] = $allclmakes;
-                        }
-                    }
-                }
-            }*/
+            /* if (isset($data) && count($data)) {
+              foreach ($data as $k => $_cldata) {
+              foreach ($_cldata as $key => $cldata) {
+              $singlemake = [];
+              if (isset($cldata['ttype']) && ($cldata['ttype'] == 1 || $cldata['ttype'] == 2)) {
+              if (isset($cldata['allmakes'])) {
+              $singlemake = explode(',', $cldata['allmakes']);
+              $clmakename = '';
+              $allclmakes = '';
+              if (isset($singlemake) && count($singlemake)) {
+              foreach ($singlemake as $__smake) {
+              $makename = \common\models\Make::find()->where(['id' => $__smake])->one();
+              if (@$makename) {
+              $clmakename .= $makename->make . ',';
+              }
+              }
+              }
+              $allclmakes = rtrim($clmakename, ',');
+              }
+              $data[$k][$key]['allmakes'] = $allclmakes;
+              }
+              }
+              }
+              } */
 
 
             $required = '';
@@ -1531,7 +1531,7 @@ class MailController extends Controller {
                     $excelsecond->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
                     $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
                     $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
-                    $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
+                    $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename, 'mid' => $__data['make']];
                     $cdetails = (object) ['id' => $__data['mid'], 'cemail' => $__data['email']];
                     $mailnum++;
 
@@ -1759,7 +1759,7 @@ class MailController extends Controller {
                             $excel->save("" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx");
                             $filepath = "" . $_SERVER['DOCUMENT_ROOT'] . "/backend/web/pdf/" . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ' - ' . $__data['itype'] . ".xlsx";
                             $filename = time() . str_replace('/', '_', str_replace(' ', '_', $__data['makename'])) . ".xlsx";
-                            $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename];
+                            $filestosend[] = ['name' => str_replace(' ', '_', $__data['makename']) . ' - ' . $__data['itype'] . ".xlsx", 'path' => $filepath, 'fname' => $filename, 'mid' => $__data['make']];
                             $mailnum++;
                         }
                         $mail = $this->actionConfiguremail($filestosend, $tenderids, $itemids, $_client, 1);
@@ -1906,12 +1906,14 @@ class MailController extends Controller {
 
     public function actionConfiguremail($filestosend, $tenderids, $itemids, $client, $type) {
         $allmails = [];
+        $mids = [];
         $htmlfilepath = Yii::getAlias('@common/mail/home-link.php');
         $textfilepath = '';
         $ses = new \SimpleEmailService(Yii::$app->params['IAM_KEY'], Yii::$app->params['IAM_SECRET']);
         $m = new \SimpleEmailServiceMessage();
         if (isset($filestosend) && count($filestosend)) {
             foreach ($filestosend as $_file) {
+                $mids[] = $_file['mid'];
                 $m->addAttachmentFromFile($_file['name'], $_file['path'], 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
             }
         }
@@ -1955,7 +1957,7 @@ class MailController extends Controller {
             }
             $allfnames = implode(',', $filenames);
             $allfpaths = implode(',', $filepaths);
-            $datasave = ['cid' => $client->id, 'type' => $type, 'tid' => $ttdds, 'itemids' => $iiddss, 'filename' => $allfnames, 'filepath' => $allfpaths, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
+            $datasave = ['cid' => $client->id, 'mids' => implode(',', $mids), 'type' => $type, 'tid' => $ttdds, 'itemids' => $iiddss, 'filename' => $allfnames, 'filepath' => $allfpaths, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
             $mailsent = \Yii::$app
                     ->db
                     ->createCommand()

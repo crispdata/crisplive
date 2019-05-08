@@ -72,8 +72,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <thead>
                             <tr>
                                 <th data-field = "email">Tender Id</th>
-                                <th data-field = "name" width = "250px">Details of Contracting Office</th>
-                                <th data-field = "name" width = "150px">DD Office</th>
+                                <th data-field = "name">Details of Contracting Office</th>
+                                <th data-field = "name">DD Office</th>
                                 <?php if ($aocstatus != 1) {
                                     ?>
                                     <th data-field="email" width="120px">Cost of Tender</th>
@@ -94,7 +94,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 foreach ($tenders as $key => $tender) {
                                     $tdetails = '';
                                     $command = Sitecontroller::actionGetcommand($tender->command);
-                                    $ddoffice = \common\models\Ddengineers::find()->where(['id'=>$tender->ddfavour])->one();
+                                    $ddoffice = \common\models\Ddengineers::find()->where(['id' => $tender->ddfavour])->one();
                                     if (!isset($tender->cengineer) && isset($tender->gengineer)) {
                                         $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
                                     } else {
@@ -126,7 +126,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <tr data-id = "<?= $tender->tender_id ?>">
                                         <td class = ""><?= $tender->tender_id ?></td>
                                         <td class = ""><?= $tdetails ?></td>
-                                        <td class = ""><?= @$ddoffice->text ?></td>
+                                        <td class = ""><?= (@$ddoffice->text) ? $ddoffice->text : '---' ?></td>
                                         <?php if ($aocstatus != 1) { ?>
                                             <td class = ""><?= $tender->cvalue; ?></td>
                                             <td class = ""><?= $tender->bid_end_date ?></td>

@@ -54,7 +54,7 @@ $(document).ready(function () {
         "bLengthChange": true,
 
     });
-    
+
     $('#current-project-contractors').DataTable({
         language: {
             searchPlaceholder: 'Search records',
@@ -130,7 +130,7 @@ $(document).ready(function () {
     $('#statusFilter').on('change', function () {
         $("#make-types").submit();
     });
-    
+
     $('#product').on('change', function () {
         $("#product-types").submit();
     });
@@ -200,10 +200,15 @@ $(document).ready(function () {
 });
 
 function deleteConfirm() {
-    var result = confirm("Do you really want to perform this action?");
-    if (result) {
-        return true;
-    } else {
+    if ($('input[name="selected_id[]"]:checked').length <= 0) {
+        swal("", "Please select any tender", "warning");
         return false;
+    } else {
+        var result = confirm("Do you really want to perform this action?");
+        if (result) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }

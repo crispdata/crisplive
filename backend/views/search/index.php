@@ -597,7 +597,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                             </div>
                             <div class="row" style="float:left;width:100%">
-                                <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
+                                <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">
                             </div>
                         </form>
                         <?php if (@$tenders) {
@@ -622,11 +622,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <table class="responsive-table bordered">
                                 <thead>
                                     <tr>
-                                        <th data-field="email" width="100px">Tender Id</th>
-                                        <th data-field="name" width="350px">Details of Contracting Office</th>
-                                        <th data-field="email" width="120px">Cost of Tender</th>
-                                        <th data-field="email" width="120px">Awarded Cost</th>
-                                        <th data-field="email" width="100px">Bid end date</th>
+                                        <th data-field="email">Tender Id</th>
+                                        <th data-field="name" >Details of Contracting Office</th>
+                                        <th data-field="email">Cost of Tender</th>
+                                        <th data-field="email" >Awarded Cost</th>
+                                        <th data-field="email" >Bid end date</th>
                                         <th data-field="email">Status</th>
                                         <th data-field="email" width="300px">Actions</th>
                                     </tr>

@@ -298,7 +298,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <?php }
                         ?>
 
-                        <input class="waves-effect waves-light btn blue m-b-xs" name="submit" type="submit" value="Submit">
+                        <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">
 
                     </form>
 

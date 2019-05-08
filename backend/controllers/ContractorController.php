@@ -208,7 +208,7 @@ class ContractorController extends Controller {
             } else {
                 $model = new \common\models\Contractor();
                 $model->firm = @$_POST['firm'];
-                $model->firmname = str_replace('M/s ', '', @$_POST['firm']);
+                $model->firmname = trim(str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm'])));
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
@@ -260,14 +260,14 @@ class ContractorController extends Controller {
         @$allcon = [];
         $offset = ($page - 1) * $resultCount;
 
-        $contractors = \common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->orWhere(['like', 'address', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->orderBy(['firmname' => SORT_ASC])->offset($offset)->limit($resultCount)->all();
+        $contractors = \common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->orderBy(['firmname' => SORT_ASC])->offset($offset)->limit($resultCount)->all();
 
         if ($contractors) {
             foreach ($contractors as $_contractor) {
                 @$allcon[] = ['id' => $_contractor->id, 'text' => $_contractor->firm . ' - ' . $_contractor->address];
             }
         }
-        $count = count(\common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->orWhere(['like', 'address', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->all());
+        $count = count(\common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->all());
         $endCount = $offset + $resultCount;
         $morePages = $count > $endCount;
 
@@ -296,12 +296,16 @@ class ContractorController extends Controller {
 
     public function actionUpdatetenders() {
         $tenders = \common\models\Tender::find()->all();
-        
         if ($tenders) {
             foreach ($tenders as $_tender) {
-                $tid = explode('_',$_tender->tender_id);
-                $_tender->tid = trim($tid['2']);
-                $_tender->save();
+                if ($_tender->aoc_date != '') {
+                    $tid = date('Y-m-d', strtotime($_tender->aoc_date));
+                    $_tender->aoc_date_format = $tid;
+                    $_tender->save();
+                }else{
+                    $_tender->aoc_date_format = '';
+                    $_tender->save();
+                }
             }
         }
     }
