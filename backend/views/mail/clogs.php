@@ -62,6 +62,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </thead>
                         <tbody id="contacts_list">
                             <?php
+                          
                             if (@$logs) {
                                 $i = 0;
                                 foreach ($logs as $key => $_log) {
@@ -81,12 +82,13 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $tids = array_unique($tids);
                                     $total = count($tids);
                                    
+                                    
                                     if ($tids) {
                                         $t = 1;
                                         foreach ($tids as $_tid) {
                                             $tdetail = \common\models\Tender::find()->where(['id' => $_tid])->one();
                                             if ($total == $t) {
-                                                $tenderids .= @$tdetail->tender_id;
+                                                $tenderids .= $tdetail->tender_id;
                                             } else {
                                                 $tenderids .= $tdetail->tender_id . ', ';
                                             }

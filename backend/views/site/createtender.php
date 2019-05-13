@@ -19,6 +19,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <script>
     function GetFileSizeTender() {
         var fi = document.getElementById('file'); // GET THE FILE INPUT.
+        var department = document.forms["myform"]["department"].value;
         var com = document.forms["myform"]["command"].value;
         var work = document.forms["myform"]["work"].value;
         var ref = document.forms["myform"]["refno"].value;
@@ -26,6 +27,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         var edate = document.forms["myform"]["enddate"].value;
         var odate = document.forms["myform"]["odate"].value;
         var cvalue = document.forms["myform"]["costvalue"].value;
+        if (department == "") {
+            swal("", "Please select Department", "warning");
+            return false;
+        }
         if (com == "") {
             swal("", "Please select Command", "warning");
             return false;
@@ -105,6 +110,24 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "post" onsubmit="return GetFileSizeTender()" action = "<?= $baseURL ?>site/create-tender">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <input type="hidden" value="<?= @$tender->id; ?>" name="id">
+                            <div class="row">
+                                <div class="input-fields col s12 row">
+                                    <label>Select Department</label>
+                                    <select class="validate required materialSelect" name="department" id="department">
+                                        <option value="">Select Department</option>
+                                        <?php
+                                        if (@$departments) {
+                                            foreach ($departments as $_department) {
+                                                ?>
+                                                <option value="<?= $_department->id ?>" <?= (@$tender->department == $_department->id) ? 'selected' : '' ?>><?= $_department->name; ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+
+                                    </select>
+                                </div>
+                            </div>
                             <div class="row">
                                 <div class="input-fields col s12 row">
                                     <label>Select Command</label>
@@ -302,7 +325,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <?php } ?>
                             <div class="row">
                                 <div class="input-fields col s12 row">
-                                     <label for="ddfavour">Select DD in favour of</label>
+                                    <label for="ddfavour">Select DD in favour of</label>
                                     <select class="ddfavour materialSelect browser-default" name="ddfavour" id="ddfavour">
                                         <?php SiteController::actionGengineers(@$tender->ddfavour); ?>
                                     </select>

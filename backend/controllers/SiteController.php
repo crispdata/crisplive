@@ -4207,6 +4207,7 @@ class SiteController extends Controller {
 
             if ($_POST['id']) {
                 $model = \common\models\Tender::find()->where(['id' => $_POST['id']])->one();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4265,6 +4266,7 @@ class SiteController extends Controller {
                 }
             } else {
                 $model = new \common\models\Tender();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4348,9 +4350,10 @@ class SiteController extends Controller {
             } else {
                 $tender = [];
             }
-
+            $departments = \common\models\Departments::find()->where(['status' => 1])->all();
             return $this->render('createtender', [
-                        'tender' => $tender
+                        'tender' => $tender,
+                        'departments' => $departments
             ]);
         }
     }
