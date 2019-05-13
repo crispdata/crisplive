@@ -298,14 +298,8 @@ class ContractorController extends Controller {
         $tenders = \common\models\Tender::find()->all();
         if ($tenders) {
             foreach ($tenders as $_tender) {
-                if ($_tender->aoc_date != '') {
-                    $tid = date('Y-m-d', strtotime($_tender->aoc_date));
-                    $_tender->aoc_date_format = $tid;
-                    $_tender->save();
-                }else{
-                    $_tender->aoc_date_format = '';
-                    $_tender->save();
-                }
+                $_tender->department = '1';
+                $_tender->save();
             }
         }
     }

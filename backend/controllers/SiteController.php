@@ -3779,7 +3779,7 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['id' => SORT_DESC]);
+        $tenders = \common\models\Tender::find()->where(['on_hold' => null, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['aoc_date_format' => SORT_ASC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -3826,7 +3826,7 @@ class SiteController extends Controller {
         $page = @$_REQUEST['page'];
         $filter = @$_GET['filter'];
 
-        $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['aoc_date' => SORT_ASC]);
+        $tenders = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' => 1, 'is_archived' => null])->orderBy(['aoc_date_format' => SORT_ASC]);
         $countQuery = clone $tenders;
         if ($val && $page) {
             $items_per_page = $val;
@@ -4207,6 +4207,7 @@ class SiteController extends Controller {
 
             if ($_POST['id']) {
                 $model = \common\models\Tender::find()->where(['id' => $_POST['id']])->one();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4265,6 +4266,7 @@ class SiteController extends Controller {
                 }
             } else {
                 $model = new \common\models\Tender();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4348,9 +4350,10 @@ class SiteController extends Controller {
             } else {
                 $tender = [];
             }
-
+            $departments = \common\models\Departments::find()->where(['status' => 1])->all();
             return $this->render('createtender', [
-                        'tender' => $tender
+                        'tender' => $tender,
+                        'departments' => $departments
             ]);
         }
     }
@@ -5474,6 +5477,7 @@ class SiteController extends Controller {
             $data .= '<option value="57">GE (I) CAMPBELL BAY - MES</option>';
             $data .= '<option value="58">GE (I) (P) Central-Port Blair - MES</option>';
             $data .= '<option value="59">GE (I) (P) NORTH PORT BLAIR- MES</option>';
+            $data .= '<option value="143">GE (P) NORTH PORT BLAIR- MES</option>';
         } elseif ($value == 20) {
             $data .= '<option value="60">CWE (AF) (NORTH) BANGALORE - MES</option>';
             $data .= '<option value="61">CWE (AF) SECUNDERABAD - MES</option>';
@@ -5584,6 +5588,7 @@ class SiteController extends Controller {
         } elseif ($value == 2) {
             $data .= '<option value="5">GE(AF)IZATNAGAR - MES</option>';
             $data .= '<option value="317">GE(P)(AF)BKT - MES</option>';
+            $data .= '<option value="377">GE AF Bareilly - MES</option>';
         } elseif ($value == 3) {
             $data .= '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
             $data .= '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
@@ -5755,6 +5760,7 @@ class SiteController extends Controller {
             $data .= '<option value="124">GE (AF) LEH - MES</option>';
             $data .= '<option value="329">GE (AF) THOISE - MES</option>';
             $data .= '<option value="125">GE(AF)SRINAGAR - MES</option>';
+            $data .= '<option value="378">GE(AF)Awantipur - MES</option>';
         } elseif ($value == 46) {
             $data .= '<option value="330">GE KARGIL - MES</option>';
             $data .= '<option value="331">GE KHUMBATHANG - MES</option>';
@@ -5817,6 +5823,7 @@ class SiteController extends Controller {
             $data .= '<option value="339">AGE(I) MANAURI - MES</option>';
             $data .= '<option value="156">GE (AF) MC Chandigarh - MES</option>';
             $data .= '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
+            $data .= '<option value="379">GE (P) AF Gurgaon - MES</option>';
         } elseif ($value == 68) {
             $data .= '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
         } elseif ($value == 70) {
@@ -5926,6 +5933,7 @@ class SiteController extends Controller {
         } elseif ($value == 98) {
             $data .= '<option value="232">GE (AF) CHILODA - MES</option>';
             $data .= '<option value="347">GE (AF) BARODA - MES</option>';
+            $data .= '<option value="380">GE (I) P AF CHILODA - MES</option>';
         } elseif ($value == 99) {
             $data .= '<option value="233">GE (AF) Phalodi - MES</option>';
         } elseif ($value == 100) {
@@ -7384,6 +7392,7 @@ class SiteController extends Controller {
         $data[] = '<option value="57">GE (I) CAMPBELL BAY - MES</option>';
         $data[] = '<option value="58">GE (I) (P) Central-Port Blair - MES</option>';
         $data[] = '<option value="59">GE (I) (P) NORTH PORT BLAIR- MES</option>';
+        $data[] = '<option value="143">GE (P) NORTH PORT BLAIR- MES</option>';
         $data[] = '<option value="60">CWE (AF) (NORTH) BANGALORE - MES</option>';
         $data[] = '<option value="61">CWE (AF) SECUNDERABAD - MES</option>';
         $data[] = '<option value="62">CWE (AF) (SOUTH) BANGALORE - MES</option>';
@@ -7867,6 +7876,7 @@ class SiteController extends Controller {
             $data[] = '<option value="57">GE (I) CAMPBELL BAY - MES</option>';
             $data[] = '<option value="58">GE (I) (P) Central-Port Blair - MES</option>';
             $data[] = '<option value="59">GE (I) (P) NORTH PORT BLAIR- MES</option>';
+            $data[] = '<option value="143">GE (P) NORTH PORT BLAIR- MES</option>';
         } elseif ($value == 20) {
             $data[] = '<option value="60">CWE (AF) (NORTH) BANGALORE - MES</option>';
             $data[] = '<option value="61">CWE (AF) SECUNDERABAD - MES</option>';
@@ -8069,6 +8079,7 @@ class SiteController extends Controller {
             $data[] = '<option value="57">GE (I) CAMPBELL BAY - MES</option>';
             $data[] = '<option value="58">GE (I) (P) Central-Port Blair - MES</option>';
             $data[] = '<option value="59">GE (I) (P) NORTH PORT BLAIR- MES</option>';
+            $data[] = '<option value="143">GE (P) NORTH PORT BLAIR- MES</option>';
         } elseif ($value == 20) {
             $data[] = '<option value="60">CWE (AF) (NORTH) BANGALORE - MES</option>';
             $data[] = '<option value="61">CWE (AF) SECUNDERABAD - MES</option>';
@@ -8194,6 +8205,7 @@ class SiteController extends Controller {
         } elseif ($value == 2) {
             $data[] = '<option value="5">GE(AF)IZATNAGAR - MES</option>';
             $data[] = '<option value="317">GE(P)(AF)BKT - MES</option>';
+            $data[] = '<option value="377">GE AF Bareilly - MES</option>';
         } elseif ($value == 3) {
             $data[] = '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
             $data[] = '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
@@ -8365,6 +8377,7 @@ class SiteController extends Controller {
             $data[] = '<option value="124">GE (AF) LEH - MES</option>';
             $data[] = '<option value="329">GE (AF) THOISE - MES</option>';
             $data[] = '<option value="125">GE(AF)SRINAGAR - MES</option>';
+            $data[] = '<option value="378">GE(AF)Awantipur - MES</option>';
         } elseif ($value == 46) {
             $data[] = '<option value="330">GE KARGIL - MES</option>';
             $data[] = '<option value="331">GE KHUMBATHANG - MES</option>';
@@ -8427,6 +8440,7 @@ class SiteController extends Controller {
             $data[] = '<option value="339">AGE(I) MANAURI - MES</option>';
             $data[] = '<option value="156">GE (AF) MC Chandigarh - MES</option>';
             $data[] = '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
+            $data[] = '<option value="379">GE (P) AF Gurgaon - MES</option>';
         } elseif ($value == 68) {
             $data[] = '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
         } elseif ($value == 70) {
@@ -8536,6 +8550,7 @@ class SiteController extends Controller {
         } elseif ($value == 98) {
             $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
             $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
+            $data[] = '<option value="380">GE (I) P AF CHILODA - MES</option>';
         } elseif ($value == 99) {
             $data[] = '<option value="233">GE (AF) Phalodi - MES</option>';
         } elseif ($value == 100) {
@@ -8707,6 +8722,7 @@ class SiteController extends Controller {
             } elseif ($value == 2) {
                 $data[] = '<option value="5">GE(AF)IZATNAGAR - MES</option>';
                 $data[] = '<option value="317">GE(P)(AF)BKT - MES</option>';
+                $data[] = '<option value="377">GE AF Bareilly - MES</option>';
             } elseif ($value == 3) {
                 $data[] = '<option value="6">GE (AF) TECH AREA KHERIA - MES</option>';
                 $data[] = '<option value="318">GE (AF) ADM AREA KHERIA - MES</option>';
@@ -8878,6 +8894,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="124">GE (AF) LEH - MES</option>';
                 $data[] = '<option value="329">GE (AF) THOISE - MES</option>';
                 $data[] = '<option value="125">GE(AF)SRINAGAR - MES</option>';
+                $data[] = '<option value="378">GE(AF)Awantipur - MES</option>';
             } elseif ($value == 46) {
                 $data[] = '<option value="330">GE KARGIL - MES</option>';
                 $data[] = '<option value="331">GE KHUMBATHANG - MES</option>';
@@ -8940,6 +8957,7 @@ class SiteController extends Controller {
                 $data[] = '<option value="339">AGE(I) MANAURI - MES</option>';
                 $data[] = '<option value="156">GE (AF) MC Chandigarh - MES</option>';
                 $data[] = '<option value="157">GE (AF) TUGHLAKABAD - MES</option>';
+                $data[] = '<option value="379">GE (P) AF Gurgaon - MES</option>';
             } elseif ($value == 68) {
                 $data[] = '<option value="158">GE (I) (AF) NAGPUR - MES</option>';
             } elseif ($value == 70) {
@@ -9049,6 +9067,7 @@ class SiteController extends Controller {
             } elseif ($value == 98) {
                 $data[] = '<option value="232">GE (AF) CHILODA - MES</option>';
                 $data[] = '<option value="347">GE (AF) BARODA - MES</option>';
+                $data[] = '<option value="380">GE (I) P AF CHILODA - MES</option>';
             } elseif ($value == 99) {
                 $data[] = '<option value="233">GE (AF) Phalodi - MES</option>';
             } elseif ($value == 100) {
