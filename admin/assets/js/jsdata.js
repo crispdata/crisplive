@@ -21,8 +21,12 @@ $(document).ready(function () {
         changeMonth: true,
         changeYear: true,
         onSelect: function (selectedDate) {
+            var fromdate = $(this).datepicker('getDate');
             var newDate = $(this).datepicker('getDate');
-            $('#todatesearch').datepicker('option', 'minDate', newDate);
+            newDate.setDate(newDate.getDate()+30); 
+            //$('#todatesearch').datepicker('setDate', newDate);
+            $('#todatesearch').datepicker('option', 'minDate', fromdate);
+            $('#todatesearch').datepicker('option', 'maxDate', newDate);
         }
     });
 

@@ -165,14 +165,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Keyword</b></h5></div>
                                 <div class="input-field col s12">
-                                    <input id="keyword" type="text" name = "keyword" class="validate required" value="<?= @$_GET['keyword']; ?>">
+                                    <input id="keyword" type="text" name = "keyword" class="validate required" required="" value="<?= @$_GET['keyword']; ?>">
                                     <label for="keyword">Search Keyword</label>
                                 </div>
                             </div>
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Dates</b></h5></div>
                                 <div class="input-field col s6">
-                                    <input id="fromdatesearch" type="text" name = "fromdate"  placeholder='From Date' autocomplete="off" value="<?php
+                                    <input id="fromdatesearch" type="text" name = "fromdate"  placeholder='From Date' required="" autocomplete="off" value="<?php
                                     if (@$_GET['fromdate']) {
                                         echo @$_GET['fromdate'];
                                     }
@@ -180,7 +180,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
 
                                 <div class="input-field col s6">
-                                    <input id="todatesearch" type="text" name = "todate" autocomplete="off" placeholder="To Date" value="<?php
+                                    <input id="todatesearch" type="text" name = "todate" autocomplete="off" required="" placeholder="To Date" value="<?php
                                     if (@$_GET['todate']) {
                                         echo @$_GET['todate'];
                                     }
