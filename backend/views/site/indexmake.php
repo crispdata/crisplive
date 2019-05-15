@@ -1230,6 +1230,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
 
                     </div>
+                     <?php if ($user->id != 257) { ?>
                     <div class="row no-m-t no-m-b"  id = "cable-size" <?= ($type == 1) ? '' : 'style=display:none' ?>>
                         <div class="col s12 m12 l12">
                             <div class="card invoices-card products">
@@ -1355,6 +1356,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                         </div>
                     </div>
+                     <?php }?>
                 </div>
 
             </main>

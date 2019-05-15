@@ -78,7 +78,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 </script>
 <main class="mn-inner">
     <div class="row">
-        <div class="col s12">
+        <div class="col s6">
             <div class="page-title"><?= $this->title ?></div>
         </div>
 
@@ -100,8 +100,24 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             </div>
         <?php endif; ?>
 
+        <a href="#department" class="waves-effect waves-light btn blue m-b-xs modal-trigger add-contact">Add Department</a>
+        <div id="department" class="modal">
+            <div class="modal-content">
+                <h4>Add new department</h4>
+                <form id="sort-data" method = "post" action = "<?= $baseURL ?>site/adddepartment">
+                    <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+                    <div class="row">
+                        <div class="input-field col s12">
+                            <input id="department" type="text" name = "department" required="" class="validate required" value="">
+                            <label for="department">Department Name</label>
+                        </div>
+                    </div>
+                    <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">
+                </form>
 
+            </div>
 
+        </div>
         <div class="col s12 m12 l12">
             <div class="card">
                 <div class="card-content">
