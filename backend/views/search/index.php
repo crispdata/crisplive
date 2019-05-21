@@ -350,75 +350,75 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
                                         <option value="0">ALL COMMANDS</option>
                                         <option value="1" <?php
-                            if (@$_GET['command'] == 1) {
-                                echo "selected";
-                            }
-                            ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
+                                        if (@$_GET['command'] == 1) {
+                                            echo "selected";
+                                        }
+                                        ?>>ADG (CG AND PROJECT) CHENNAI AND CE (CG) GOA - MES</option>
                                         <option value="2" <?php
                                         if (@$_GET['command'] == 2) {
                                             echo "selected";
                                         }
-                            ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
+                                        ?>>ADG (DESIGN and CONSULTANCY) PUNE - MES</option>
                                         <option value="3" <?php
                                         if (@$_GET['command'] == 3) {
                                             echo "selected";
                                         }
-                            ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
+                                        ?>>ADG (OF and DRDO) AND CE (FY) HYDERABAD - MES</option>
                                         <option value="4" <?php
                                         if (@$_GET['command'] == 4) {
                                             echo "selected";
                                         }
-                            ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
+                                        ?>>ADG (OF and DRDO)  AND CE (R and D) DELHI-  MES</option>
                                         <option value="5" <?php
                                         if (@$_GET['command'] == 5) {
                                             echo "selected";
                                         }
-                            ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
+                                        ?>>ADG (OF and DRDO) AND CE (R and D) SECUNDERABAD - MES</option>
                                         <option value="13" <?php
                                         if (@$_GET['command'] == 13) {
                                             echo "selected";
                                         }
-                            ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
+                                        ?>>ADG (Projects) AND CE (CG) Visakhapatnam - MES</option>
                                         <option value="14" <?php
                                         if (@$_GET['command'] == 14) {
                                             echo "selected";
                                         }
-                            ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
+                                        ?>>ADG (Project) Chennai AND CE (FY) Hyderabad - MES</option>
                                         <option value="6" <?php
                                         if (@$_GET['command'] == 6) {
                                             echo "selected";
                                         }
-                            ?>>CENTRAL COMMAND</option>
+                                        ?>>CENTRAL COMMAND</option>
                                         <option value="7" <?php
                                         if (@$_GET['command'] == 7) {
                                             echo "selected";
                                         }
-                            ?>>EASTERN COMMAND</option>
+                                        ?>>EASTERN COMMAND</option>
                                         <option value="8" <?php
                                         if (@$_GET['command'] == 8) {
                                             echo "selected";
                                         }
-                            ?>>NORTHERN COMMAND</option>
+                                        ?>>NORTHERN COMMAND</option>
                                         <option value="9" <?php
                                         if (@$_GET['command'] == 9) {
                                             echo "selected";
                                         }
-                            ?>>SOUTHERN COMMAND</option>
+                                        ?>>SOUTHERN COMMAND</option>
                                         <option value="10" <?php
                                         if (@$_GET['command'] == 10) {
                                             echo "selected";
                                         }
-                            ?>>SOUTH WESTERN COMMAND</option>
+                                        ?>>SOUTH WESTERN COMMAND</option>
                                         <option value="11" <?php
                                         if (@$_GET['command'] == 11) {
                                             echo "selected";
                                         }
-                            ?>>WESTERN COMMAND</option>
+                                        ?>>WESTERN COMMAND</option>
                                         <option value="12" <?php
                                         if (@$_GET['command'] == 12) {
                                             echo "selected";
                                         }
-                            ?>>DGNP MUMBAI - MES</option>
+                                        ?>>DGNP MUMBAI - MES</option>
                                         <!--option value="2">B/R</option-->
                                     </select>
                                 </div>
@@ -737,6 +737,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                     <?php } ?>
                                                     <?php if ($tender->is_archived != 1 && $contractor && ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6)) { ?>
                                                         <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
+                                                    <?php } ?>
+                                                    <?php if ($user->group_id != 3 && $user->group_id != 6 && $tender->is_archived != 1) { ?>    
+                                                        <a onclick="movearchive(<?= $tender->id; ?>)" id="tenderarc<?= $tender->id; ?>" class="waves-effect waves-light btn blue proj-delete">Archive</a>    
                                                     <?php } ?>
 
                                                 </td>
