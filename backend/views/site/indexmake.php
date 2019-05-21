@@ -1068,7 +1068,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 0) {
-                                                if (@$_POST['type'] == 1) {
+                                                if ($user->authtype == 1) {
                                                     $value = 'Value in Rs.';
                                                 } else {
                                                     $value = 'Approx avg value in Rs.';
@@ -1103,7 +1103,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 1) {
-                                                if (@$_POST['type'] == 1) {
+                                                if ($user->authtype == 1) {
                                                     $value = 'Value in Rs.';
                                                 } else {
                                                     $value = 'Approx avg value in Rs.';
@@ -1134,7 +1134,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($details as $key => $_log) {
                                             if ($key == 2) {
-                                                if (@$_POST['type'] == 1) {
+                                                if ($user->authtype == 1) {
                                                     $value = 'Value in Rs.';
                                                 } else {
                                                     $value = 'Approx avg value in Rs.';
