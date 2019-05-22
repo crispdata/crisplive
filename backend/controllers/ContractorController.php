@@ -195,7 +195,7 @@ class ContractorController extends Controller {
             if ($_POST['id']) {
                 $model = \common\models\Contractor::find()->where(['id' => $_POST['id']])->one();
                 $model->firm = @$_POST['firm'];
-                $model->firmname = trim(str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm'])));
+                $model->firmname = trim(str_replace('m/s ', '', str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm']))));
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
@@ -208,7 +208,7 @@ class ContractorController extends Controller {
             } else {
                 $model = new \common\models\Contractor();
                 $model->firm = @$_POST['firm'];
-                $model->firmname = trim(str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm'])));
+                $model->firmname = trim(str_replace('m/s ', '', str_replace('M/S ', '', str_replace('M/s ', '', @$_POST['firm']))));
                 $model->name = @$_POST['name'];
                 $model->address = @$_POST['address'];
                 $model->contact = @$_POST['contact'];
