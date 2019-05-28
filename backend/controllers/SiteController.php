@@ -51,7 +51,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus','adddepartment', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'adddepartment', 'states', 'change-department-status', 'delete-department', 'departments', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4214,6 +4214,7 @@ class SiteController extends Controller {
                 $model->gengineer = @$_POST['gengineer'];
                 $model->work = $_POST['work'];
                 $model->ddfavour = $_POST['ddfavour'];
+                $model->state = @$_POST['state'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
                 $tid = explode('_', $model->tender_id);
@@ -4273,6 +4274,7 @@ class SiteController extends Controller {
                 $model->gengineer = @$_POST['gengineer'];
                 $model->work = $_POST['work'];
                 $model->ddfavour = $_POST['ddfavour'];
+                $model->state = @$_POST['state'];
                 $model->reference_no = $_POST['refno'];
                 $model->tender_id = $_POST['tid'];
                 $tid = explode('_', $model->tender_id);
@@ -10256,6 +10258,23 @@ class SiteController extends Controller {
         echo $data;
     }
 
+    public function actionStates($state) {
+        $data = '<option value="">Select State</option>';
+        $states = \common\models\States::find()->where(['country_id' => 101])->all();
+
+        if (isset($states)) {
+            foreach ($states as $_state) {
+                $select = '';
+                if ($state == $_state->id) {
+                    $select = 'selected';
+                }
+                $data .= '<option value="' . $_state->id . '" ' . $select . '>' . $_state->name . '</option>';
+            }
+        }
+
+        echo $data;
+    }
+
     public function actionInsertdd() {
         $user = Yii::$app->user->identity;
         $gengineers = \common\models\Gengineer::find()->where(['status' => 1])->all();
@@ -10420,18 +10439,59 @@ class SiteController extends Controller {
         }
         die();
     }
-    
-    public function actionAdddepartment(){
+
+    public function actionAdddepartment() {
+
+        if (isset($_POST['did']) && $_POST['did'] != '') {
+            $department = \common\models\Departments::find()->where(['id' => $_POST['did']])->one();
+            $department->name = @$_POST['department'];
+            $department->createdon = date('Y-m-d h:i:s');
+            $department->save();
+
+            Yii::$app->session->setFlash('success', "Department successfully updated");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            $user = Yii::$app->user->identity;
+            $model = new \common\models\Departments();
+            $model->name = @$_POST['department'];
+            $model->user_id = $user->id;
+            $model->createdon = date('Y-m-d h:i:s');
+            $model->status = 1;
+            $model->save();
+
+            Yii::$app->session->setFlash('success', "Department successfully added");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+    }
+
+    public function actionDepartments() {
         $user = Yii::$app->user->identity;
-        $model = new \common\models\Departments();
-        $model->name = @$_POST['department'];
-        $model->user_id = $user->id;
-        $model->createdon = date('Y-m-d h:i:s');
-        $model->status = 1;
-        $model->save();
-        
-        Yii::$app->session->setFlash('success', "Department successfully added");
+        $departments = \common\models\Departments::find()->all();
+        return $this->render('departments', [
+                    'departments' => $departments
+        ]);
+    }
+
+    public function actionChangeDepartmentStatus() {
+        $id = @$_GET['id'];
+        $depart = \common\models\Departments::find()->where(['id' => $id])->one();
+        if ($depart->status == 1) {
+            $depart->status = 0;
+        } else {
+            $depart->status = 1;
+        }
+        $depart->save();
+        Yii::$app->session->setFlash('success', "Status successfully changed");
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+    
+    public function actionDeleteDepartment() {
+        $id = $_GET['id'];
+        $depart = \common\models\Departments::deleteAll(['id' => $id]);
+        if ($depart) {
+            Yii::$app->session->setFlash('success', "Department successfully deleted");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
     }
 
 }

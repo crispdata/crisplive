@@ -226,15 +226,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     $i = 0;
                                     foreach ($tenders as $key => $tender) {
                                         $tdetails = '';
-                                        $command = Sitecontroller::actionGetcommand($tender->command);
-                                        if (!isset($tender->cengineer) && isset($tender->gengineer)) {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                        if ($tender->department == 1) {
+                                            $command = Sitecontroller::actionGetcommand($tender->command);
+                                            if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                            } else {
+                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                            }
+                                            $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
+                                            $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
+                                            $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                         } else {
-                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                            $dname = \common\models\Departments::find()->where(['id' => $tender->department])->one();
+                                            $tdetails = $dname->name;
                                         }
-                                        $cwengineer = \common\models\Cwengineer::find()->where(['cid' => $tender->cwengineer, 'status' => 1])->one();
-                                        $gengineer = \common\models\Gengineer::find()->where(['gid' => $tender->gengineer, 'status' => 1])->one();
-                                        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                         if ($tender->status == 1) {
                                             $status = 'Approved';
                                             $class = 'green';
@@ -277,23 +282,23 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </tr>
 
                                     <div id="modalfiles<?= $tender->id; ?>" class="modal">
-            <?php ?>
+                                        <?php ?>
                                         <div class="modal-content">
                                             <h4>View Tender Files</h4>
 
                                             <div class="row">
-                                                    <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
+                                                <?php $tech = \common\models\Tender::find()->where(['id' => $tender->id])->one(); ?>
                                                 <div class="input-field col s6">
                                                     <?php if ($tech->tfile != '') { ?>
                                                         <a href="<?= $tender->tfile; ?>" download>Tender Files</a>
                                                     <?php } else { ?>
                                                         <a class="notavailable">No Tender files yet</a>
-            <?php } ?>
+                                                    <?php } ?>
                                                 </div>
                                             </div>
 
                                             <h4>View BOQ Sheet</h4>
-                                                <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
+                                            <?php $finfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 2])->orderBy(['id' => SORT_DESC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$finfiles) {
@@ -322,7 +327,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                             </div>
                                             <h4>View AOC Files</h4>
-                                                <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
+                                            <?php $aocfiles = \common\models\Tenderfile::find()->where(['tender_id' => $tender->id, 'type' => 3])->orderBy(['id' => SORT_ASC])->all(); ?>
                                             <div class="row">
                                                 <?php
                                                 if (@$aocfiles) {
@@ -383,7 +388,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     </div>
                 </div>
             </div>
-<?php } ?>
+        <?php } ?>
     </div>
 </main>
 <script>

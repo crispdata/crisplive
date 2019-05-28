@@ -93,16 +93,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 $i = 0;
                                 foreach ($tenders as $key => $tender) {
                                     $tdetails = '';
-                                    $command = Sitecontroller::actionGetcommand($tender->command);
-                                    $ddoffice = \common\models\Ddengineers::find()->where(['id' => $tender->ddfavour])->one();
-                                    if (!isset($tender->cengineer) && isset($tender->gengineer)) {
-                                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                    if ($tender->department == 1) {
+                                        $command = Sitecontroller::actionGetcommand($tender->command);
+                                        if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                        } else {
+                                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                        }
+                                        $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
+                                        $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
+                                        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                     } else {
-                                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                        $dname = \common\models\Departments::find()->where(['id' => $tender->department])->one();
+                                        $tdetails = $dname->name;
                                     }
-                                    $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
-                                    $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
-                                    $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                     if ($tender->status == 1 && $tender->is_archived == 1) {
                                         $status = 'Archived';
                                         $class = 'orange';

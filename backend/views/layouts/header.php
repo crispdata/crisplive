@@ -171,7 +171,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
         float: left;
         width:4%;
     }
-    
+
 </style>
 <script>
     function GetFileSize() {
@@ -287,9 +287,9 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                     </div>
                     <a href="javascript: void(0)" class="close-search"><i class="material-icons">close</i></a>
                 </form>
-                <?php if($user->group_id == 6){?>
+                <?php if ($user->group_id == 6) { ?>
                     <a href="/site/lasttenders" class="btn green asearch">Contracts awarded last week</a>
-                <?php }?>
+                <?php } ?>
                 <?php if ($user->group_id != 4 && $user->group_id != 5 && $user->group_id != 6) { ?>
                     <a href="/search/index" class="btn green asearch">Advanced Search</a>
                 <?php }
@@ -551,6 +551,12 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                             </ul>
                         </div>
                     </li>
+                    <li class="no-padding <?= ($controller == 'site' && $action == 'departments') ? 'active' : '' ?>">
+                        <a class="waves-effect waves-grey" href="/site/departments">
+                            <i class="material-icons">home</i>
+                            Departments
+                        </a>
+                    </li>
                     <?php if ($user->group_id != 3) { ?>
 
                         <li class="no-padding <?= ($controller == 'site' && $action == 'clients') ? 'active' : '' ?>">
@@ -602,7 +608,7 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                                 Users
                             </a>
                         </li>
-                       
+
 
                     <?php } ?>
                     <li class="no-padding <?= ($controller == 'search' && $action == 'items') ? 'active' : '' ?>">
