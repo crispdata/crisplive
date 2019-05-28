@@ -130,15 +130,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             $i = 0;
                                             foreach ($tenders as $key => $tender) {
                                                 $tdetails = '';
-                                                $command = Sitecontroller::actionGetcommand($tender->command);
-                                                if (!isset($tender->cengineer) && isset($tender->gengineer)) {
-                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                                if ($tender->department == 1) {
+                                                    $command = Sitecontroller::actionGetcommand($tender->command);
+                                                    if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                                    } else {
+                                                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                    }
+                                                    $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
+                                                    $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
+                                                    $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                                 } else {
-                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                    $dname = \common\models\Departments::find()->where(['id' => $tender->department])->one();
+                                                    $tdetails = $dname->name;
                                                 }
-                                                $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
-                                                $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
-                                                $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                                 if ($tender->status == 1) {
                                                     $status = 'Approved';
                                                     $class = 'green';
@@ -231,7 +236,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         <a href="#modalfiles<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">View Files</a>
                                                         <a href="#modalcont<?= $tender->id; ?>" class="waves-effect waves-light btn blue modal-trigger proj-delete">Contractor</a>
                                                         <a href="<?= Url::to(['mail/create-excel-items', 'id' => $tender->id]) ?>" class="waves-effect waves-light btn m-b-xs">Download Items in Excel</a>
-                                                            <?php if ($tender->is_archived != 1) { ?>
+                                                        <?php if ($tender->is_archived != 1) { ?>
                                                             <a onclick="changehold(<?= $tender->id; ?>)" id="tenderhold<?= $tender->id; ?>"  class="waves-effect waves-light btn <?= $classaoc; ?>"><?= $text ?></a>
                                                         <?php } ?>
                                                         <?php if ($user->group_id != 3) { ?>    

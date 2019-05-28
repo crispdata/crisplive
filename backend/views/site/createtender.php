@@ -15,6 +15,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         border-color: unset;
     }
     .row{margin-bottom: 0px;}
+    .row.states {
+        margin-top: 20px;
+    }
 </style>
 <script>
     function GetFileSizeTender() {
@@ -29,10 +32,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         var cvalue = document.forms["myform"]["costvalue"].value;
         if (department == "") {
             swal("", "Please select Department", "warning");
-            return false;
-        }
-        if (com == "") {
-            swal("", "Please select Command", "warning");
             return false;
         }
         if (work == "") {
@@ -344,6 +343,15 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <label for="ddfavour">Select DD in favour of</label>
                                     <select class="ddfavour materialSelect browser-default" name="ddfavour" id="ddfavour">
                                         <?php SiteController::actionGengineers(@$tender->ddfavour); ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row states">
+                                <div class="input-fields col s12 row">
+                                    <label for="state">Select State</label>
+                                    <select class="ddfavour materialSelect browser-default" name="state" id="state">
+                                        <?php SiteController::actionStates(@$tender->state); ?>
                                     </select>
                                 </div>
                             </div>
