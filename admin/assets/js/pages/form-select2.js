@@ -24,6 +24,30 @@ $(document).ready(function () {
         }
     });
 
+    $('select.materialSelectdepart').select2({
+        closeOnSelect: true,
+        placeholder: 'Select Department',
+        allowClear: true,
+        ajax: {
+            headers: {
+                "Authorization": "Bearer " + csrf_token,
+                "Content-Type": "application/json",
+            },
+            type: 'get',
+            url: baseUrl + 'contractor/getdepartments',
+            dataType: 'json',
+            data: function (params) {
+                $("#conextrad").remove();
+                $("#showcontd").remove();
+                return {
+                    term: params.term || '',
+                    page: params.page || 1
+                }
+            },
+            cache: true,
+        }
+    });
+
     $('select.materialSelectcon').select2({
         closeOnSelect: true,
         placeholder: 'All Contractors',

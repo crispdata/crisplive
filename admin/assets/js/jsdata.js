@@ -23,7 +23,7 @@ $(document).ready(function () {
         onSelect: function (selectedDate) {
             var fromdate = $(this).datepicker('getDate');
             var newDate = $(this).datepicker('getDate');
-            newDate.setDate(newDate.getDate()+30); 
+            newDate.setDate(newDate.getDate() + 30);
             //$('#todatesearch').datepicker('setDate', newDate);
             $('#todatesearch').datepicker('option', 'minDate', fromdate);
             $('#todatesearch').datepicker('option', 'maxDate', newDate);
@@ -1690,6 +1690,14 @@ function getsubtypes(value) {
     }
 }
 
+function getsubsubtypes(value) {
+    if (value == 3) {
+        $("#third").hide();
+    } else {
+        $("#third").show();
+    }
+}
+
 function getsubpricetypes(value) {
     if (value == 1) {
         $("#second").show();
@@ -1805,7 +1813,7 @@ function getpricewithparams(id, ptype, type, make, key) {
     $.ajax({
         type: 'post',
         url: baseUrl + 'search/getpricewithparams',
-        data: {'type': type, ptype: ptype, command: command, fromdate: fromdate, todate: todate, make: make,key:key, quantity: quantity, '_csrf-backend': csrf_token},
+        data: {'type': type, ptype: ptype, command: command, fromdate: fromdate, todate: todate, make: make, key: key, quantity: quantity, '_csrf-backend': csrf_token},
         beforeSend: function () {
             if (ptype == 4) {
                 $("#value").html('<img src="/assets/images/loading.gif" alt="">');
@@ -2035,7 +2043,14 @@ function addrow(num) {
     var rand = Math.floor((Math.random() * 100) + 1);
     var id = rand + time;
     //var rowitems = "<div class='row added iteminfo' id='inforows" + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + "' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s2' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>Core 1</option><option value='2'>Core 2</option><option value='3'>Core 3</option><option value='4'>Core 3.5</option><option value='5'>Core 4</option></select></div><div class='input-field col s2' id='typefit" + id + "'><select class='validate required materialSelecttypefit' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' required='' class='validate required' value='RM'><label for='itemunit" + id + "'>Units</label><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='text' name = 'quantity[]' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s3'><select class='validate required materialSelect" + id + " browser-default' required='' name='makes[]' multiple id='makes" + newnum + "'></select></div><div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + ")'>Delete</a></div></div>";
-    var rowitems = "<div class='row added iteminfo' id='inforows" + newnum + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' style='pointer-events:none;' required='' class='validate required' value='RM'><!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
+    if (selected == 1 || selected == 5) {
+        var label = "<label for='itemunit" + id + "'>Unit</label>";
+    } else {
+        var label = '';
+    }
+
+    var rowitems = "<div class='row added iteminfo' id='inforows" + newnum + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' onkeypress='return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)' required='' class='validate required' value=''>" + label + "<!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
+
     var row = "<div id=info" + id + "><div class='col s12'><div class='input-fields col s2 row'><label>Select type of work</label><select class='validate required materialSelect' name='tenderone[]' id='tenderone" + id + "' onchange='getdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option><option value='1'>E/M</option></select></div><div id='second" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendertwo[]' id='tendertwo" + id + "' onchange='getseconddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='third" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderthree[]' id='tenderthree" + id + "' onchange='getthirddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fourth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfour[]' id='tenderfour" + id + "' onchange='getfourdatasub(this.value," + id + "," + newnum + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fifth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfive[]' id='tenderfive" + id + "' onchange='getfivedatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='sixth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendersix[]' id='tendersix" + id + "' onchange='getsixdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div></div>" + rowitems + '</div>';
     $("#itemdata").append(rowitems);
     $("#itemtender" + id + "").focus();
@@ -2056,7 +2071,7 @@ function addrow(num) {
         $("#sizesdiv" + id + "").show();
         $("#sizes" + newnum + "").attr('required');
         $("#sizes" + newnum + "").addClass('required');
-        $("#itemunit" + id + "").val('RM');
+        $("#itemunit" + id + "").val('');
         $("#corediv" + id + "").show();
         $("#core" + newnum + "").attr('required');
         $("#core" + newnum + "").addClass('required');
@@ -2121,7 +2136,7 @@ function addrow(num) {
         $("#sizesdiv" + id + "").show();
         $("#sizes" + newnum + "").attr('required');
         $("#sizes" + newnum + "").addClass('required');
-        $("#itemunit" + id + "").val('RM');
+        $("#itemunit" + id + "").val('');
     }
 
     /*if (selected == 1) {
@@ -2864,6 +2879,10 @@ function getfourdata(value) {
     $("#itemdata .added").remove();
     //$("#itemdata").remove();
     if (value == 1) {
+        var label = document.createElement("label");
+        label.id = "itemunit";
+        label.innerHTML = "Unit";
+        $("#unit").append(label);
         $("#typefit").hide();
         $("#type0").removeAttr('required');
         $("#type0").removeClass('required');
@@ -2879,7 +2898,7 @@ function getfourdata(value) {
         $("#sizesdiv").show();
         $("#sizes0").attr('required');
         $("#sizes0").addClass('required');
-        $("#itemunit").val('RM');
+        $("#itemunit").val('');
         $("#corediv").show();
         $("#core0").attr('required');
         $("#core0").addClass('required');
@@ -2907,6 +2926,7 @@ function getfourdata(value) {
         $("#text0").attr('required');
         $("#text0").addClass('required');
         $("#itemunit").val('NOS');
+        $("#unit label").remove();
         $("#itemdata").show();
         $("#makes").show();
         $("#itembutton").show();
@@ -2931,10 +2951,15 @@ function getfourdata(value) {
         $("#accone0").attr('required');
         $("#accone0").addClass('required');
         $("#itemunit").val('NOS');
+        $("#unit label").remove();
         $("#itemdata").show();
         $("#makes").show();
         $("#itembutton").show();
     } else {
+        var label = document.createElement("label");
+        label.id = "itemunit";
+        label.innerHTML = "Unit";
+        $("#unit").append(label);
         $("#corediv").hide();
         $("#core0").removeAttr('required');
         $("#core0").removeClass('required');
@@ -2953,7 +2978,7 @@ function getfourdata(value) {
         $("#sizesdiv").show();
         $("#sizes0").attr('required');
         $("#sizes0").addClass('required');
-        $("#itemunit").val('RM');
+        $("#itemunit").val('');
         $("#itemdata").show();
         $("#makes").show();
         $("#itembutton").show();
@@ -3084,6 +3109,7 @@ function getfourdata(value) {
             if ($("#makes0").data('select2')) {
                 $("#makes0").select2("val", "");
             }
+            $('.select2-container').show();
             // setup listener for custom event to re-initialize on change
             $('.materialSelect').on('contentChanged', function () {
                 $(this).select2({closeOnSelect: true, placeholder: 'Select Makes'});
@@ -3222,11 +3248,14 @@ function getfivedata(value) {
     //$("#itemdata").show();
     //$("#itembutton").show();
     $("#sixth").show();
+    var parent = $('#tenderfour').val();
+    var one = $('#tenderfive').val();
+    var selects = '';
     $.ajax({
         type: 'post',
         url: baseUrl + 'site/getfivedata',
         dataType: "json",
-        data: {'value': value, '_csrf-backend': csrf_token},
+        data: {'value': value, 'parent': parent, 'one': one, '_csrf-backend': csrf_token},
         success: function (resultData) {
             if (resultData.item == '0') {
                 $("#tendersix").html(resultData.data);
@@ -3243,6 +3272,20 @@ function getfivedata(value) {
                 $("#makes").show();
                 $("#itembutton").show();
             }
+            $('.materialSelectsize').on('contentChanged', function () {
+                $(this).select2({closeOnSelect: true, placeholder: 'Select Sizes'});
+            });
+
+            $.each(resultData.sizes, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Sizes</option>';
+                }
+            }
+            );
+            $("#sizes0").html(selects);
+            $("#sizes0").trigger('contentChanged');
         }
     });
 }
@@ -3251,11 +3294,14 @@ function getfivedatasub(value, id) {
     //$("#itemdata").show();
     //$("#itembutton").show();
     $("#sixth" + id + "").show();
+    var parent = $('#tenderfour').val();
+    var one = $('#tenderfive').val();
+    var selects = '';
     $.ajax({
         type: 'post',
         url: baseUrl + 'site/getfivedata',
         dataType: "json",
-        data: {'value': value, '_csrf-backend': csrf_token},
+        data: {'value': value, 'parent': parent, 'one': one, '_csrf-backend': csrf_token},
         success: function (resultData) {
             if (resultData.item == '0') {
                 $("#tendersix" + id + "").html(resultData.data);
@@ -3269,6 +3315,20 @@ function getfivedatasub(value, id) {
                 $("#itemdata" + id + "").show();
                 $("#itembutton" + id + "").show();
             }
+            $('.materialSelectsize').on('contentChanged', function () {
+                $(this).select2({closeOnSelect: true, placeholder: 'Select Sizes'});
+            });
+
+            $.each(resultData.sizes, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Sizes</option>';
+                }
+            }
+            );
+            $("#sizes0").html(selects);
+            $("#sizes0").trigger('contentChanged');
         }
     });
 }

@@ -415,10 +415,11 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                 <input id="acctwo0" type="text" name = "accessorytwo[]" required="" class="validate required" value="">
                                                 <label for="acctwo0">Model</label>
                                             </div>
-                                            <div class="input-field col s1">
-                                                <input id="itemunit" type="text" name = "units[]" required="" style="pointer-events: none;" class="validate required" value="RM">
+                                            <div class="input-field col s1" id="unit">
+                                                <input id="itemunit" type="text" name = "units[]" required="" onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)" class="validate required" value="">
                                                 <!--textarea id="item" name="desc" class="materialize-textarea"></textarea>
                                                 <label for="item">Item description</label-->
+                                                <label for="itemunit">Unit</label>
                                             </div>
                                             <div class="input-field col s1">
                                                 <input id="quantity" type="number" name = "quantity[]" min="1" step="1" onkeypress='return event.charCode >= 48 && event.charCode <= 57' required="" class="validate required" value="">

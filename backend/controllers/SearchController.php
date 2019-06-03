@@ -170,7 +170,7 @@ class SearchController extends Controller {
                     }
                     $tenders = \common\models\Tender::find()->leftJoin('items', 'tenders.id = items.tender_id')->leftJoin('itemdetails', 'items.id = itemdetails.item_id')->where(['tenders.status' => 1, 'items.tenderfour' => $type])->andWhere('find_in_set(:key2, itemdetails.make)', [':key2' => $make]);
                 } else {
-                    $tenders = \common\models\Tender::find()->where(['status' => '1']);
+                    $tenders = \common\models\Tender::find()->where(['status' => '1'])->orWhere(['status' => 0]);
                 }
             }
 
@@ -201,6 +201,11 @@ class SearchController extends Controller {
             if (isset($_REQUEST['contype']) && $_REQUEST['contype'] != '') {
                 $tenders->andWhere(['and',
                     ['contractor' => $_REQUEST['contype']]
+                ]);
+            }
+            if (isset($_REQUEST['department']) && $_REQUEST['department'] != '') {
+                $tenders->andWhere(['and',
+                    ['department' => $_REQUEST['department']]
                 ]);
             }
             if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0) {
