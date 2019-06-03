@@ -115,6 +115,7 @@ class SiteController extends Controller {
         $ddeals = [];
         $emmakes = [];
         $civilmakes = [];
+        $departments = [];
         $dunapprovedtenders = [];
         $daoctenders = [];
 
@@ -132,6 +133,7 @@ class SiteController extends Controller {
             $ddeals = \common\models\Clients::find()->where(['status' => 1, 'type' => 3])->orderBy(['id' => SORT_DESC])->count();
             $emmakes = \common\models\Make::find()->where(['status' => 1, 'mtype' => [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13]])->orderBy(['id' => SORT_DESC])->count();
             $civilmakes = \common\models\Make::find()->where(['status' => 1, 'mtype' => [14, 15, 16, 17]])->orderBy(['id' => SORT_DESC])->count();
+            $departments = \common\models\Departments::find()->where(['status' => 1])->orderBy(['id' => SORT_DESC])->count();
         }
 
         if ($user->group_id == 4 || $user->group_id == 5) {
@@ -452,6 +454,7 @@ class SiteController extends Controller {
                         'ddeals' => $ddeals,
                         'emmakes' => $emmakes,
                         'civilmakes' => $civilmakes,
+                        'departments' => $departments,
                         'graphsce' => ''
             ]);
         } else {
@@ -6185,6 +6188,7 @@ class SiteController extends Controller {
         if (($value == 1) || ($value == 12)) {
             $data .= '<option value="1">Copper</option>';
             $data .= '<option value="2">Aluminium</option>';
+            $data .= '<option value="3">ABC Cable</option>';
         } elseif ($value == 3) {
             $data .= '<option value="6">Ceiling fans</option>';
             $data .= '<option value="7">Wall fans</option>';
@@ -6279,6 +6283,8 @@ class SiteController extends Controller {
 
     public function actionGetfivedata() {
         $value = $_REQUEST['value'];
+        $parent = $_REQUEST['parent'];
+        $one = $_REQUEST['one'];
         $item = 0;
         $data = '<option value="0" selected>Select</option>';
         if (($value == 1) || ($value == 2)) {
@@ -6287,7 +6293,20 @@ class SiteController extends Controller {
         } else {
             $item = 1;
         }
-        echo json_encode(['data' => $data, 'item' => $item]);
+
+        $allsizes = [];
+        $sizes = [];
+        $sizes = \common\models\Size::find()->where(['mtypeone' => $parent, 'mtypetwo' => $one, 'status' => 1])->orderBy(['size' => SORT_ASC])->all();
+
+        if ($sizes) {
+            foreach ($sizes as $_size) {
+                $allsizes[$_size->id] = $_size->size;
+            }
+        } else {
+            $allsizes['0'] = 'No Sizes';
+        }
+
+        echo json_encode(['data' => $data, 'item' => $item, 'sizes' => $allsizes]);
         die;
     }
 
@@ -6441,7 +6460,7 @@ class SiteController extends Controller {
 
         if (isset($_POST)) {
             if (isset($_POST['mtypesortone']) && $_POST['mtypesortone'] != '' && $_POST['mtypesortone'] == 1) {
-                $sizes = \common\models\Size::find()->where(['mtypeone' => @$_POST['mtypesortone'], 'mtypetwo' => $_POST['mtypesorttwo'], 'mtypethree' => $_POST['mtypesortthree']])->orderBy(['size' => SORT_ASC])->all();
+                $sizes = \common\models\Size::find()->where(['mtypeone' => @$_POST['mtypesortone'], 'mtypetwo' => $_POST['mtypesorttwo'], 'mtypethree' => @$_POST['mtypesortthree']])->orderBy(['size' => SORT_ASC])->all();
             } else {
                 $sizes = \common\models\Size::find()->where(['mtypeone' => @$_POST['mtypesortone']])->orderBy(['size' => SORT_ASC])->all();
             }
@@ -6680,7 +6699,7 @@ class SiteController extends Controller {
                 $model->createdon = date('Y-m-d h:i:s');
                 $model->status = 1;
                 if ($_POST['mtypeone'] == 1) {
-                    $size = \common\models\Size::find()->where(['size' => $_POST['size'], 'mtypeone' => $_POST['mtypeone'], 'mtypetwo' => $_POST['mtypetwo'], 'mtypethree' => $_POST['mtypethree']])->one();
+                    $size = \common\models\Size::find()->where(['size' => $_POST['size'], 'mtypeone' => $_POST['mtypeone'], 'mtypetwo' => $_POST['mtypetwo'], 'mtypethree' => @$_POST['mtypethree']])->one();
                 } else {
                     $size = \common\models\Size::find()->where(['size' => $_POST['size'], 'mtypeone' => $_POST['mtypeone']])->one();
                 }
@@ -7007,6 +7026,9 @@ class SiteController extends Controller {
         $parent = $_REQUEST['subparent'];
         $one = $_REQUEST['subone'];
         $two = $_REQUEST['subtwo'];
+        if ($two == '' || $two == 0) {
+            $two = null;
+        }
         if ($parent == 1) {
             $sizes = \common\models\Size::find()->where(['mtypeone' => $parent, 'mtypetwo' => $one, 'mtypethree' => $two, 'status' => 1])->all();
         } else {
@@ -9385,14 +9407,15 @@ class SiteController extends Controller {
         if (($value == 1) || ($value == 12)) {
             $data[] = '<option value="1">Copper</option>';
             $data[] = '<option value="2">Aluminium</option>';
+            $data[] = '<option value="3">ABC Cable</option>';
         } elseif ($value == 2) {
-            $data[] = '<option value="3">Domestic</option>';
-            $data[] = '<option value="4">Industrial</option>';
-            $data[] = '<option value="5">Street/Road</option>';
+            $data[] = '<option value="4">Domestic</option>';
+            $data[] = '<option value="5">Industrial</option>';
+            $data[] = '<option value="6">Street/Road</option>';
         } elseif ($value == 3) {
-            $data[] = '<option value="6">Ceiling fans</option>';
-            $data[] = '<option value="7">Wall fans</option>';
-            $data[] = '<option value="8">Exhaust fans</option>';
+            $data[] = '<option value="7">Ceiling fans</option>';
+            $data[] = '<option value="8">Wall fans</option>';
+            $data[] = '<option value="9">Exhaust fans</option>';
         }
 
         $i = 0;
@@ -9615,21 +9638,24 @@ class SiteController extends Controller {
                 return "Aluminium";
                 break;
             case "3":
-                return "Domestic";
+                return "ABC Cable";
                 break;
             case "4":
-                return "Industrial";
+                return "Domestic";
                 break;
             case "5":
-                return "Street/Road";
+                return "Industrial";
                 break;
             case "6":
-                return "Ceiling fans";
+                return "Street/Road";
                 break;
             case "7":
-                return "Wall fans";
+                return "Ceiling fans";
                 break;
             case "8":
+                return "Wall fans";
+                break;
+            case "9":
                 return "Exhaust fans";
                 break;
             default:
@@ -10484,7 +10510,7 @@ class SiteController extends Controller {
         Yii::$app->session->setFlash('success', "Status successfully changed");
         return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
     }
-    
+
     public function actionDeleteDepartment() {
         $id = $_GET['id'];
         $depart = \common\models\Departments::deleteAll(['id' => $id]);

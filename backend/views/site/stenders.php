@@ -107,6 +107,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $dname = \common\models\Departments::find()->where(['id' => $tender->department])->one();
                                         $tdetails = $dname->name;
                                     }
+                                    $ddoffice = \common\models\Ddengineers::find()->where(['id'=>$tender->ddfavour])->one();
                                     if ($tender->status == 1 && $tender->is_archived == 1) {
                                         $status = 'Archived';
                                         $class = 'orange';

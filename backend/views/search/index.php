@@ -59,6 +59,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         width: 100%;
         float: left;
     }
+    #showcontd {
+        background-color: #E4E4E4;
+        border-radius: 15px;
+        padding: 10px;
+        margin-top: 5px;
+        width: 100%;
+        float: left;
+    }
     ::placeholder{color:rgba(0,0,0,.6)!important;}
     input#keyword,#fromdatesearch,#todatesearch {
         margin-bottom: 0px;
@@ -136,6 +144,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <div class="row fullrow">
                         <form id="create-project-form-tender" name="myform" class="col s12" enctype="multipart/form-data" method = "get" action = "<?= $baseURL ?>search/index">
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
+
                             <div class="row firstrow">
                                 <div style="text-align: center;"><h5><b>Search By Keyword</b></h5></div>
                                 <div class="input-field col s12">
@@ -596,6 +605,33 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
 
                             </div>
+                            <?php if ($user->group_id != 6) { ?>
+                                <div class="row firstrow">
+                                    <div style="text-align: center;"><h5><b>Search By Department</b></h5></div>
+                                    <div class="input-field col s12">
+                                        <select class="validate required materialSelectdepart browser-default" name="department" id="department">
+                                            <option value="">All Departments</option>
+
+                                        </select>
+                                        <?php
+                                        $cont = \common\models\Departments::find()->where(['id' => @$_GET['department']])->one();
+                                        if (@$cont) {
+                                            ?>
+                                            <div id="showcontd">
+                                                <?php echo $cont->name; ?>
+                                            </div>
+                                        <?php }
+                                        ?>
+                                    </div>
+                                    <?php if (@$cont) { ?>
+                                        <div id="conextrad">
+                                            <input type="hidden" name="department" value="<?= $cont->id ?>">
+                                        </div>
+                                        <?php
+                                    }
+                                    ?>
+                                </div>
+                            <?php } ?>
                             <div class="row" style="float:left;width:100%">
                                 <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">
                             </div>
@@ -637,15 +673,20 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         $i = 0;
                                         foreach ($tenders as $key => $tender) {
                                             $tdetails = '';
-                                            $command = Sitecontroller::actionGetcommand($tender->command);
-                                            if (!isset($tender->cengineer) && isset($tender->gengineer)) {
-                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                            if ($tender->department == 1) {
+                                                $command = Sitecontroller::actionGetcommand($tender->command);
+                                                if (!isset($tender->cengineer) && isset($tender->gengineer)) {
+                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->gengineer, 'status' => 1])->one();
+                                                } else {
+                                                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                }
+                                                $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
+                                                $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
+                                                $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                             } else {
-                                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $tender->cengineer, 'status' => 1])->one();
+                                                $dname = \common\models\Departments::find()->where(['id' => $tender->department])->one();
+                                                $tdetails = $dname->name;
                                             }
-                                            $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $tender->cengineer, 'cid' => $tender->cwengineer, 'status' => 1])->one();
-                                            $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $tender->cwengineer, 'gid' => $tender->gengineer, 'status' => 1])->one();
-                                            $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                                             if ($tender->status == 1 && $tender->is_archived == 1) {
                                                 $status = 'Archived';
                                                 $class = 'orange';

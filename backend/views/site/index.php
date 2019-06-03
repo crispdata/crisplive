@@ -1565,6 +1565,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         </div>
                     </div>
                 </div>
+                <div class="col s12 m12 l4">
+                    <div class="card stats-card">
+                        <div class="card-content">
+                            <a href="site/departments">
+                                <span class="card-title leftside">All Departments</span>
+                                <span class="stats-counter"><span class="counter upper leftside"><?= $departments; ?></span></span>
+                            </a>
+                        </div>
+                        <div class="progress stats-card-progress green">
+                            <div class="determinate green" style="width: 100%"></div>
+                        </div>
+                    </div>
+                </div>
             </div></div></main>
 <?php } ?>
 

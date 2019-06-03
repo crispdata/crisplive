@@ -160,6 +160,13 @@ $(document).ready(function () {
         $("#make-types").submit();
     });
 
+    $('#mtypesorttwo').on('change', function () {
+        var selectedValue = $(this).val();
+        if (selectedValue == 3) {
+            $("#make-types").submit();
+        }
+    });
+
     $('#commanddropdown').on('change', function () {
         $("#command-types").submit();
     });

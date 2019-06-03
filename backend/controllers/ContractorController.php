@@ -42,7 +42,7 @@ class ContractorController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'uploadfile', 'allcontractors', 'updatetenders', 'updatecontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
+                        'actions' => ['logout', 'index', 'uploadfile', 'getdepartments', 'allcontractors', 'updatetenders', 'updatecontractors', 'getcontractors', 'add-contractor', 'delete-contractor'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -268,6 +268,34 @@ class ContractorController extends Controller {
             }
         }
         $count = count(\common\models\Contractor::find()->where(['like', 'firm', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->all());
+        $endCount = $offset + $resultCount;
+        $morePages = $count > $endCount;
+
+        $results = array(
+            "results" => $allcon,
+            "pagination" => array(
+                "more" => $morePages
+            )
+        );
+
+        echo json_encode($results);
+        die();
+    }
+
+    public function actionGetdepartments() {
+        $page = $_REQUEST['page'];
+        $resultCount = 25;
+        @$allcon = [];
+        $offset = ($page - 1) * $resultCount;
+
+        $departments = \common\models\Departments::find()->where(['like', 'name', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->orderBy(['name' => SORT_ASC])->offset($offset)->limit($resultCount)->all();
+
+        if ($departments) {
+            foreach ($departments as $_depart) {
+                @$allcon[] = ['id' => $_depart->id, 'text' => $_depart->name];
+            }
+        }
+        $count = count(\common\models\Departments::find()->where(['like', 'name', '%' . @$_REQUEST['term'] . '%', false])->andWhere(['status' => 1])->all());
         $endCount = $offset + $resultCount;
         $morePages = $count > $endCount;
 

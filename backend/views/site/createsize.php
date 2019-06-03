@@ -104,10 +104,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 }
                                 ?>" >
                                     <label>Select Sub Type</label>
-                                    <select class="validate required" required="" name="mtypetwo" id="mtypetwo">
+                                    <select class="validate required" required="" name="mtypetwo" id="mtypetwo" onchange="getsubsubtypes(this.value)">
                                         <option value="" disabled selected>Select</option>
                                         <option value="1" <?= (@$size->mtypetwo == 1) ? 'selected' : '' ?> >Copper</option>
                                         <option value="2" <?= (@$size->mtypetwo == 2) ? 'selected' : '' ?>>Aluminium</option>
+                                        <option value="3" <?= (@$size->mtypetwo == 3) ? 'selected' : '' ?>>ABC Cable</option>
 
                                     </select>
                                 </div>

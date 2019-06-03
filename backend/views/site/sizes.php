@@ -70,6 +70,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <option value="" disabled selected>Select</option>
                                 <option value="1" <?= (@$_POST['mtypesorttwo'] == 1) ? 'selected' : '' ?> >Copper</option>
                                 <option value="2" <?= (@$_POST['mtypesorttwo'] == 2) ? 'selected' : '' ?>>Aluminium</option>
+                                <option value="3" <?= (@$_POST['mtypesorttwo'] == 3) ? 'selected' : '' ?>>ABC Cable</option>
 
                             </select>
                         </div>
