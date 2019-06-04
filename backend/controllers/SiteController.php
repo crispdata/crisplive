@@ -4374,6 +4374,7 @@ class SiteController extends Controller {
 
         if (isset($_POST['submit'])) {
 
+
             $_POST['makeids'] = json_decode($_POST['makeids']);
             if (@$_POST['makeids']) {
                 foreach ($_POST['makeids'] as $allmakes) {
@@ -4418,6 +4419,7 @@ class SiteController extends Controller {
                     $detail->capacityfitting = @$_POST['text'][$k];
                     $detail->accessoryone = @$_POST['accessoryone'][$k];
                     $detail->accessorytwo = @$_POST['accessorytwo'][$k];
+                    $detail->accessorythree = @$_POST['accessorythree'][$k];
 //$detail->make = @$newarr[$k];
                     $detail->make = implode(',', array_filter($_POST['makes']));
                     $detail->makeid = @$_POST['makeid'][$k];
@@ -4449,6 +4451,7 @@ class SiteController extends Controller {
                             $mdetail->capacityfitting = @$_POST['text'][$k];
                             $mdetail->accessoryone = @$_POST['accessoryone'][$k];
                             $mdetail->accessorytwo = @$_POST['accessorytwo'][$k];
+                            $mdetail->accessorythree = @$_POST['accessorythree'][$k];
 //$mdetail->make = $makes_ids;
                             $mdetail->make = implode(',', $_POST['makes']);
                             $mdetail->makeid = @$_POST['makeid'][$k];
@@ -4537,12 +4540,14 @@ class SiteController extends Controller {
                     $type = $this->actionGetfit($idetail->typefitting);
                     $capacity = $this->actionGetfit($idetail->capacityfitting);
                     $accone = $this->actionGetaccessory($idetail->accessoryone);
+                    $acctwo = $this->actionGetaccessorytwo($idetail->accessorytwo);
+                    $accthree = $this->actionGetaccessorythree($idetail->accessorythree);
                     if ($items->tenderfour == 1) {
                         $idetail->description = @$size->size . ' ' . $core . ' (' . $descfull . ')';
                     } elseif ($items->tenderfour == 2) {
                         $idetail->description = @$type . ' ' . @$capacity . ' (' . $descfull . ')';
                     } elseif ($items->tenderfour == 4) {
-                        $idetail->description = @$accone . ' ' . @$idetail->accessorytwo . ' (' . $descfull . ')';
+                        $idetail->description = @$accone . ' ' . @$acctwo . ' ' . @$accthree . ' (' . $descfull . ')';
                     } elseif ($items->tenderfour == 5) {
                         $idetail->description = @$size->size . ' (' . $descfull . ')';
                     } else {
@@ -6409,12 +6414,14 @@ class SiteController extends Controller {
                 $type = $this->actionGetfit($idetail->typefitting);
                 $capacity = $this->actionGetfit($idetail->capacityfitting);
                 $accone = $this->actionGetaccessory($idetail->accessoryone);
+                $acctwo = $this->actionGetaccessorytwo($idetail->accessorytwo);
+                $accthree = $this->actionGetaccessorythree($idetail->accessorythree);
                 if ($items->tenderfour == 1) {
                     $idetail->description = @$size->size . ' ' . $core . ' (' . $descfull . ')';
                 } elseif ($items->tenderfour == 2) {
                     $idetail->description = @$type . ' ' . @$capacity . ' (' . $descfull . ')';
                 } elseif ($items->tenderfour == 4) {
-                    $idetail->description = @$accone . ' ' . @$idetail->accessorytwo . ' (' . $descfull . ')';
+                    $idetail->description = @$accone . ' ' . @$acctwo . ' ' . @$accthree . ' (' . $descfull . ')';
                 } elseif ($items->tenderfour == 5) {
                     $idetail->description = @$size->size . ' (' . $descfull . ')';
                 } else {
@@ -6918,6 +6925,7 @@ class SiteController extends Controller {
                 $model->capacityfitting = @$_POST['capacityfitting'];
                 $model->accessoryone = @$_POST['accessoryone'];
                 $model->accessorytwo = @$_POST['accessorytwo'];
+                $model->accessorythree = @$_POST['accessorythree'];
                 $model->make = implode(',', $_POST['makes']);
                 $model->makeid = @$_POST['makeid'];
 
@@ -6944,6 +6952,7 @@ class SiteController extends Controller {
                         $mdetail->capacityfitting = @$_POST['capacityfitting'];
                         $mdetail->accessoryone = @$_POST['accessoryone'];
                         $mdetail->accessorytwo = @$_POST['accessorytwo'];
+                        $mdetail->accessorythree = @$_POST['accessorythree'];
                         $mdetail->make = $make_ids;
                         $mdetail->makeid = @$_POST['makeid'];
                         $mdetail->user_id = $user->id;
@@ -7171,6 +7180,95 @@ class SiteController extends Controller {
             $type = [];
         }
         return @$type->text;
+    }
+
+    public function actionGetaccessorytwo($value) {
+        switch ($value) {
+            case "1":
+                return "1 Way";
+                break;
+            case "2":
+                return "2 Way";
+                break;
+            case "3":
+                return "3 Pin";
+                break;
+            case "4":
+                return "5 Pin";
+                break;
+            case "5":
+                return "6 Pin";
+                break;
+            case "6":
+                return "Universal";
+                break;
+            case "7":
+                return "Telephone Socket RJ-11";
+                break;
+            case "8":
+                return "Computer Jack RJ-45";
+                break;
+            case "9":
+                return "TV Socket";
+                break;
+            case "10":
+                return "USB Socket";
+                break;
+            case "11":
+                return "Dimmer";
+                break;
+            case "12":
+                return "5 Step";
+                break;
+            default:
+                return "";
+        }
+    }
+
+    public function actionGetaccessorythree($value) {
+        switch ($value) {
+            case "1":
+                return "5 A";
+                break;
+            case "2":
+                return "6 A";
+                break;
+            case "3":
+                return "10 A";
+                break;
+            case "4":
+                return "15 A";
+                break;
+            case "5":
+                return "16 A";
+                break;
+            case "6":
+                return "25 A";
+                break;
+            case "7":
+                return "32 A";
+                break;
+            case "8":
+                return "5 A";
+                break;
+            case "9":
+                return "6 A";
+                break;
+            case "10":
+                return "10 A";
+                break;
+            case "11":
+                return "13 A";
+                break;
+            case "12":
+                return "15 A";
+                break;
+            case "13":
+                return "16 A";
+                break;
+            default:
+                return "";
+        }
     }
 
     public function actionGetcommand($id) {

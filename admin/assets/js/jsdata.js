@@ -1460,6 +1460,398 @@ $(document).ready(function () {
 
 });
 
+function gettype(val) {
+    if (val == 19) {
+        var accessoriestwo = '';
+        var accessoriesthree = '';
+        $("#accessorytwo").addClass('makesload');
+        $("#accessorythree").addClass('makesload');
+
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="1" selected>1 Way</option>';
+        accessoriestwo += '<option value="2">2 Way</option>';
+
+        $("#acctwo0").html(accessoriestwo);
+        $("#acctwo0").trigger('contentChanged');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+        accessoriesthree += '<option value="4">15 A</option>';
+        accessoriesthree += '<option value="5">16 A</option>';
+        accessoriesthree += '<option value="6">25 A</option>';
+        accessoriesthree += '<option value="7">32 A</option>';
+
+        $("#accthree0").html(accessoriesthree);
+        $("#accthree0").trigger('contentChanged');
+
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
+        $("#accessorythree").show();
+
+        $("#accessorytwo").removeClass('makesload');
+        $("#accessorythree").removeClass('makesload');
+
+    } else if (val == 20) {
+        var accessoriestwo = '';
+        var accessoriesthree = '';
+        $("#accessorytwo").addClass('makesload');
+        $("#accessorythree").addClass('makesload');
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="3" selected>3 Pin</option>';
+        accessoriestwo += '<option value="4">5 Pin</option>';
+        accessoriestwo += '<option value="5">6 Pin</option>';
+        accessoriestwo += '<option value="6">Universal</option>';
+        accessoriestwo += '<option value="7">Telephone Socket RJ-11</option>';
+        accessoriestwo += '<option value="8">Computer Jack RJ-45</option>';
+        accessoriestwo += '<option value="9">TV Socket</option>';
+        accessoriestwo += '<option value="10">USB Socket</option>';
+
+        $("#acctwo0").html(accessoriestwo);
+        $("#acctwo0").trigger('contentChanged');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="8" selected>5 A</option>';
+        accessoriesthree += '<option value="9">6 A</option>';
+        accessoriesthree += '<option value="10">10 A</option>';
+        accessoriesthree += '<option value="11">13 A</option>';
+        accessoriesthree += '<option value="12">15 A</option>';
+        accessoriesthree += '<option value="13">16 A</option>';
+
+        $("#accthree0").html(accessoriesthree);
+        $("#accthree0").trigger('contentChanged');
+
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
+        $("#accessorythree").show();
+
+        $("#accessorytwo").removeClass('makesload');
+        $("#accessorythree").removeClass('makesload');
+
+    } else {
+        var accessoriestwo = '';
+        $("#accessorytwo").addClass('makesload');
+
+        if ($("#accthree0").data('select2')) {
+            $("#accthree0").select2("val", "0");
+            $("#accthree0").removeAttr('required');
+            $("#accthree0").removeClass('required');
+            $("#accessorythree").hide();
+        }
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="11" selected>Dimmer</option>';
+        accessoriestwo += '<option value="12">5 Step</option>';
+
+        $("#acctwo0").html(accessoriestwo);
+        $("#acctwo0").trigger('contentChanged');
+
+        $("#accessorytwo").removeClass('makesload');
+    }
+
+}
+
+function gettypeinner(val, id, newnum) {
+    if (val == 19) {
+        var accessoriestwo = '';
+        var accessoriesthree = '';
+        $("#accessorytwo" + id + "").addClass('makesload');
+        $("#accessorythree" + id + "").addClass('makesload');
+
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="1" selected>1 Way</option>';
+        accessoriestwo += '<option value="2">2 Way</option>';
+
+        $("#acctwo" + newnum + "").html(accessoriestwo);
+        $("#acctwo" + newnum + "").trigger('contentChanged');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+        accessoriesthree += '<option value="4">15 A</option>';
+        accessoriesthree += '<option value="5">16 A</option>';
+        accessoriesthree += '<option value="6">25 A</option>';
+        accessoriesthree += '<option value="7">32 A</option>';
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+
+        $("#accessorytwo" + id + "").removeClass('makesload');
+        $("#accessorythree" + id + "").removeClass('makesload');
+
+    } else if (val == 20) {
+        var accessoriestwo = '';
+        var accessoriesthree = '';
+        $("#accessorytwo" + id + "").addClass('makesload');
+        $("#accessorythree" + id + "").addClass('makesload');
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="3" selected>3 Pin</option>';
+        accessoriestwo += '<option value="4">5 Pin</option>';
+        accessoriestwo += '<option value="5">6 Pin</option>';
+        accessoriestwo += '<option value="6">Universal</option>';
+        accessoriestwo += '<option value="7">Telephone Socket RJ-11</option>';
+        accessoriestwo += '<option value="8">Computer Jack RJ-45</option>';
+        accessoriestwo += '<option value="9">TV Socket</option>';
+        accessoriestwo += '<option value="10">USB Socket</option>';
+
+        $("#acctwo" + newnum + "").html(accessoriestwo);
+        $("#acctwo" + newnum + "").trigger('contentChanged');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="8" selected>5 A</option>';
+        accessoriesthree += '<option value="9">6 A</option>';
+        accessoriesthree += '<option value="10">10 A</option>';
+        accessoriesthree += '<option value="11">13 A</option>';
+        accessoriesthree += '<option value="12">15 A</option>';
+        accessoriesthree += '<option value="13">16 A</option>';
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+
+        $("#accessorytwo" + id + "").removeClass('makesload');
+        $("#accessorythree" + id + "").removeClass('makesload');
+
+    } else {
+        var accessoriestwo = '';
+        $("#accessorytwo" + id + "").addClass('makesload');
+
+        if ($("#accthree" + newnum + "").data('select2')) {
+            $("#accthree" + newnum + "").select2("val", "0");
+            $("#accthree" + newnum + "").removeAttr('required');
+            $("#accthree" + newnum + "").removeClass('required');
+            $("#accessorythree" + id + "").hide();
+        }
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="11" selected>Dimmer</option>';
+        accessoriestwo += '<option value="12">5 Step</option>';
+
+        $("#acctwo" + newnum + "").html(accessoriestwo);
+        $("#acctwo" + newnum + "").trigger('contentChanged');
+
+        $("#accessorytwo" + id + "").removeClass('makesload');
+    }
+
+}
+
+function getsubtype(val) {
+    if (val == 1) {
+        var accessoriesthree = '';
+        $("#accessorythree").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+        accessoriesthree += '<option value="4">15 A</option>';
+        accessoriesthree += '<option value="5">16 A</option>';
+        accessoriesthree += '<option value="6">25 A</option>';
+        accessoriesthree += '<option value="7">32 A</option>';
+
+
+        $("#accthree0").html(accessoriesthree);
+        $("#accthree0").trigger('contentChanged');
+
+        $("#accessorythree").removeClass('makesload');
+
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
+        $("#accessorythree").show();
+
+    } else if (val == 2) {
+        var accessoriesthree = '';
+        $("#accessorythree").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+
+        $("#accthree0").html(accessoriesthree);
+        $("#accthree0").trigger('contentChanged');
+
+        $("#accessorythree").removeClass('makesload');
+
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
+        $("#accessorythree").show();
+
+    } else if (val == 3 || val == 4 || val == 5 || val == 6) {
+        var accessoriesthree = '';
+        $("#accessorythree").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="8" selected>5 A</option>';
+        accessoriesthree += '<option value="9">6 A</option>';
+        accessoriesthree += '<option value="10">10 A</option>';
+        accessoriesthree += '<option value="11">13 A</option>';
+        accessoriesthree += '<option value="12">15 A</option>';
+        accessoriesthree += '<option value="13">16 A</option>';
+
+        $("#accthree0").html(accessoriesthree);
+        $("#accthree0").trigger('contentChanged');
+
+        $("#accessorythree").removeClass('makesload');
+
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
+        $("#accessorythree").show();
+
+    } else {
+        if ($("#accthree0").data('select2')) {
+            $("#accthree0").select2("val", "0");
+            $("#accthree0").removeAttr('required');
+            $("#accthree0").removeClass('required');
+            $("#accessorythree").hide();
+        }
+    }
+}
+
+function getsubtypeinner(val, id, newnum) {
+    if (val == 1) {
+        var accessoriesthree = '';
+        $("#accessorythree" + id + "").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+        accessoriesthree += '<option value="4">15 A</option>';
+        accessoriesthree += '<option value="5">16 A</option>';
+        accessoriesthree += '<option value="6">25 A</option>';
+        accessoriesthree += '<option value="7">32 A</option>';
+
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#accessorythree" + id + "").removeClass('makesload');
+
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+
+    } else if (val == 2) {
+        var accessoriesthree = '';
+        $("#accessorythree" + id + "").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#accessorythree" + id + "").removeClass('makesload');
+
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+
+    } else if (val == 3 || val == 4 || val == 5 || val == 6) {
+        var accessoriesthree = '';
+        $("#accessorythree" + id + "").addClass('makesload');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="8" selected>5 A</option>';
+        accessoriesthree += '<option value="9">6 A</option>';
+        accessoriesthree += '<option value="10">10 A</option>';
+        accessoriesthree += '<option value="11">13 A</option>';
+        accessoriesthree += '<option value="12">15 A</option>';
+        accessoriesthree += '<option value="13">16 A</option>';
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#accessorythree" + id + "").removeClass('makesload');
+
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+
+    } else {
+        if ($("#accthree" + newnum + "").data('select2')) {
+            $("#accthree" + newnum + "").select2("val", "0");
+            $("#accthree" + newnum + "").removeAttr('required');
+            $("#accthree" + newnum + "").removeClass('required');
+            $("#accessorythree" + id + "").hide();
+        }
+    }
+}
+
 function showdivs(val) {
     if (val == 1) {
         $("#cablesdiv").show();
@@ -2049,7 +2441,7 @@ function addrow(num) {
         var label = '';
     }
 
-    var rowitems = "<div class='row added iteminfo' id='inforows" + newnum + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><input id='acctwo" + newnum + "' type='text' name = 'accessorytwo[]' required='' class='validate required' value=''><label for='acctwo" + newnum + "'>Model</label></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' onkeypress='return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)' required='' class='validate required' value=''>" + label + "<!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
+    var rowitems = "<div class='row added iteminfo' id='inforows" + newnum + id + "' ><div class='input-field col s1'><input id='itemtender" + id + "' type='text' name = 'itemtender[]' required='' class='validate required' value=''><label for='itemtender'>Sr. no</label></div><div class='input-field col s2' id='sizesdiv" + id + "'><select class='validate required materialSelectsize" + id + " browser-default' required='' name='desc[]' id='sizes" + newnum + "' style='display: inline; height: 0px; padding: 0px; width: 0px;'><option value='' disabled required>No Sizes</option></select></div><div class='input-field col s3' id='corediv" + id + "'><select class='validate required materialSelectcore' required='' name='core[]' id='core" + newnum + "'><option value=''>Select Core</option><option value='1'>1 Core</option><option value='2'>2 Core</option><option value='3'>3 Core</option><option value='4'>3.5 Core</option><option value='5'>4 Core</option><option value='6'>5 Core</option><option value='7'>6 Core</option><option value='8'>7 Core</option><option value='9'>8 Core</option><option value='10'>10 Core</option></select></div><div class='input-field col s3' id='typefit" + id + "'><select class='validate required materialSelecttypefit browser-default' required='' name='type[]' id='type" + newnum + "'></select></div> <div class='input-field col s2' id='capacityfit" + id + "'><select class='validate required materialSelectcapacityfit browser-default' required='' name='text[]' id='text" + newnum + "'></select></div><div class='input-field col s3' id='accessoryone" + id + "'><select class='validate required materialSelectaccessoryone browser-default' required='' name='accessoryone[]' id='accone" + newnum + "' onchange='gettypeinner(this.value," + id + "," + newnum + ")'></select></div><div class='input-field col s2' id='accessorytwo" + id + "'><select class='validate required materialSelectaccessorytwo browser-default' required='' name='accessorytwo[]' id='acctwo" + newnum + "' onchange='getsubtypeinner(this.value," + id + "," + newnum + ")'></select></div><div class='input-field col s2' id='accessorythree" + id + "'><select class='validate required materialSelectaccessorythree browser-default' required='' name='accessorythree[]' id='accthree" + newnum + "' ></select></div><div class='input-field col s1'><input id='itemunit" + id + "' type='text' name = 'units[]' onkeypress='return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)' required='' class='validate required' value=''>" + label + "<!--textarea id='item' name='desc' class='materialize-textarea'></textarea><label for='item'>Item description</label--></div><div class='input-field col s1'><input id='quantity" + id + "' type='number' name = 'quantity[]' min='1' step='1' onkeypress='return event.charCode >= 48 && event.charCode <= 57' required='' class='validate required' value=''><label for='quantity" + id + "'>Quantity</label></div> <div class='input-field col s2'><input id='makeid" + id + "' type='text' name = 'makeid[]' class='validate' value=''><label for='makeid" + id + "'>CatPart Id </label></div> <div class='input-field col s2'><a class='waves-effect waves-light btn blue m-b-xs button' onclick='deletebutton(" + id + "," + newnum + ")'>Delete</a></div></div>";
 
     var row = "<div id=info" + id + "><div class='col s12'><div class='input-fields col s2 row'><label>Select type of work</label><select class='validate required materialSelect' name='tenderone[]' id='tenderone" + id + "' onchange='getdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option><option value='1'>E/M</option></select></div><div id='second" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendertwo[]' id='tendertwo" + id + "' onchange='getseconddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='third" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderthree[]' id='tenderthree" + id + "' onchange='getthirddatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fourth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfour[]' id='tenderfour" + id + "' onchange='getfourdatasub(this.value," + id + "," + newnum + ")'><option value='' disabled selected>Select</option></select></div></div><div id='fifth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tenderfive[]' id='tenderfive" + id + "' onchange='getfivedatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div><div id='sixth" + id + "' style='display: none;'><div class='input-fields col s2 row'><label>Select Sub Type</label><select class='validate required materialSelect' name='tendersix[]' id='tendersix" + id + "' onchange='getsixdatasub(this.value," + id + ")'><option value='' disabled selected>Select</option></select></div></div></div>" + rowitems + '</div>';
     $("#itemdata").append(rowitems);
@@ -2068,6 +2460,9 @@ function addrow(num) {
         $("#accessoryone" + id + "").hide();
         $("#accone" + newnum + "").removeAttr('required');
         $("#accone" + newnum + "").removeClass('required');
+        $("#accessorythree" + id + "").hide();
+        $("#accthree" + newnum + "").removeAttr('required');
+        $("#accthree" + newnum + "").removeClass('required');
         $("#sizesdiv" + id + "").show();
         $("#sizes" + newnum + "").attr('required');
         $("#sizes" + newnum + "").addClass('required');
@@ -2089,6 +2484,9 @@ function addrow(num) {
         $("#accessoryone" + id + "").hide();
         $("#accone" + newnum + "").removeAttr('required');
         $("#accone" + newnum + "").removeClass('required');
+        $("#accessorythree" + id + "").hide();
+        $("#accthree" + newnum + "").removeAttr('required');
+        $("#accthree" + newnum + "").removeClass('required');
         $("#typefit" + id + "").show();
         $("#type" + newnum + "").attr('required');
         $("#type" + newnum + "").addClass('required');
@@ -2116,6 +2514,9 @@ function addrow(num) {
         $("#accessoryone" + id + "").show();
         $("#accone" + newnum + "").attr('required');
         $("#accone" + newnum + "").addClass('required');
+        $("#accessorythree" + id + "").show();
+        $("#accthree" + newnum + "").attr('required');
+        $("#accthree" + newnum + "").addClass('required');
         $("#itemunit" + id + "").val('NOS');
     } else {
         $("#corediv" + id + "").hide();
@@ -2127,6 +2528,9 @@ function addrow(num) {
         $("#accessoryone" + id + "").hide();
         $("#accone" + newnum + "").removeAttr('required');
         $("#accone" + newnum + "").removeClass('required');
+        $("#accessorythree" + id + "").hide();
+        $("#accthree" + newnum + "").removeAttr('required');
+        $("#accthree" + newnum + "").removeClass('required');
         $("#typefit" + id + "").hide();
         $("#type" + newnum + "").removeAttr('required');
         $("#type" + newnum + "").removeClass('required');
@@ -2180,6 +2584,8 @@ function addrow(num) {
     $("#type" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Type'});
     $("#text" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Capacity'});
     $("#accone" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Accessory'});
+    $("#acctwo" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Type'});
+    $("#accthree" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
 
 
     /*$("#tenderone" + id + "").material_select();
@@ -2321,10 +2727,41 @@ function addrow(num) {
 
                 $("#accone" + newnum + "").html(accessories);
                 $("#accone" + newnum + "").select2({closeOnSelect: true, placeholder: 'Select Accessory'});
-                $("#addrow").removeAttr('onclick');
-                $("#addrow").attr('onclick', 'addrow("' + newnum + '")');
+
             }
         });
+
+        var accessoriestwo = '';
+        var accessoriesthree = '';
+
+        $('.materialSelectaccessorytwo').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+        });
+
+        accessoriestwo += '<option value="1" selected>1 Way</option>';
+        accessoriestwo += '<option value="2">2 Way</option>';
+
+        $("#acctwo" + newnum + "").html(accessoriestwo);
+        $("#acctwo" + newnum + "").trigger('contentChanged');
+
+        $('.materialSelectaccessorythree').on('contentChanged', function () {
+            $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+        });
+
+        accessoriesthree += '<option value="0">Select Sub Type</option>';
+        accessoriesthree += '<option value="1" selected>5 A</option>';
+        accessoriesthree += '<option value="2">6 A</option>';
+        accessoriesthree += '<option value="3">10 A</option>';
+        accessoriesthree += '<option value="4">15 A</option>';
+        accessoriesthree += '<option value="5">16 A</option>';
+        accessoriesthree += '<option value="6">25 A</option>';
+        accessoriesthree += '<option value="7">32 A</option>';
+
+        $("#accthree" + newnum + "").html(accessoriesthree);
+        $("#accthree" + newnum + "").trigger('contentChanged');
+
+        $("#addrow").removeAttr('onclick');
+        $("#addrow").attr('onclick', 'addrow("' + newnum + '")');
     }
 
 }
@@ -2895,6 +3332,9 @@ function getfourdata(value) {
         $("#accessoryone").hide();
         $("#accone0").removeAttr('required');
         $("#accone0").removeClass('required');
+        $("#accessorythree").hide();
+        $("#accthree0").removeAttr('required');
+        $("#accthree0").removeClass('required');
         $("#sizesdiv").show();
         $("#sizes0").attr('required');
         $("#sizes0").addClass('required');
@@ -2919,6 +3359,9 @@ function getfourdata(value) {
         $("#accessoryone").hide();
         $("#accone0").removeAttr('required');
         $("#accone0").removeClass('required');
+        $("#accessorythree").hide();
+        $("#accthree0").removeAttr('required');
+        $("#accthree0").removeClass('required');
         $("#typefit").show();
         $("#type0").attr('required');
         $("#type0").addClass('required');
@@ -2950,6 +3393,9 @@ function getfourdata(value) {
         $("#accessoryone").show();
         $("#accone0").attr('required');
         $("#accone0").addClass('required');
+        $("#accessorythree").show();
+        $("#accthree0").attr('required');
+        $("#accthree0").addClass('required');
         $("#itemunit").val('NOS');
         $("#unit label").remove();
         $("#itemdata").show();
@@ -2969,6 +3415,9 @@ function getfourdata(value) {
         $("#accessoryone").hide();
         $("#accone0").removeAttr('required');
         $("#accone0").removeClass('required');
+        $("#accessorythree").hide();
+        $("#accthree0").removeAttr('required');
+        $("#accthree0").removeClass('required');
         $("#typefit").hide();
         $("#type0").removeAttr('required');
         $("#type0").removeClass('required');
@@ -3079,6 +3528,8 @@ function getfourdata(value) {
             $("#sizesdiv").addClass('makesload');
             $("#corediv").addClass('makesload');
             $("#accessoryone").addClass('makesload');
+            $("#accessorytwo").addClass('makesload');
+            $("#accessorythree").addClass('makesload');
             $(".select2-container").hide();
         },
         success: function (resultData) {
@@ -3088,6 +3539,8 @@ function getfourdata(value) {
             $("#sizesdiv").removeClass('makesload');
             $("#corediv").removeClass('makesload');
             $("#accessoryone").removeClass('makesload');
+            $("#accessorytwo").removeClass('makesload');
+            $("#accessorythree").removeClass('makesload');
             if (resultData.item == '0') {
                 $("#tenderfive").html(resultData.data);
                 $("#sixth").hide();
@@ -3176,6 +3629,8 @@ function getfourdata(value) {
                 $("#text0").trigger('contentChanged');
             }
             var accessories = '';
+            var accessoriestwo = '';
+            var accessoriesthree = '';
             if (value == 4) {
                 $('.materialSelectaccessoryone').on('contentChanged', function () {
                     $(this).select2({closeOnSelect: true, placeholder: 'Select Accessory'});
@@ -3191,6 +3646,32 @@ function getfourdata(value) {
                 );
                 $("#accone0").html(accessories);
                 $("#accone0").trigger('contentChanged');
+
+                $('.materialSelectaccessorytwo').on('contentChanged', function () {
+                    $(this).select2({closeOnSelect: true, placeholder: 'Select Type'});
+                });
+
+                accessoriestwo += '<option value="1" selected>1 Way</option>';
+                accessoriestwo += '<option value="2">2 Way</option>';
+
+                $("#acctwo0").html(accessoriestwo);
+                $("#acctwo0").trigger('contentChanged');
+
+                $('.materialSelectaccessorythree').on('contentChanged', function () {
+                    $(this).select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
+                });
+
+                accessoriesthree += '<option value="0">Select Sub Type</option>';
+                accessoriesthree += '<option value="1" selected>5 A</option>';
+                accessoriesthree += '<option value="2">6 A</option>';
+                accessoriesthree += '<option value="3">10 A</option>';
+                accessoriesthree += '<option value="4">15 A</option>';
+                accessoriesthree += '<option value="5">16 A</option>';
+                accessoriesthree += '<option value="6">25 A</option>';
+                accessoriesthree += '<option value="7">32 A</option>';
+
+                $("#accthree0").html(accessoriesthree);
+                $("#accthree0").trigger('contentChanged');
             }
         }
     });

@@ -140,7 +140,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <td class = ""><?= $tender->qvalue ?></td>
                                             <td class = ""><?= $tender->aoc_date ?></td>
                                         <?php } ?>
-                                        <td ><a class = "btn <?= $class ?>"><?= $status ?></a></td>
+                                        <td><a class = "btn <?= $class ?>"><?= $status ?></a></td>
                                         <td>
                                             <?php
                                             if ($user->group_id == 9) {
@@ -158,7 +158,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                                         if ($tender->aoc_status == 1 && $tender->is_archived != 1) {
                                                             ?>
 
-                                                            <a class="waves-effect waves-light btn green">AOC</a>
+                                                          <a onclick="openmodal('modalaoc<?= $tender->id; ?>')" class="waves-effect waves-light btn green modal-trigger proj-delete">AOC</a>
 
                                                             <?php
                                                         } else {

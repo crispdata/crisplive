@@ -565,7 +565,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             <div class="row">
 
                                                 <div class="col s6">
-                                                    <a target="_blank" class="waves-effect waves-light btn blue proj-delete" href="<?= Url::to(['contractor/add-contractor', 'id' => $contractor->id]) ?>">Edit</a>
+                                                    <a target="_blank" class="waves-effect waves-light btn blue proj-delete" href="<?= Url::to(['contractor/add-contractor', 'id' => @$contractor->id]) ?>">Edit</a>
                                                 </div>
 
                                             </div>

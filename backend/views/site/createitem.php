@@ -406,15 +406,22 @@ $rootURL = Yii::$app->params['ROOT_URL'];
                                                 </select>
                                             </div>
                                             <div class="input-field col s3" id="accessoryone">
-                                                <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone[]" id="accone0">
+                                                <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone[]" id="accone0" onchange="gettype(this.value)">
 
 
                                                 </select>
                                             </div>
                                             <div class="input-field col s2" id="accessorytwo">
-                                                <input id="acctwo0" type="text" name = "accessorytwo[]" required="" class="validate required" value="">
-                                                <label for="acctwo0">Model</label>
+                                                <select class="validate required materialSelectaccessorytwo browser-default" required="" name="accessorytwo[]" id="acctwo0" onchange="getsubtype(this.value)">
+                                                    
+                                                </select>
                                             </div>
+                                            <div class="input-field col s2" id="accessorythree">
+                                                <select class="validate required materialSelectaccessorythree browser-default" required="" name="accessorythree[]" id="accthree0">
+                                                    
+                                                </select>
+                                            </div>
+                                           
                                             <div class="input-field col s1" id="unit">
                                                 <input id="itemunit" type="text" name = "units[]" required="" onkeypress="return (event.charCode > 64 && event.charCode < 91) || (event.charCode > 96 && event.charCode < 123)" class="validate required" value="">
                                                 <!--textarea id="item" name="desc" class="materialize-textarea"></textarea>
