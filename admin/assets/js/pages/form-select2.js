@@ -84,6 +84,8 @@ $(document).ready(function () {
     $('.materialSelecttypefit').select2({closeOnSelect: true, placeholder: 'Select Type'});
     $('.materialSelectcapacityfit').select2({closeOnSelect: true, placeholder: 'Select Capacity'});
     $('.materialSelectaccessoryone').select2({closeOnSelect: true, placeholder: 'Select Accessory'});
+    $('.materialSelectaccessorytwo').select2({closeOnSelect: true, placeholder: 'Select Type'});
+    $('.materialSelectaccessorythree').select2({closeOnSelect: true, placeholder: 'Select Sub Type'});
     $('select.ddfavour').select2({closeOnSelect: true});
     $('select.contact-authtypes').select2();
     $('#multiple').select2({

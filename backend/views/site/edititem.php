@@ -88,8 +88,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         background-color: #1e90ff;
     }
     .makesrow {
-    margin-top: 25px;
-}
+        margin-top: 25px;
+    }
 </style>
 
 <main class="mn-inner">
@@ -422,9 +422,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
 
                                     <div class="row">
-                                        <div class="input-fields col s6" id='accessoryone' style="display:none;">
+                                        <div class="input-fields col s4" id='accessoryone' style="display:none;">
                                             <label>Select Accessory</label>
-                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0" onchange="gettype(this.value)">
                                                 <?php
                                                 if ($accessories) {
                                                     foreach ($accessories as $_type) {
@@ -444,10 +444,58 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-                                        <div class="input-field col s6" id='accessorytwo' style="display:none">
-                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
-                                            <label for="accessorytwo">Model</label>
+                                        <div class="input-fields col s4" id='accessorytwo' style="display:none">
+                                            <label>Select Type</label>
+                                            <select class="validate required materialSelectaccessorytwo browser-default" required="" name="accessorytwo" id="acctwo0" onchange="getsubtype(this.value)">
+                                                <?php if ($item->accessoryone == 19) { ?>
+                                                    <option value="1" <?= ($item->accessorytwo == 1) ? 'selected' : '' ?> >1 Way</option>
+                                                    <option value="2" <?= ($item->accessorytwo == 2) ? 'selected' : '' ?>>2 Way</option>
+                                                <?php } elseif ($item->accessoryone == 20) { ?>
+                                                    <option value="3" <?= ($item->accessorytwo == 3) ? 'selected' : '' ?>>3 Pin</option>
+                                                    <option value="4" <?= ($item->accessorytwo == 4) ? 'selected' : '' ?>>5 Pin</option>
+                                                    <option value="5" <?= ($item->accessorytwo == 5) ? 'selected' : '' ?>>6 Pin</option>
+                                                    <option value="6" <?= ($item->accessorytwo == 6) ? 'selected' : '' ?>>Universal</option>
+                                                    <option value="7" <?= ($item->accessorytwo == 7) ? 'selected' : '' ?>>Telephone Socket RJ-11</option>
+                                                    <option value="8" <?= ($item->accessorytwo == 8) ? 'selected' : '' ?>>Computer Jack RJ-45</option>
+                                                    <option value="9" <?= ($item->accessorytwo == 9) ? 'selected' : '' ?>>TV Socket</option>
+                                                    <option value="10" <?= ($item->accessorytwo == 10) ? 'selected' : '' ?>>USB Socket</option>
+                                                <?php } else { ?>
+                                                    <option value="11" <?= ($item->accessorytwo == 11) ? 'selected' : '' ?>>Dimmer</option>
+                                                    <option value="12" <?= ($item->accessorytwo == 12) ? 'selected' : '' ?> >5 Step</option>
+                                                <?php } ?>
+
+
+                                            </select>
                                         </div>
+                                        
+                                            <div class="input-fields col s4" id='accessorythree' style="display:none">
+                                                <label>Select Sub Type</label>
+                                                <select class="validate required materialSelectaccessorythree browser-default" required="" name="accessorythree" id="accthree0">
+                                                    <?php if ($item->accessorytwo == 1) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="4" <?= ($item->accessorythree == 4) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="5" <?= ($item->accessorythree == 5) ? 'selected' : '' ?>>16 A</option>
+                                                        <option value="6" <?= ($item->accessorythree == 6) ? 'selected' : '' ?>>25 A</option>
+                                                        <option value="7" <?= ($item->accessorythree == 7) ? 'selected' : '' ?>>32 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 2) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 3 || $item->accessorytwo == 4 || $item->accessorytwo == 5 || $item->accessorytwo == 6) { ?>
+                                                        <option value="8" <?= ($item->accessorythree == 8) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="9" <?= ($item->accessorythree == 9) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="10" <?= ($item->accessorythree == 10) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="11" <?= ($item->accessorythree == 11) ? 'selected' : '' ?>>13 A</option>
+                                                        <option value="12" <?= ($item->accessorythree == 12) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="13" <?= ($item->accessorythree == 13) ? 'selected' : '' ?>>16 A</option>
+                                                    <?php } ?>
+
+
+                                                </select>
+                                            </div>
+                                        
                                     </div>
 
                                 <?php } elseif ($parentitems->tenderfour == 2) { ?>
@@ -539,11 +587,11 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
                                     </div>
-                            
+
                                     <div class="row">
-                                        <div class="input-fields col s6" id='accessoryone' style="display:none;">
+                                        <div class="input-fields col s4" id='accessoryone' style="display:none;">
                                             <label>Select Accessory</label>
-                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0" onchange="gettype(this.value)">
                                                 <?php
                                                 if ($accessories) {
                                                     foreach ($accessories as $_type) {
@@ -563,10 +611,58 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-                                        <div class="input-field col s6" id='accessorytwo' style="display:none;">
-                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
-                                            <label for="accessorytwo">Model</label>
+                                        <div class="input-fields col s4" id='accessorytwo' style="display:none">
+                                            <label>Select Type</label>
+                                            <select class="validate required materialSelectaccessorytwo browser-default" required="" name="accessorytwo" id="acctwo0" onchange="getsubtype(this.value)">
+                                                <?php if ($item->accessoryone == 19) { ?>
+                                                    <option value="1" <?= ($item->accessorytwo == 1) ? 'selected' : '' ?> >1 Way</option>
+                                                    <option value="2" <?= ($item->accessorytwo == 2) ? 'selected' : '' ?>>2 Way</option>
+                                                <?php } elseif ($item->accessoryone == 20) { ?>
+                                                    <option value="3" <?= ($item->accessorytwo == 3) ? 'selected' : '' ?>>3 Pin</option>
+                                                    <option value="4" <?= ($item->accessorytwo == 4) ? 'selected' : '' ?>>5 Pin</option>
+                                                    <option value="5" <?= ($item->accessorytwo == 5) ? 'selected' : '' ?>>6 Pin</option>
+                                                    <option value="6" <?= ($item->accessorytwo == 6) ? 'selected' : '' ?>>Universal</option>
+                                                    <option value="7" <?= ($item->accessorytwo == 7) ? 'selected' : '' ?>>Telephone Socket RJ-11</option>
+                                                    <option value="8" <?= ($item->accessorytwo == 8) ? 'selected' : '' ?>>Computer Jack RJ-45</option>
+                                                    <option value="9" <?= ($item->accessorytwo == 9) ? 'selected' : '' ?>>TV Socket</option>
+                                                    <option value="10" <?= ($item->accessorytwo == 10) ? 'selected' : '' ?>>USB Socket</option>
+                                                <?php } else { ?>
+                                                    <option value="11" <?= ($item->accessorytwo == 11) ? 'selected' : '' ?>>Dimmer</option>
+                                                    <option value="12" <?= ($item->accessorytwo == 12) ? 'selected' : '' ?> >5 Step</option>
+                                                <?php } ?>
+
+
+                                            </select>
                                         </div>
+                                       
+                                            <div class="input-fields col s4" id='accessorythree' style="display:none">
+                                                <label>Select Sub Type</label>
+                                                <select class="validate required materialSelectaccessorythree browser-default" required="" name="accessorythree" id="accthree0">
+                                                    <?php if ($item->accessorytwo == 1) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="4" <?= ($item->accessorythree == 4) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="5" <?= ($item->accessorythree == 5) ? 'selected' : '' ?>>16 A</option>
+                                                        <option value="6" <?= ($item->accessorythree == 6) ? 'selected' : '' ?>>25 A</option>
+                                                        <option value="7" <?= ($item->accessorythree == 7) ? 'selected' : '' ?>>32 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 2) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 3 || $item->accessorytwo == 4 || $item->accessorytwo == 5 || $item->accessorytwo == 6) { ?>
+                                                        <option value="8" <?= ($item->accessorythree == 8) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="9" <?= ($item->accessorythree == 9) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="10" <?= ($item->accessorythree == 10) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="11" <?= ($item->accessorythree == 11) ? 'selected' : '' ?>>13 A</option>
+                                                        <option value="12" <?= ($item->accessorythree == 12) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="13" <?= ($item->accessorythree == 13) ? 'selected' : '' ?>>16 A</option>
+                                                    <?php } ?>
+
+
+                                                </select>
+                                            </div>
+                                        
                                     </div>
 
 
@@ -658,9 +754,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="input-fields col s6" id='accessoryone'>
+                                        <div class="input-fields col s4" id='accessoryone'>
                                             <label>Select Accessory</label>
-                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0" onchange="gettype(this.value)">
                                                 <?php
                                                 if ($accessories) {
                                                     foreach ($accessories as $_type) {
@@ -680,10 +776,55 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-                                        <div class="input-field col s6" id='accessorytwo'>
-                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
-                                            <label for="accessorytwo">Model</label>
+                                        <div class="input-fields col s4" id='accessorytwo'>
+                                            <label>Select Type</label>
+                                            <select class="validate required materialSelectaccessorytwo browser-default" required="" name="accessorytwo" id="acctwo0" onchange="getsubtype(this.value)">
+                                                <?php if ($item->accessoryone == 19) { ?>
+                                                    <option value="1" <?= ($item->accessorytwo == 1) ? 'selected' : '' ?> >1 Way</option>
+                                                    <option value="2" <?= ($item->accessorytwo == 2) ? 'selected' : '' ?>>2 Way</option>
+                                                <?php } elseif ($item->accessoryone == 20) { ?>
+                                                    <option value="3" <?= ($item->accessorytwo == 3) ? 'selected' : '' ?>>3 Pin</option>
+                                                    <option value="4" <?= ($item->accessorytwo == 4) ? 'selected' : '' ?>>5 Pin</option>
+                                                    <option value="5" <?= ($item->accessorytwo == 5) ? 'selected' : '' ?>>6 Pin</option>
+                                                    <option value="6" <?= ($item->accessorytwo == 6) ? 'selected' : '' ?>>Universal</option>
+                                                    <option value="7" <?= ($item->accessorytwo == 7) ? 'selected' : '' ?>>Telephone Socket RJ-11</option>
+                                                    <option value="8" <?= ($item->accessorytwo == 8) ? 'selected' : '' ?>>Computer Jack RJ-45</option>
+                                                    <option value="9" <?= ($item->accessorytwo == 9) ? 'selected' : '' ?>>TV Socket</option>
+                                                    <option value="10" <?= ($item->accessorytwo == 10) ? 'selected' : '' ?>>USB Socket</option>
+                                                <?php } else { ?>
+                                                    <option value="11" <?= ($item->accessorytwo == 11) ? 'selected' : '' ?>>Dimmer</option>
+                                                    <option value="12" <?= ($item->accessorytwo == 12) ? 'selected' : '' ?> >5 Step</option>
+                                                <?php } ?>
+                                            </select>
                                         </div>
+                                       
+                                            <div class="input-fields col s4" id='accessorythree'  <?php if ($item->accessorytwo != 1 && $item->accessorytwo != 2 && $item->accessorytwo != 3 && $item->accessorytwo != 4 && $item->accessorytwo != 5 && $item->accessorytwo != 6) { echo "style='display:none;'"; } ?>>
+                                                <label>Select Sub Type</label>
+                                                <select class="validate required materialSelectaccessorythree browser-default" required="" name="accessorythree" id="accthree0">
+                                                    <?php if ($item->accessorytwo == 1) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="4" <?= ($item->accessorythree == 4) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="5" <?= ($item->accessorythree == 5) ? 'selected' : '' ?>>16 A</option>
+                                                        <option value="6" <?= ($item->accessorythree == 6) ? 'selected' : '' ?>>25 A</option>
+                                                        <option value="7" <?= ($item->accessorythree == 7) ? 'selected' : '' ?>>32 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 2) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 3 || $item->accessorytwo == 4 || $item->accessorytwo == 5 || $item->accessorytwo == 6) { ?>
+                                                        <option value="8" <?= ($item->accessorythree == 8) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="9" <?= ($item->accessorythree == 9) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="10" <?= ($item->accessorythree == 10) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="11" <?= ($item->accessorythree == 11) ? 'selected' : '' ?>>13 A</option>
+                                                        <option value="12" <?= ($item->accessorythree == 12) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="13" <?= ($item->accessorythree == 13) ? 'selected' : '' ?>>16 A</option>
+                                                    <?php } ?>
+
+
+                                                </select>
+                                            </div>
                                     </div>
                                 <?php } else { ?>
                                     <div class="row">
@@ -772,9 +913,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         </div>
                                     </div>
                                     <div class="row">
-                                        <div class="input-fields col s6" id='accessoryone' style="display:none">
+                                        <div class="input-fields col s4" id='accessoryone' style="display:none">
                                             <label>Select Accessory</label>
-                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0">
+                                            <select class="validate required materialSelectaccessoryone browser-default" required="" name="accessoryone" id="accone0" onchange="gettype(this.value)">
                                                 <?php
                                                 if ($accessories) {
                                                     foreach ($accessories as $_type) {
@@ -794,10 +935,58 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             </select>
                                         </div>
 
-                                        <div class="input-field col s6" id='accessorytwo' style="display:none">
-                                            <input id="accessorytwo" type="text" name = "accessorytwo" required="" class="validate required" value="<?= $item->accessorytwo; ?>">
-                                            <label for="accessorytwo">Model</label>
+                                        <div class="input-fields col s4" id='accessorytwo' style="display:none">
+                                            <label>Select Type</label>
+                                            <select class="validate required materialSelectaccessorytwo browser-default" required="" name="accessorytwo" id="acctwo0" onchange="gettype(this.value)">
+                                                <?php if ($item->accessoryone == 19) { ?>
+                                                    <option value="1" <?= ($item->accessorytwo == 1) ? 'selected' : '' ?> >1 Way</option>
+                                                    <option value="2" <?= ($item->accessorytwo == 2) ? 'selected' : '' ?>>2 Way</option>
+                                                <?php } elseif ($item->accessoryone == 20) { ?>
+                                                    <option value="3" <?= ($item->accessorytwo == 3) ? 'selected' : '' ?>>3 Pin</option>
+                                                    <option value="4" <?= ($item->accessorytwo == 4) ? 'selected' : '' ?>>5 Pin</option>
+                                                    <option value="5" <?= ($item->accessorytwo == 5) ? 'selected' : '' ?>>6 Pin</option>
+                                                    <option value="6" <?= ($item->accessorytwo == 6) ? 'selected' : '' ?>>Universal</option>
+                                                    <option value="7" <?= ($item->accessorytwo == 7) ? 'selected' : '' ?>>Telephone Socket RJ-11</option>
+                                                    <option value="8" <?= ($item->accessorytwo == 8) ? 'selected' : '' ?>>Computer Jack RJ-45</option>
+                                                    <option value="9" <?= ($item->accessorytwo == 9) ? 'selected' : '' ?>>TV Socket</option>
+                                                    <option value="10" <?= ($item->accessorytwo == 10) ? 'selected' : '' ?>>USB Socket</option>
+                                                <?php } else { ?>
+                                                    <option value="11" <?= ($item->accessorytwo == 11) ? 'selected' : '' ?>>Dimmer</option>
+                                                    <option value="12" <?= ($item->accessorytwo == 12) ? 'selected' : '' ?> >5 Step</option>
+                                                <?php } ?>
+
+
+                                            </select>
                                         </div>
+                                       
+                                            <div class="input-fields col s4" id='accessorythree' style="display:none">
+                                                <label>Select Sub Type</label>
+                                                <select class="validate required materialSelectaccessorythree browser-default" required="" name="accessorythree" id="accthree0">
+                                                    <?php if ($item->accessorytwo == 1) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="4" <?= ($item->accessorythree == 4) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="5" <?= ($item->accessorythree == 5) ? 'selected' : '' ?>>16 A</option>
+                                                        <option value="6" <?= ($item->accessorythree == 6) ? 'selected' : '' ?>>25 A</option>
+                                                        <option value="7" <?= ($item->accessorythree == 7) ? 'selected' : '' ?>>32 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 2) { ?>
+                                                        <option value="1" <?= ($item->accessorythree == 1) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="2" <?= ($item->accessorythree == 2) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="3" <?= ($item->accessorythree == 3) ? 'selected' : '' ?>>10 A</option>
+                                                    <?php } elseif ($item->accessorytwo == 3 || $item->accessorytwo == 4 || $item->accessorytwo == 5 || $item->accessorytwo == 6) { ?>
+                                                        <option value="8" <?= ($item->accessorythree == 8) ? 'selected' : '' ?> >5 A</option>
+                                                        <option value="9" <?= ($item->accessorythree == 9) ? 'selected' : '' ?>>6 A</option>
+                                                        <option value="10" <?= ($item->accessorythree == 10) ? 'selected' : '' ?>>10 A</option>
+                                                        <option value="11" <?= ($item->accessorythree == 11) ? 'selected' : '' ?>>13 A</option>
+                                                        <option value="12" <?= ($item->accessorythree == 12) ? 'selected' : '' ?>>15 A</option>
+                                                        <option value="13" <?= ($item->accessorythree == 13) ? 'selected' : '' ?>>16 A</option>
+                                                    <?php } ?>
+
+
+                                                </select>
+                                            </div>
+                                       
                                     </div>
                                     <?php
                                 }
