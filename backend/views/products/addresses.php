@@ -18,18 +18,21 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
     .select-wrapper input.select-dropdown, .select-wrapper input.select-dropdown:disabled {
         border-color: unset;
     }
-   
+
 </style>
 <script>
     function GetFileSize() {
-        var com = document.forms["myform"]["command"].value;
+        var com = document.forms["myform"]["department"].value;
         if (com == "") {
-            swal("", "Please select Command", "warning");
+            swal("", "Please select Department", "warning");
             return false;
         }
         $("#form-addresses").submit();
     }
 </script>
+<?php
+$departments = \common\models\Departments::find()->orderBy(['name' => SORT_ASC])->all();
+?>
 <main class="mn-inner">
     <div class="row">
         <div class="col s6">
@@ -62,6 +65,21 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <form id="form-addresses" name="myform" class="col s12" onsubmit="return GetFileSize()" method = "post" action = "<?= $baseURL ?>products/addresses">
                         <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                         <input type="hidden" value="<?= @$address->id; ?>" name="id">
+                        <div class="input-fields col s12">
+                            <label>Select Department</label>
+                            <select class="validate required materialSelect" name="department" id="department">
+                                <option value="">Select Department</option>
+                                <?php
+                                if (count($departments)) {
+                                    foreach ($departments as $depart) {
+                                        ?>
+                                        <option value="<?= $depart->id ?>" <?= (@$_POST['department'] == $depart->id) ? 'selected' : '' ?> ><?= $depart->name ?></option>
+                                        <?php
+                                    }
+                                }
+                                ?>
+                            </select>
+                        </div>
                         <div class="input-fields col s12">
                             <label>Select Command</label>
                             <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineeraddress(this.value)">
@@ -145,7 +163,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </select>
                         </div>
                         <?php
-                      
                         if ((@$_POST['cengineer'] == 0 || @$_POST['cengineer'] == null) && (@$_POST['gengineer'] == 0 || @$_POST['gengineer'] == null)) {
                             $arrcommands = [1, 2, 3, 4, 5, 13, 14];
                             $getcengineers = \common\models\Cengineer::find()->where(['command' => @$_POST['command']])->all();
@@ -161,13 +178,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
                                 <?php
                             } elseif (@$getcengineers && (in_array(@$_POST['command'], $arrcommands))) {
-                              
                                 ?>
                                 <div id="ge">
                                     <div class="input-field col s12">
                                         <select class="validate required materialSelect" name="gengineer" id="gengineer">
                                             <option value="">Select GE</option>
-                                            <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'],''); ?>
+                                            <?php SiteController::actionGetcengineeraddressbycommand(@$_POST['command'], ''); ?>
                                         </select>
                                     </div>
                                 </div>  
@@ -269,7 +285,6 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         }
 
                         if ((@$_POST['cengineer'] != 0 || @$_POST['cengineer'] != null) && (@$_POST['cwengineer'] != 0 || @$_POST['cwengineer'] != null) && @$_POST['gengineer'] != 0) {
-                           
                             ?>
 
                             <div id="ge">
@@ -324,7 +339,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                         ?>
                                         <tr data-id = "<?= $user->id ?>">
                                             <td class = ""><?= $key + 1 ?></td>
-                                            <td class = ""><?= str_replace('-MES','',str_replace(' - MES', '', $user->command)); ?></td>
+                                            <td class = ""><?= str_replace('-MES', '', str_replace(' - MES', '', $user->command)); ?></td>
                                             <td class = ""><?= $user->contact ?></td>
                                             <td class = ""><?= $user->email ?></td>
                                             <td class = ""><?= $user->address ?></td>
