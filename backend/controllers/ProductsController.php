@@ -45,7 +45,7 @@ class ProductsController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'category-em', 'files','xfiles', 'addaddress', 'addresses', 'deleteaddress', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
+                        'actions' => ['logout', 'index', 'category-em', 'files', 'xfiles', 'addaddress', 'addresses', 'deleteaddress', 'delete-file', 'allfiles', 'fileimages', 'getaccessories', 'uploadfile', 'updatetend', 'searchcontractor', 'updatedetails', 'updatedetailsitems', 'category-civil', 'create-accessory', 'delete-accessory', 'prices', 'create-price', 'accessories', 'getsizes', 'delete-price'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -871,6 +871,7 @@ class ProductsController extends Controller {
 
             if ($_POST['id']) {
                 $model = \common\models\Addresses::find()->where(['id' => $_POST['id']])->one();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -907,6 +908,7 @@ class ProductsController extends Controller {
                 return $this->redirect(array('products/addresses'));
             } else {
                 $model = new \common\models\Addresses();
+                $model->department = @$_POST['department'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -981,46 +983,60 @@ class ProductsController extends Controller {
     public function actionAddresses() {
 
         if (isset($_POST['submit'])) {
-           
+
             $addresses = \common\models\Addresses::find()->where(['status' => 1]);
-            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && @$_REQUEST['cengineer'] == '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['gengineer'] == '') {
+            if (isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0 && @$_REQUEST['command'] == '' && @$_REQUEST['cengineer'] == '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['gengineer'] == '') {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
+                    ['cengineer' => null],
+                    ['cwengineer' => null],
+                    ['gengineer' => null]
+                ]);
+            }
+            if (isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0 && isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && @$_REQUEST['cengineer'] == '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['gengineer'] == '') {
+                $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['command' => $_REQUEST['command']],
                     ['cengineer' => null],
                     ['cwengineer' => null],
                     ['gengineer' => null]
                 ]);
             }
-            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
+            if ((isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0) && (isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (@$_REQUEST['cwengineer'] == '') && (@$_REQUEST['gengineer'] == '')) {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['cengineer' => $_REQUEST['cengineer']],
                     ['cwengineer' => null],
                     ['gengineer' => null]
                 ]);
             }
-            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
+            if ((isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0) && (isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (@$_REQUEST['gengineer'] == '')) {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['cengineer' => $_REQUEST['cengineer']],
                     ['cwengineer' => $_REQUEST['cwengineer']],
                     ['gengineer' => null]
                 ]);
             }
-            if ((isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+            if ((isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0) && (isset($_REQUEST['cengineer']) && $_REQUEST['cengineer'] != '') && (isset($_REQUEST['cwengineer']) && $_REQUEST['cwengineer'] != '') && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['cengineer' => $_REQUEST['cengineer']],
                     ['cwengineer' => $_REQUEST['cwengineer']],
                     ['gengineer' => $_REQUEST['gengineer']]
                 ]);
             }
-            if ((!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
+            if ((isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0) && (!isset($_REQUEST['cengineer'])) && (!isset($_REQUEST['cwengineer'])) && (isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '')) {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['cengineer' => null],
                     ['cwengineer' => null],
                     ['gengineer' => $_REQUEST['gengineer']]
                 ]);
             }
-            if (isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['cengineer'] == '') {
+            if ((isset($_REQUEST['department']) && $_REQUEST['department'] != '' && $_REQUEST['department'] != 0) && isset($_REQUEST['command']) && $_REQUEST['command'] != '' && $_REQUEST['command'] != 0 && isset($_REQUEST['gengineer']) && $_REQUEST['gengineer'] != '' && @$_REQUEST['cwengineer'] == '' && @$_REQUEST['cengineer'] == '') {
                 $addresses->andWhere(['and',
+                    ['department' => $_REQUEST['department']],
                     ['cengineer' => null],
                     ['cwengineer' => null],
                     ['gengineer' => $_REQUEST['gengineer']]
@@ -1048,6 +1064,9 @@ class ProductsController extends Controller {
                     } elseif ($_address->command != '' && $_address->cengineer == '' && $_address->cwengineer == '' && $_address->gengineer != '') {
                         $office = \common\models\Cengineer::find()->where(['cid' => $_address->gengineer, 'status' => 1])->one();
                         $officename = $office->text;
+                    } elseif ($_address->department != '') {
+                        $department = \common\models\Departments::find()->where(['id' => $_address->department])->one();
+                        $officename = $department->name;
                     }
                     $_address->command = $officename;
                 }
@@ -1117,9 +1136,9 @@ class ProductsController extends Controller {
             return $this->redirect(array('products/addresses'));
         }
     }
-    
+
     public function actionXfiles() {
-        $clients = \common\models\Clients::find()->where(['type'=>3])->andWhere('find_in_set(:key2, cables)', [':key2' => '10'])->all();
+        $clients = \common\models\Clients::find()->where(['type' => 3])->andWhere('find_in_set(:key2, cables)', [':key2' => '10'])->all();
         echo "<pre/>";
         print_r($clients);
         die();

@@ -18,12 +18,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 </style>
 <script>
     function GetFileSize() {
-        var com = document.forms["myform"]["command"].value;
+        var com = document.forms["myform"]["department"].value;
         var con = document.forms["myform"]["contact"].value;
         var email = document.forms["myform"]["email"].value;
         var address = document.forms["myform"]["address"].value;
         if (com == "") {
-            swal("", "Please select Command", "warning");
+            swal("", "Please select Department", "warning");
             return false;
         }
         if (con == "") {
@@ -34,9 +34,12 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
             swal("", "Please enter Address", "warning");
             return false;
         }
-         $("#create-project-form-tender").submit();
+        $("#create-project-form-tender").submit();
     }
 </script>
+<?php
+$departments = \common\models\Departments::find()->orderBy(['name' => SORT_ASC])->all();
+?>
 <main class="mn-inner">
     <div class="row">
         <div class="col s12">
@@ -72,6 +75,21 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                             <input type="hidden" value="<?= @$address->id; ?>" name="id">
                             <div class="row">
+                                <div class="input-fields col s12 row">
+                                    <label>Select Department</label>
+                                    <select class="validate required materialSelect" name="department" id="department">
+                                        <option value="">Select Department</option>
+                                        <?php
+                                        if (count($departments)) {
+                                            foreach ($departments as $depart) {
+                                                ?>
+                                                <option value="<?= $depart->id ?>" <?= ($address->department == $depart->id)?'selected':''?> ><?= $depart->name ?></option>
+                                                <?php
+                                            }
+                                        }
+                                        ?>
+                                    </select>
+                                </div>
                                 <div class="input-fields col s12 row">
                                     <label>Select Command</label>
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
@@ -146,7 +164,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                             echo "selected";
                                         }
                                         ?>>DGNP MUMBAI - MES</option>
-                                        <!--option value="2">B/R</option-->
+
                                     </select>
                                 </div>
                             </div>
