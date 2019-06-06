@@ -15,9 +15,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         border-color: unset;
     }
     .row{margin-bottom: 0px;}
-    .row.states {
-        margin-top: 20px;
-    }
+    .row .states{margin-top:20px;}
+    .row .states{margin-bottom:20px;}
 </style>
 <script>
     function GetFileSizeTender() {
@@ -31,7 +30,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
         var odate = document.forms["myform"]["odate"].value;
         var cvalue = document.forms["myform"]["costvalue"].value;
         if (department == "") {
-            swal("", "Please select Department", "warning");
+            swal("", "Please select Organisation", "warning");
             return false;
         }
         if (work == "") {
@@ -127,9 +126,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <input type="hidden" value="<?= @$tender->id; ?>" name="id">
                             <div class="row">
                                 <div class="input-fields col s12 row">
-                                    <label>Select Department</label>
-                                    <select class="validate required materialSelect" name="department" id="department">
-                                        <option value="">Select Department</option>
+                                    <label>Select Organisation</label>
+                                    <select class="materialSelectorg browser-default" name="department" id="department" onchange="showsubtypes(this.value)">
+                                        <option value="">Select Organisation</option>
                                         <?php
                                         if (@$departments) {
                                             foreach ($departments as $_department) {
@@ -143,7 +142,60 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </select>
                                 </div>
                             </div>
-                            <div class="row">
+
+                            <div class="row states">
+                                <div class="input-fields col s12 row">
+                                    <label for="state">Select State</label>
+                                    <select class="ddfavour materialSelect browser-default" name="state" id="state">
+                                        <?php SiteController::actionStates(@$tender->state); ?>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="row" id="subtypes" <?php
+                            if (!@$tender->department) {
+                                echo 'style="display:none;"';
+                            }
+                            ?>>
+
+                                <?php if (@$tender->department) { ?>
+                                    <div class="input-fields col s12 row">
+                                        <label>Select Department</label>
+                                        <select class="validate required materialSelect" name="directorate" id="directorate" onchange="getdivision(this.value)">
+                                            <?php SiteController::actionGetsubdepartmentsbyorg($tender->department, $tender->directorate); ?>
+                                        </select>
+                                    </div>
+                                <?php } elseif (!@$tender->directorate) { ?>
+                                    <div class="input-fields col s12 row departments" style="display:none;">
+                                        <label>Select Department</label>
+                                        <select class="validate required materialSelect" name="directorate" id="directorate" onchange="getdivision(this.value)">
+                                            <option value="0" disabled selected>Select</option>
+                                        </select>
+                                    </div> 
+                                <?php } ?>
+
+                                <?php if (!@$tender->directorate) { ?>
+                                    <div class="input-fields col s12 row divisions" style="display:none;">
+                                        <label>Select Division</label>
+                                        <select class="validate required materialSelect" name="division" id="division">
+                                            <option value="0" disabled selected>Select</option>
+                                        </select>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="input-fields col s12 row divisions" >
+                                        <label>Select Division</label>
+                                        <select class="validate required materialSelect" name="division" id="division">
+                                            <?php SiteController::actionGetdivisionbydirect($tender->directorate, $tender->division); ?>
+                                        </select>
+                                    </div>
+                                <?php } ?>
+
+                            </div>
+                            <div class="row" id="commandlist" <?php
+                            if (!@$tender->command) {
+                                echo 'style="display:none;"';
+                            }
+                            ?>>
                                 <div class="input-fields col s12 row">
                                     <label>Select Command</label>
                                     <select class="validate required materialSelect" name="command" id="commandz" onchange="getcengineer(this.value)">
@@ -338,7 +390,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     </div>
                                 </div>
                             <?php } ?>
-                            <div class="row">
+                            <div class="row" id="ddlist" style="display:none;">
                                 <div class="input-fields col s12 row">
                                     <label for="ddfavour">Select DD in favour of</label>
                                     <select class="ddfavour materialSelect browser-default" name="ddfavour" id="ddfavour">
@@ -347,14 +399,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 </div>
                             </div>
 
-                            <div class="row states">
-                                <div class="input-fields col s12 row">
-                                    <label for="state">Select State</label>
-                                    <select class="ddfavour materialSelect browser-default" name="state" id="state">
-                                        <?php SiteController::actionStates(@$tender->state); ?>
-                                    </select>
-                                </div>
-                            </div>
+
 
                             <div class="row">
                                 <div class="input-field col s6">

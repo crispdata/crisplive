@@ -81,7 +81,10 @@ $(document).ready(function () {
     $('select.nmakes').select2({closeOnSelect: true, placeholder: 'Select Non Structural Steel Makes'});
     $('#dashmake').select2({closeOnSelect: true, placeholder: 'Select Make'});
     $('.materialSelectsize').select2({closeOnSelect: true, placeholder: 'Select Size'});
+    $('.materialSelectdivision').select2({closeOnSelect: true, placeholder: 'Select Division'});
     $('.materialSelecttypefit').select2({closeOnSelect: true, placeholder: 'Select Type'});
+    $('.materialSelectorg').select2({closeOnSelect: true, placeholder: 'Select Organisation'});
+    $('.materialSelectdepart').select2({closeOnSelect: true, placeholder: 'Select Department'});
     $('.materialSelectcapacityfit').select2({closeOnSelect: true, placeholder: 'Select Capacity'});
     $('.materialSelectaccessoryone').select2({closeOnSelect: true, placeholder: 'Select Accessory'});
     $('.materialSelectaccessorytwo').select2({closeOnSelect: true, placeholder: 'Select Type'});

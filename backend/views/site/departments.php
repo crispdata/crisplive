@@ -4,7 +4,7 @@
 use backend\controllers\SiteController;
 use yii\helpers\Url;
 
-$this->title = 'All Departments';
+$this->title = 'All Organisations';
 $user = Yii::$app->user->identity;
 $baseURL = Yii::$app->params['BASE_URL'];
 $imageURL = Yii::$app->params['IMAGE_URL'];
@@ -20,19 +20,19 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 <main class="mn-inner">
     <div class="row">
         <div class="col s6">
-            <div class="page-title">All Departments</div>
+            <div class="page-title">All Organisations</div>
         </div>
 
-        <a href="#department" class="waves-effect waves-light btn blue m-b-xs modal-trigger add-contact">Add Department</a>
+        <a href="#department" class="waves-effect waves-light btn blue m-b-xs modal-trigger add-contact">Add Organisation</a>
         <div id="department" class="modal">
             <div class="modal-content">
-                <h4>Add new department</h4>
+                <h4>Add new organisation</h4>
                 <form id="sort-data" method = "post" action = "<?= $baseURL ?>site/adddepartment">
                     <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                     <div class="row">
                         <div class="input-field col s12">
                             <input id="department" type="text" name = "department" required="" class="validate required" value="">
-                            <label for="department">Department Name</label>
+                            <label for="department">Organisation Name</label>
                         </div>
                     </div>
                     <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">
@@ -110,14 +110,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                 <div id="editmodal<?= $department->id; ?>" class="modal">
                                     <div class="modal-content">
-                                        <h4>Edit department</h4>
+                                        <h4>Edit organisation</h4>
                                         <form id="sort-data" method = "post" action = "<?= $baseURL ?>site/adddepartment">
                                             <input type="hidden" name="<?= Yii::$app->request->csrfParam; ?>" value="<?= Yii::$app->request->csrfToken; ?>" />
                                             <input type="hidden" name="did" value="<?= $department->id; ?>">
                                             <div class="row">
                                                 <div class="input-field col s12">
                                                     <input id="department" type="text" name = "department" required="" class="validate required" value="<?= $department->name; ?>">
-                                                    <label for="department">Department Name</label>
+                                                    <label for="department">Organisation Name</label>
                                                 </div>
                                             </div>
                                             <input class="btn blue m-b-xs" name="submit" type="submit" value="Submit">

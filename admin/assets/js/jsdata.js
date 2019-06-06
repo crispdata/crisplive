@@ -1460,6 +1460,115 @@ $(document).ready(function () {
 
 });
 
+function getdivision(val) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getdivisions',
+        dataType: "json",
+        data: {'value': val, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+        },
+        success: function (resultData) {
+            var selects = '';
+            selects += '<option value="" disabled>Select Division</option>';
+            $.each(resultData.divisions, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Divisions</option>';
+                }
+            }
+            );
+
+            $("#division").html(selects);
+            $("#division").material_select();
+            $(".divisions").show();
+        }
+    });
+}
+
+function getsubdepartments(val) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getsubdepartments',
+        dataType: "json",
+        data: {'value': val, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+        },
+        success: function (resultData) {
+            var selects = '';
+
+            $.each(resultData.departments, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Departments</option>';
+                }
+            }
+            );
+
+            $("#subdepartment").html(selects);
+            $("#subdepartment").material_select();
+            $(".subdepartments").show();
+            $(".division").show();
+        }
+    });
+}
+
+function showsubtypes(val) {
+    if (val == 1) {
+        $("#commandlist").show();
+        $("#ddlist").show();
+        $(".ddfavour").select2();
+        $(".states").css('margin-top', '20px');
+        $(".states").css('margin-bottom', '20px');
+        $("#directorate").prop('selectedIndex', '');
+        $(".departments").hide();
+        $("#division").prop('selectedIndex', '');
+        $(".divisions").hide();
+    } else {
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getsubdepartments',
+            dataType: "json",
+            data: {'value': val, '_csrf-backend': csrf_token},
+            beforeSend: function () {
+                $("#division").prop('selectedIndex', '');
+                $(".divisions").hide();
+            },
+            success: function (resultData) {
+                var selects = '';
+                selects += '<option value="" readonly>Select Department</option>';
+                $.each(resultData.departments, function (key, value) {
+                    if (key != 0) {
+                        selects += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        selects += '<option value="" disabled required>No Departments</option>';
+                    }
+                }
+                );
+
+                $("#directorate").html(selects);
+                $("#directorate").material_select();
+                $("#subtypes").show();
+                $(".departments").show();
+                $(".states").css('margin-bottom', '20px');
+                $("#commandz").prop('selectedIndex', '');
+                $("#commandlist").hide();
+                $("#cengineer").prop('selectedIndex', '');
+                $("#ce").hide();
+                $("#cwengineer").prop('selectedIndex', '');
+                $("#cwe").hide();
+                $("#gengineer").prop('selectedIndex', '');
+                $("#ge").hide();
+                $("#ddfavour").prop('selectedIndex', '');
+                $("#ddlist").hide();
+            }
+        });
+    }
+
+}
+
 function gettype(val) {
     if (val == 19) {
         var accessoriestwo = '';

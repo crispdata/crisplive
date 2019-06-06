@@ -51,7 +51,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'adddepartment', 'states', 'change-department-status', 'delete-department', 'departments', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus', 'getsubdepartments','change-division-status','delete-division', 'getdivisions', 'addsubdepartment','getsubdepartmentsbyorg', 'getdivisionbydirect', 'subdepartments', 'divisions', 'adddivision', 'adddepartment', 'states', 'change-department-status', 'delete-department', 'change-subdepartment-status', 'delete-subdepartment', 'departments', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4211,6 +4211,8 @@ class SiteController extends Controller {
             if ($_POST['id']) {
                 $model = \common\models\Tender::find()->where(['id' => $_POST['id']])->one();
                 $model->department = @$_POST['department'];
+                $model->directorate = @$_POST['directorate'];
+                $model->division = @$_POST['division'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4271,6 +4273,8 @@ class SiteController extends Controller {
             } else {
                 $model = new \common\models\Tender();
                 $model->department = @$_POST['department'];
+                $model->directorate = @$_POST['directorate'];
+                $model->division = @$_POST['division'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4355,10 +4359,14 @@ class SiteController extends Controller {
             } else {
                 $tender = [];
             }
-            $departments = \common\models\Departments::find()->where(['status' => 1])->all();
+            $departments = \common\models\Departments::find()->where(['status' => 1])->orderBy(['name'=>SORT_ASC])->all();
+            $directorates = \common\models\Directorates::find()->where(['status' => 1])->orderBy(['name'=>SORT_ASC])->all();
+            $divisions = \common\models\Divisions::find()->where(['status' => 1])->orderBy(['name'=>SORT_ASC])->all();
             return $this->render('createtender', [
                         'tender' => $tender,
-                        'departments' => $departments
+                        'departments' => $departments,
+                        'directorates' => $directorates,
+                        'divisions' => $divisions
             ]);
         }
     }
@@ -5174,8 +5182,8 @@ class SiteController extends Controller {
                         }
                     }
                     $itemid = \common\models\Item::deleteAll(['tender_id' => $_POST["selected_id"]]);
-                    $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => $ids]);
-                    $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => $ids]);
+                    $deleteone = \common\models\ItemDetails::deleteAll(['item_id' => @$ids]);
+                    $deletetwo = \common\models\MakeDetails::deleteAll(['item_id' => @$ids]);
                     Yii::$app->session->setFlash('success', "Tenders successfully deleted");
                     return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
                 }
@@ -10615,6 +10623,214 @@ class SiteController extends Controller {
         if ($depart) {
             Yii::$app->session->setFlash('success', "Department successfully deleted");
             return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+    }
+
+    public function actionChangeSubdepartmentStatus() {
+        $id = @$_GET['id'];
+        $depart = \common\models\Directorates::find()->where(['id' => $id])->one();
+        if ($depart->status == 1) {
+            $depart->status = 0;
+        } else {
+            $depart->status = 1;
+        }
+        $depart->save();
+        Yii::$app->session->setFlash('success', "Status successfully changed");
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
+    public function actionDeleteSubdepartment() {
+        $id = $_GET['id'];
+        $depart = \common\models\Directorates::deleteAll(['id' => $id]);
+        if ($depart) {
+            Yii::$app->session->setFlash('success', "Department successfully deleted");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+    }
+    
+    public function actionChangeDivisionStatus() {
+        $id = @$_GET['id'];
+        $depart = \common\models\Divisions::find()->where(['id' => $id])->one();
+        if ($depart->status == 1) {
+            $depart->status = 0;
+        } else {
+            $depart->status = 1;
+        }
+        $depart->save();
+        Yii::$app->session->setFlash('success', "Status successfully changed");
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
+    public function actionDeleteDivision() {
+        $id = $_GET['id'];
+        $depart = \common\models\Divisions::deleteAll(['id' => $id]);
+        if ($depart) {
+            Yii::$app->session->setFlash('success', "Division successfully deleted");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+    }
+
+    public function actionGetdivisions() {
+        $id = $_REQUEST['value'];
+        $divs = [];
+        $divisions = \common\models\Divisions::find()->where(['direct_id' => $id, 'status' => 1])->all();
+        if ($divisions) {
+            foreach ($divisions as $_size) {
+                $divs[$_size->id] = $_size->name;
+            }
+        } else {
+            $divs['0'] = 'No Divisions';
+        }
+        echo json_encode(['divisions' => $divs]);
+        die();
+    }
+
+    public function actionGetsubdepartments() {
+        $id = $_REQUEST['value'];
+        $divs = [];
+        $directorates = \common\models\Directorates::find()->where(['did' => $id, 'status' => 1])->orderBy(['name' => SORT_ASC])->all();
+        if ($directorates) {
+            foreach ($directorates as $_size) {
+                $divs[$_size->id] = $_size->name;
+            }
+        } else {
+            $divs['0'] = 'No Departments';
+        }
+        echo json_encode(['departments' => $divs]);
+        die();
+    }
+
+    public function actionGetdivisionbydirect($direct, $division) {
+        $divs = '';
+        $divisions = \common\models\Divisions::find()->where(['direct_id' => $direct, 'status' => 1])->orderBy(['name'=>SORT_ASC])->all();
+        if ($divisions) {
+            foreach ($divisions as $_size) {
+                if ($_size->id == $division) {
+                    $divs .= '<option value=' . $_size->id . ' selected>' . $_size->name . '</option>';
+                } else {
+                    $divs .= '<option value=' . $_size->id . '>' . $_size->name . '</option>';
+                }
+            }
+        }
+        echo $divs;
+    }
+    
+    public function actionGetsubdepartmentsbyorg($did, $direct) {   
+        $divs = '';
+        $directs = \common\models\Directorates::find()->where(['did' => $did, 'status' => 1])->orderBy(['name'=>SORT_ASC])->all();
+        if ($directs) {
+            foreach ($directs as $_size) {
+                if ($_size->id == $direct) {
+                    $divs .= '<option value=' . $_size->id . ' selected>' . $_size->name . '</option>';
+                } else {
+                    $divs .= '<option value=' . $_size->id . '>' . $_size->name . '</option>';
+                }
+            }
+        }else{
+             $divs .= '<option value="" disabled>No Departments</option>';
+        }
+        echo $divs;
+    }
+
+    public function actionSubdepartments() {
+        $departments = \common\models\Departments::find()->all();
+        $directorates = \common\models\Directorates::find()->all();
+        return $this->render('directorates', [
+                    'directorates' => $directorates,
+                    'departments' => $departments
+        ]);
+    }
+
+    public function actionDivisions() {
+        $departments = \common\models\Departments::find()->all();
+        $divisions = \common\models\Divisions::find()->all();
+        return $this->render('divisions', [
+                    'divisions' => $divisions,
+                    'departments' => $departments
+        ]);
+    }
+
+    public function actionAddsubdepartment() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Directorates::find()->where(['id' => $_POST['id']])->one();
+                $model->did = @$_POST['organisation'];
+                $model->name = @$_POST['subdepartment'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Department successfully updated");
+                }
+            } else {
+                $model = new \common\models\Directorates();
+                $model->did = @$_POST['organisation'];
+                $model->name = @$_POST['subdepartment'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Department successfully added");
+                }
+            }
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            if ($id) {
+                $subdepart = \common\models\Directorates::find()->where(['id' => $id])->one();
+            } else {
+                $subdepart = [];
+            }
+            $departments = \common\models\Departments::find()->orderBy(['name' => SORT_ASC])->all();
+            return $this->render('addsubdepartment', [
+                        'departments' => $departments,
+                        'subdepart' => $subdepart
+            ]);
+        }
+    }
+
+    public function actionAdddivision() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Divisions::find()->where(['id' => $_POST['id']])->one();
+                $model->did = @$_POST['organisation'];
+                $model->direct_id = @$_POST['subdepartment'];
+                $model->name = @$_POST['division'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Division successfully updated");
+                }
+            } else {
+                $model = new \common\models\Divisions();
+                $model->did = @$_POST['organisation'];
+                $model->direct_id = @$_POST['subdepartment'];
+                $model->name = @$_POST['division'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Division successfully added");
+                }
+            }
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            if ($id) {
+                $division = \common\models\Divisions::find()->where(['id' => $id])->one();
+            } else {
+                $division = [];
+            }
+            $departments = \common\models\Departments::find()->orderBy(['name' => SORT_ASC])->all();
+            $directs = \common\models\Directorates::find()->orderBy(['name' => SORT_ASC])->all();
+            return $this->render('adddivision', [
+                        'departments' => $departments,
+                        'subdepartments' => $directs,
+                        'division' => $division
+            ]);
         }
     }
 
