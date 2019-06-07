@@ -86,8 +86,8 @@ $(document).ready(function () {
         e.preventDefault();
         var val = $("#searchdata").val() // get the current value of the input field.
         var vallength = $("#searchdata").val().length; // get the current value of the input field.
-        if (vallength < 6) {
-            alert('Please enter minimum 6 digits Tender Id');
+        if (vallength < 5) {
+            alert('Please enter minimum 5 digits Tender Id');
             return false;
         }
         if (val) {
@@ -1461,30 +1461,32 @@ $(document).ready(function () {
 });
 
 function getdivision(val) {
-    $.ajax({
-        type: 'post',
-        url: baseUrl + 'site/getdivisions',
-        dataType: "json",
-        data: {'value': val, '_csrf-backend': csrf_token},
-        beforeSend: function () {
-        },
-        success: function (resultData) {
-            var selects = '';
-            selects += '<option value="" disabled>Select Division</option>';
-            $.each(resultData.divisions, function (key, value) {
-                if (key != 0) {
-                    selects += '<option value="' + key + '">' + value + '</option>';
-                } else {
-                    selects += '<option value="" disabled required>No Divisions</option>';
+    if (val != '') {
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getdivisions',
+            dataType: "json",
+            data: {'value': val, '_csrf-backend': csrf_token},
+            beforeSend: function () {
+            },
+            success: function (resultData) {
+                var selects = '';
+                selects += '<option value="" disabled>Select Division</option>';
+                $.each(resultData.divisions, function (key, value) {
+                    if (key != 0) {
+                        selects += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        selects += '<option value="" disabled required>No Divisions</option>';
+                    }
                 }
-            }
-            );
+                );
 
-            $("#division").html(selects);
-            $("#division").material_select();
-            $(".divisions").show();
-        }
-    });
+                $("#division").html(selects);
+                $("#division").material_select();
+                $(".divisions").show();
+            }
+        });
+    }
 }
 
 function getsubdepartments(val) {
@@ -1515,6 +1517,54 @@ function getsubdepartments(val) {
     });
 }
 
+function showstatedepart(val) {
+    var org = $("#department option:selected").val();
+    if (org == '') {
+        alert('Please select Organisation');
+        return false;
+    }
+    if (org != 1) {
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getsubdepartmentsbystate',
+            dataType: "json",
+            data: {'value': val, org: org, '_csrf-backend': csrf_token},
+            beforeSend: function () {
+                $("#division").prop('selectedIndex', '');
+                $(".divisions").hide();
+            },
+            success: function (resultData) {
+                var selects = '';
+                selects += '<option value="" readonly>Select Department</option>';
+                $.each(resultData.departments, function (key, value) {
+                    if (key != 0) {
+                        selects += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        selects += '<option value="" disabled required>No Departments</option>';
+                    }
+                }
+                );
+
+                $("#directorate").html(selects);
+                $("#directorate").material_select();
+                $("#subtypes").show();
+                $(".departments").show();
+                $(".states").css('margin-bottom', '20px');
+                $("#commandz").prop('selectedIndex', '');
+                $("#commandlist").hide();
+                $("#cengineer").prop('selectedIndex', '');
+                $("#ce").hide();
+                $("#cwengineer").prop('selectedIndex', '');
+                $("#cwe").hide();
+                $("#gengineer").prop('selectedIndex', '');
+                $("#ge").hide();
+                $("#ddfavour").prop('selectedIndex', '');
+                $("#ddlist").hide();
+            }
+        });
+    }
+}
+
 function showsubtypes(val) {
     if (val == 1) {
         $("#commandlist").show();
@@ -1533,6 +1583,7 @@ function showsubtypes(val) {
             dataType: "json",
             data: {'value': val, '_csrf-backend': csrf_token},
             beforeSend: function () {
+                $("#state").select2('val', '0');
                 $("#division").prop('selectedIndex', '');
                 $(".divisions").hide();
             },

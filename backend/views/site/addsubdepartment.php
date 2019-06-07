@@ -1,6 +1,7 @@
 <?php
 /* @var $this yii\web\View */
 
+use backend\controllers\SiteController;
 $this->title = 'Add Department';
 
 $baseURL = Yii::$app->params['BASE_URL'];
@@ -64,6 +65,14 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
 
                                     </select>
                                 </div>
+                                <div class="row states">
+                                <div class="input-fields col s12 row">
+                                    <label for="state">Select State</label>
+                                    <select class="ddfavour materialSelect browser-default" name="state" id="state">
+                                        <?php SiteController::actionStates(@$subdepart->state_id); ?>
+                                    </select>
+                                </div>
+                            </div>
                                 <div class="input-field col s12">
                                     <input id="subdepartment" type="text" name = "subdepartment" required="" class="validate required" value="<?= @$subdepart->name ?>">
                                     <label for="subdepartment">Department Name</label>

@@ -51,6 +51,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             <tr>
                                 <th data-field="name">Sr. No.</th>
                                 <th data-field="name">Organisation</th>
+                                <th data-field="name">State</th>
                                 <th data-field="name">Department</th>
                                 <th data-field="name">Status</th>
                                 <th data-field="email">Actions</th>
@@ -62,7 +63,8 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             if (@$directorates) {
                                 $i = 0;
                                 foreach ($directorates as $key => $direct) {
-                                    $depart = \common\models\Departments::find()->where(['id'=>$direct->did])->one();
+                                    $depart = \common\models\Departments::find()->where(['id' => $direct->did])->one();
+                                    $state = \common\models\States::find()->where(['id' => $direct->state_id, 'country_id' => 101])->one();
                                     if ($direct->status == 1) {
                                         $status = 'Active';
                                         $class = 'green';
@@ -73,8 +75,9 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     ?>
                                     <tr data-id = "<?= $direct->id ?>">
                                         <td class = ""><?= $key + 1 ?></td>
-                                        <td class = ""><?= $depart->name ?></td>
-                                        <td class = ""><?= $direct->name ?></td>
+                                        <td class = ""><?= @$depart->name ?></td>
+                                        <td class = ""><?= (@$state->name)?$state->name:'N/A' ?></td>
+                                        <td class = ""><?= @$direct->name ?></td>
                                         <td ><a href="<?= Url::to(['site/change-subdepartment-status', 'id' => $direct->id]) ?>" class = "btn <?= $class ?>"><?= $status ?></a></td>
                                         <td>
                                             <a href="<?= Url::to(['site/addsubdepartment', 'id' => $direct->id]) ?>" class="waves-effect waves-light btn blue">Edit</a>

@@ -68,7 +68,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                         <thead>
                             <tr>
                                 <th data-field="name">Sr. No.</th>
-                                <th data-field="name">Department</th>
+                                <th data-field="name">Organisation</th>
                                 <th data-field="name">Status</th>
                                 <th data-field="email">Actions</th>
 

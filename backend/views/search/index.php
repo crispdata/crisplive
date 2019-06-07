@@ -607,10 +607,10 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                             </div>
                             <?php if ($user->group_id != 6) { ?>
                                 <div class="row firstrow">
-                                    <div style="text-align: center;"><h5><b>Search By Department</b></h5></div>
+                                    <div style="text-align: center;"><h5><b>Search By Organisation</b></h5></div>
                                     <div class="input-field col s12">
-                                        <select class="validate required materialSelectdepart browser-default" name="department" id="department">
-                                            <option value="">All Departments</option>
+                                        <select class="validate required materialSelectdeparts browser-default" name="department" id="department">
+                                            <option value="">All Organisations</option>
 
                                         </select>
                                         <?php
