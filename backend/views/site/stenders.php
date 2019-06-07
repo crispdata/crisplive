@@ -131,7 +131,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                     <tr data-id = "<?= $tender->tender_id ?>">
                                         <td class = ""><?= $tender->tender_id ?></td>
                                         <td class = ""><?= $tdetails ?></td>
-                                        <td class = ""><?= (@$ddoffice->text) ? $ddoffice->text : '---' ?></td>
+                                        <td class = ""><?= (@$ddoffice->text) ? $ddoffice->text : 'N/A' ?></td>
                                         <?php if ($aocstatus != 1) { ?>
                                             <td class = ""><?= $tender->cvalue; ?></td>
                                             <td class = ""><?= $tender->bid_end_date ?></td>

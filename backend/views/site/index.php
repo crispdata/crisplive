@@ -1569,7 +1569,7 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                     <div class="card stats-card">
                         <div class="card-content">
                             <a href="site/departments">
-                                <span class="card-title leftside">All Departments</span>
+                                <span class="card-title leftside">All Organisations</span>
                                 <span class="stats-counter"><span class="counter upper leftside"><?= $departments; ?></span></span>
                             </a>
                         </div>

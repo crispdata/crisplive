@@ -24,9 +24,9 @@ $(document).ready(function () {
         }
     });
 
-    $('select.materialSelectdepart').select2({
+    $('select.materialSelectdeparts').select2({
         closeOnSelect: true,
-        placeholder: 'Select Department',
+        placeholder: 'Select Organisation',
         allowClear: true,
         ajax: {
             headers: {

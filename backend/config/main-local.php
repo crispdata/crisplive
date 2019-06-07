@@ -134,6 +134,14 @@ $config = [
                 [
                     'pattern' => 'mail/create-excel-items/<id:\d+>',
                     'route' => 'mail/create-excel-items'
+                ],
+                [
+                    'pattern' => 'site/addsubdepartment/<id:\d+>',
+                    'route' => 'site/addsubdepartment'
+                ],
+                [
+                    'pattern' => 'site/adddivision/<id:\d+>',
+                    'route' => 'site/adddivision'
                 ]
             ]
         ],
