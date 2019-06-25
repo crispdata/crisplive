@@ -1468,10 +1468,12 @@ function getdivision(val) {
             dataType: "json",
             data: {'value': val, '_csrf-backend': csrf_token},
             beforeSend: function () {
+                $("#subdivision").prop('selectedIndex', '');
+                $(".subdivisions").hide();
             },
             success: function (resultData) {
                 var selects = '';
-                selects += '<option value="" disabled>Select Division</option>';
+                selects += '<option value="" readonly>Select Division</option>';
                 $.each(resultData.divisions, function (key, value) {
                     if (key != 0) {
                         selects += '<option value="' + key + '">' + value + '</option>';
@@ -1484,6 +1486,35 @@ function getdivision(val) {
                 $("#division").html(selects);
                 $("#division").material_select();
                 $(".divisions").show();
+            }
+        });
+    }
+}
+
+function getsubdivision(val) {
+    if (val != '') {
+        $.ajax({
+            type: 'post',
+            url: baseUrl + 'site/getsubdivisions',
+            dataType: "json",
+            data: {'value': val, '_csrf-backend': csrf_token},
+            beforeSend: function () {
+            },
+            success: function (resultData) {
+                var selects = '';
+                selects += '<option value="" readonly>Select Sub Division</option>';
+                $.each(resultData.sdivisions, function (key, value) {
+                    if (key != 0) {
+                        selects += '<option value="' + key + '">' + value + '</option>';
+                    } else {
+                        selects += '<option value="" disabled required>No Sub Divisions</option>';
+                    }
+                }
+                );
+
+                $("#subdivision").html(selects);
+                $("#subdivision").material_select();
+                $(".subdivisions").show();
             }
         });
     }
@@ -1513,6 +1544,34 @@ function getsubdepartments(val) {
             $("#subdepartment").material_select();
             $(".subdepartments").show();
             $(".division").show();
+        }
+    });
+}
+
+function getdivisions(val) {
+    $.ajax({
+        type: 'post',
+        url: baseUrl + 'site/getalldivisions',
+        dataType: "json",
+        data: {'value': val, '_csrf-backend': csrf_token},
+        beforeSend: function () {
+        },
+        success: function (resultData) {
+            var selects = '';
+
+            $.each(resultData.divisions, function (key, value) {
+                if (key != 0) {
+                    selects += '<option value="' + key + '">' + value + '</option>';
+                } else {
+                    selects += '<option value="" disabled required>No Divisions</option>';
+                }
+            }
+            );
+
+            $("#division").html(selects);
+            $("#division").material_select();
+            $(".divisions").show();
+            $(".subdivision").show();
         }
     });
 }
@@ -1586,6 +1645,8 @@ function showsubtypes(val) {
                 $("#state").select2('val', '0');
                 $("#division").prop('selectedIndex', '');
                 $(".divisions").hide();
+                $("#subdivision").prop('selectedIndex', '');
+                $(".subdivisions").hide();
             },
             success: function (resultData) {
                 var selects = '';
@@ -3318,6 +3379,9 @@ function getseconddata(value) {
                     $("#acctwo0").removeAttr('required');
                     $("#acctwo0").removeClass('required');
                     $("#accessoryone").hide();
+                    $("#accthree0").removeAttr('required');
+                    $("#accthree0").removeClass('required');
+                    $("#accessorythree").hide();
                     $("#accone0").removeAttr('required');
                     $("#accone0").removeClass('required');
                     $("#itemunit").val('');
@@ -3333,8 +3397,8 @@ function getseconddata(value) {
                     });
 
                     $.each(resultData.select, function (key, value) {
-                        if (key != 0) {
-                            selects += '<option value="' + key + '" selected>' + value + '</option>';
+                        if (key != 01) {
+                            selects += '<option value="' + key + '">' + value + '</option>';
                         } else {
                             selects += '<option value="" disabled required>No Makes</option>';
                         }

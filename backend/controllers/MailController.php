@@ -710,16 +710,21 @@ class MailController extends Controller {
                 if ($tenders) {
                     foreach ($tenders as $_tender) {
                         $tdetails = '';
-                        $command = Sitecontroller::actionGetcommand($_tender->command);
-                        if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
-                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+                        if ($_tender->department == 1) {
+                            $command = Sitecontroller::actionGetcommand($_tender->command);
+                            if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
+                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+                            } else {
+                                $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+                            }
+                            $cwengineer = \common\models\Cwengineer::find()->where(['cid' => $_tender->cwengineer, 'status' => 1])->one();
+                            $gengineer = \common\models\Gengineer::find()->where(['gid' => $_tender->gengineer, 'status' => 1])->one();
+                            $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                         } else {
-                            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+                            $dname = \common\models\Departments::find()->where(['id' => $_tender->department])->one();
+                            $tdetails = $dname->name;
                         }
-                        $cwengineer = \common\models\Cwengineer::find()->where(['cid' => $_tender->cwengineer, 'status' => 1])->one();
-                        $gengineer = \common\models\Gengineer::find()->where(['gid' => $_tender->gengineer, 'status' => 1])->one();
                         $items = \common\models\Item::find()->where(['tender_id' => $_tender->id, 'status' => 1])->all();
-                        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                         if ($items) {
                             foreach ($items as $_item) {
                                 $idetails = \common\models\ItemDetails::find()->where(['item_id' => $_item->id])->one();
@@ -1235,16 +1240,21 @@ class MailController extends Controller {
         if (isset($tenders) && count($tenders)) {
             foreach ($tenders as $_tender) {
                 $tdetails = '';
-                $command = Sitecontroller::actionGetcommand($_tender->command);
-                if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
-                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+                if ($_tender->department == 1) {
+                    $command = Sitecontroller::actionGetcommand($_tender->command);
+                    if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
+                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+                    } else {
+                        $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+                    }
+                    $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
+                    $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
+                    $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                 } else {
-                    $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+                    $dname = \common\models\Departments::find()->where(['id' => $_tender->department])->one();
+                    $tdetails = $dname->name;
                 }
-                $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
-                $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
                 $items = \common\models\Item::find()->where(['tender_id' => $_tender->id, 'status' => 1])->all();
-                $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
                 if ($items) {
                     foreach ($items as $_item) {
                         $idetails = \common\models\ItemDetails::find()->where(['item_id' => $_item->id])->one();
@@ -1924,6 +1934,7 @@ class MailController extends Controller {
                 foreach ($allmails as $_mail) {
                     if ($_mail) {
                         $m->addTo($_mail);
+                        //$m->addTo('sajstyles21@gmail.com');
                     } else {
                         $m->addTo('sajstyles21@gmail.com');
                     }
@@ -1959,10 +1970,10 @@ class MailController extends Controller {
             $allfpaths = implode(',', $filepaths);
             $datasave = ['cid' => $client->id, 'mids' => implode(',', $mids), 'type' => $type, 'tid' => $ttdds, 'itemids' => $iiddss, 'filename' => $allfnames, 'filepath' => $allfpaths, 'createdon' => date('Y-m-d h:i:s'), 'status' => 1];
             $mailsent = \Yii::$app
-                    ->db
-                    ->createCommand()
-                    ->insert('maillogs', $datasave)
-                    ->execute();
+              ->db
+              ->createCommand()
+              ->insert('maillogs', $datasave)
+              ->execute();
             //if ($mailsent) {
 
             /* $array = explode(',', $ttdds);
@@ -2212,20 +2223,25 @@ class MailController extends Controller {
         $_tender = \common\models\Tender::find()->where(['id' => $id])->one();
 
         $tdetails = '';
-        $command = Sitecontroller::actionGetcommand($_tender->command);
-        if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
-            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+        if ($_tender->department == 1) {
+            $command = Sitecontroller::actionGetcommand($_tender->command);
+            if (!isset($_tender->cengineer) && isset($_tender->gengineer)) {
+                $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->gengineer, 'status' => 1])->one();
+            } else {
+                $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+            }
+            $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
+            $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
+            $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
         } else {
-            $cengineer = \common\models\Cengineer::find()->where(['cid' => $_tender->cengineer, 'status' => 1])->one();
+            $dname = \common\models\Departments::find()->where(['id' => $_tender->department])->one();
+            $tdetails = $dname->name;
         }
-        $cwengineer = \common\models\Cwengineer::find()->where(['cengineer' => $_tender->cengineer, 'cid' => $_tender->cwengineer, 'status' => 1])->one();
-        $gengineer = \common\models\Gengineer::find()->where(['cwengineer' => $_tender->cwengineer, 'gid' => $_tender->gengineer, 'status' => 1])->one();
         if ($user->group_id == 6) {
             $items = \common\models\Item::find()->where(['tender_id' => $_tender->id, 'tenderfour' => $user->authtype])->all();
         } else {
             $items = \common\models\Item::find()->where(['tender_id' => $_tender->id])->all();
         }
-        $tdetails = @$command . ' ' . @$cengineer->text . ' ' . @$cwengineer->text . ' ' . @$gengineer->text;
         if ($items) {
             foreach ($items as $_item) {
                 if ($user->group_id == 6) {

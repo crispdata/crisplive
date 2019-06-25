@@ -552,12 +552,13 @@ $aochold = \common\models\Tender::find()->where(['on_hold' => 1, 'aoc_status' =>
                         </div>
                     </li>
                     <li class="no-padding <?= ($controller == 'site' && $action == 'departments') ? 'active' : '' ?>">
-                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'departments' || $action == 'subdepartments' || $action == 'divisions')) ? 'active' : '' ?>"><i class="material-icons">home</i>Organisations<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
+                        <a class="collapsible-header waves-effect waves-grey <?= ($controller == 'site' && ($action == 'departments' || $action == 'subdepartments' || $action == 'divisions' || $action == 'subdivisions')) ? 'active' : '' ?>"><i class="material-icons">home</i>Organisations<i class="nav-drop-icon material-icons">keyboard_arrow_right</i></a>
                         <div class="collapsible-body">
                             <ul>
                                 <li><a href="/site/departments" class="<?= ($controller == 'site' && $action == 'departments') ? 'active-page' : '' ?>">All Organisations</a></li>
                                 <li><a href="/site/subdepartments" class="<?= ($controller == 'site' && $action == 'subdepartments') ? 'active-page' : '' ?>">All Departments</a></li>
                                 <li><a href="/site/divisions" class="<?= ($controller == 'site' && $action == 'divisions') ? 'active-page' : '' ?>">All Divisions</a></li>
+                                <li><a href="/site/subdivisions" class="<?= ($controller == 'site' && $action == 'subdivisions') ? 'active-page' : '' ?>">All Sub Divisions</a></li>
                             </ul>
                         </div>
                     </li>
