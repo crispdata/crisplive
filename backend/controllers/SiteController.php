@@ -51,7 +51,7 @@ class SiteController extends Controller {
                         'allow' => true,
                     ],
                     [
-                        'actions' => ['logout', 'index', 'aocapprovestatus', 'getsubdepartments', 'getsubdepartmentsbystate', 'change-division-status', 'delete-division', 'getdivisions', 'addsubdepartment', 'getsubdepartmentsbyorg', 'getdivisionbydirect', 'subdepartments', 'divisions', 'adddivision', 'adddepartment', 'states', 'change-department-status', 'delete-department', 'change-subdepartment-status', 'delete-subdepartment', 'departments', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
+                        'actions' => ['logout', 'index', 'aocapprovestatus','getsubdivisions', 'getsubdepartments','getsubdivisionsbydiv', 'addsubdivision', 'getsubdepartmentsbystate', 'change-division-status', 'delete-division','change-subdivision-status', 'delete-subdivision', 'getdivisions', 'addsubdepartment', 'getsubdepartmentsbyorg', 'getdivisionsbydepart', 'getdivisionbydirect', 'subdepartments', 'divisions', 'subdivisions', 'adddivision', 'adddepartment', 'states', 'change-department-status', 'delete-department', 'change-subdepartment-status', 'delete-subdepartment', 'departments', 'lasttenders', 'insertdd', 'getrepeatcolumns', 'delcontractor', 'getcolumns','getalldivisions', 'saverate', 'getallcolumns', 'deleterate', 'create-rates', 'gengineers', 'file', 'getcegraph', 'feedback', 'unselectmake', 'getcwegraph', 'getgegraph', 'delete-approve-tender', 'approvedtenders', 'tenders', 'movearchive', 'delete-user', 'movearchivetenders', 'searchtenders', 'movetoarchive', 'getmakedetails', 'getsinglelightdata', 'getsingledata', 'on-hold', 'archivetenders', 'aocready', 'aochold', 'dealers', 'manufacturers', 'contractors', 'searchtender', 'gettenders', 'getcities', 'delete-client', 'edit-client', 'change-status-client', 'delete-size', 'delete-fitting', 'delete-tenders', 'getsizes', 'getfittings', 'change-status', 'getgroupbyid', 'edit-user', 'approvetenders', 'approveitem', 'upcomingtenders', 'editprofile', 'create-tender', 'items', 'create-item', 'delete-tender', 'getdata', 'getseconddata', 'getthirddata', 'view-items', 'getfourdata', 'getfivedata', 'getsixdata', 'e-m', 'civil', 'create-make-em', 'create-make-civil', 'create-size', 'create-fitting', 'delete-make', 'getmakes', 'delete-item', 'delete-items', 'edit-item', 'json', 'approvetender', 'getcengineer', 'getcengineeraddress', 'getcwengineer', 'getgengineer', 'getcommand', 'getcebyid', 'getcwebyid', 'getcengineerbycommand', 'getcengineerbycommandview', 'getcwengineerbyce', 'getcwengineerbyceview', 'getgengineerbycwe', 'getgengineerbycweview', 'changecommand', 'getitemdesc', 'gettendertwo', 'gettenderthree', 'gettenderfour', 'gettenderfive', 'gettendersix', 'tenderone', 'tendertwo', 'tenderthree', 'tenderfour', 'tenderfive', 'tendersix', 'technicalstatus', 'financialstatus', 'aocstatus', 'technicaltenders', 'financialtenders', 'aoctenders', 'utenders', 'atenders', 'create-user', 'users', 'sizes', 'fittings', 'clients'],
                         'allow' => true,
                         'roles' => ['@'],
                     ],
@@ -4213,6 +4213,7 @@ class SiteController extends Controller {
                 $model->department = @$_POST['department'];
                 $model->directorate = @$_POST['directorate'];
                 $model->division = @$_POST['division'];
+                $model->subdivision = @$_POST['subdivision'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -4275,6 +4276,7 @@ class SiteController extends Controller {
                 $model->department = @$_POST['department'];
                 $model->directorate = @$_POST['directorate'];
                 $model->division = @$_POST['division'];
+                $model->subdivision = @$_POST['subdivision'];
                 $model->command = @$_POST['command'];
                 $model->cengineer = @$_POST['cengineer'];
                 $model->cwengineer = @$_POST['cwengineer'];
@@ -6150,11 +6152,12 @@ class SiteController extends Controller {
         }
 
         if ($makes) {
+            $allmakes['0'] = 'Select All';
             foreach ($makes as $_make) {
                 $allmakes[$_make->id] = $_make->make;
             }
         } else {
-            $allmakes['0'] = 'No Makes';
+            $allmakes['01'] = 'No Makes';
         }
 
         echo json_encode(['data' => $data, 'item' => $item, 'value' => $value, 'select' => $allmakes]);
@@ -10670,6 +10673,28 @@ class SiteController extends Controller {
             return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
         }
     }
+    
+    public function actionChangeSubdivisionStatus() {
+        $id = @$_GET['id'];
+        $depart = \common\models\Subdivisions::find()->where(['id' => $id])->one();
+        if ($depart->status == 1) {
+            $depart->status = 0;
+        } else {
+            $depart->status = 1;
+        }
+        $depart->save();
+        Yii::$app->session->setFlash('success', "Status successfully changed");
+        return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+    }
+
+    public function actionDeleteSubdivision() {
+        $id = $_GET['id'];
+        $depart = \common\models\Subdivisions::deleteAll(['id' => $id]);
+        if ($depart) {
+            Yii::$app->session->setFlash('success', "Sub Division successfully deleted");
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        }
+    }
 
     public function actionGetdivisions() {
         $id = $_REQUEST['value'];
@@ -10685,6 +10710,21 @@ class SiteController extends Controller {
         echo json_encode(['divisions' => $divs]);
         die();
     }
+    
+    public function actionGetsubdivisions() {
+        $id = $_REQUEST['value'];
+        $divs = [];
+        $sdivisions = \common\models\Subdivisions::find()->where(['div_id' => $id, 'status' => 1])->all();
+        if ($sdivisions) {
+            foreach ($sdivisions as $_size) {
+                $divs[$_size->id] = $_size->name;
+            }
+        } else {
+            $divs['0'] = 'No Sub Divisions';
+        }
+        echo json_encode(['sdivisions' => $divs]);
+        die();
+    }
 
     public function actionGetsubdepartments() {
         $id = $_REQUEST['value'];
@@ -10698,6 +10738,21 @@ class SiteController extends Controller {
             $divs['0'] = 'No Departments';
         }
         echo json_encode(['departments' => $divs]);
+        die();
+    }
+    
+    public function actionGetalldivisions() {
+        $id = $_REQUEST['value'];
+        $divs = [];
+        $divisions = \common\models\Divisions::find()->where(['direct_id' => $id, 'status' => 1])->orderBy(['name' => SORT_ASC])->all();
+        if ($divisions) {
+            foreach ($divisions as $_size) {
+                $divs[$_size->id] = $_size->name;
+            }
+        } else {
+            $divs['0'] = 'No Divisions';
+        }
+        echo json_encode(['divisions' => $divs]);
         die();
     }
 
@@ -10735,6 +10790,21 @@ class SiteController extends Controller {
         }
         echo $divs;
     }
+    
+    public function actionGetsubdivisionsbydiv($direct, $division,$subdivision) {
+        $divs = '';
+        $sdivisions = \common\models\Subdivisions::find()->where(['direct_id' => $direct,'div_id'=>$division, 'status' => 1])->orderBy(['name' => SORT_ASC])->all();
+        if ($sdivisions) {
+            foreach ($sdivisions as $_size) {
+                if ($_size->id == $subdivision) {
+                    $divs .= '<option value=' . $_size->id . ' selected>' . $_size->name . '</option>';
+                } else {
+                    $divs .= '<option value=' . $_size->id . '>' . $_size->name . '</option>';
+                }
+            }
+        }
+        echo $divs;
+    }
 
     public function actionGetsubdepartmentsbyorg($did, $direct) {
         $divs = '';
@@ -10753,6 +10823,23 @@ class SiteController extends Controller {
         echo $divs;
     }
 
+    public function actionGetdivisionsbydepart($did, $direct, $divid) {
+        $divs = '';
+        $divisions = \common\models\Divisions::find()->where(['did' => $did,'direct_id'=>$direct,'status' => 1])->orderBy(['name' => SORT_ASC])->all();
+        if ($divisions) {
+            foreach ($divisions as $_size) {
+                if ($_size->id == $divid) {
+                    $divs .= '<option value=' . $_size->id . ' selected>' . $_size->name . '</option>';
+                } else {
+                    $divs .= '<option value=' . $_size->id . '>' . $_size->name . '</option>';
+                }
+            }
+        } else {
+            $divs .= '<option value="" disabled>No Divisions</option>';
+        }
+        echo $divs;
+    }
+
     public function actionSubdepartments() {
         $departments = \common\models\Departments::find()->all();
         $directorates = \common\models\Directorates::find()->all();
@@ -10767,6 +10854,17 @@ class SiteController extends Controller {
         $divisions = \common\models\Divisions::find()->all();
         return $this->render('divisions', [
                     'divisions' => $divisions,
+                    'departments' => $departments
+        ]);
+    }
+
+    public function actionSubdivisions() {
+        $departments = \common\models\Departments::find()->all();
+        $divisions = \common\models\Divisions::find()->all();
+        $subdivisions = \common\models\Subdivisions::find()->all();
+        return $this->render('subdivisions', [
+                    'divisions' => $divisions,
+                    'subdivisions' => $subdivisions,
                     'departments' => $departments
         ]);
     }
@@ -10853,6 +10951,54 @@ class SiteController extends Controller {
                         'departments' => $departments,
                         'subdepartments' => $directs,
                         'division' => $division
+            ]);
+        }
+    }
+
+    public function actionAddsubdivision() {
+        $user = Yii::$app->user->identity;
+        $id = @$_GET['id'];
+        if (isset($_POST['submit'])) {
+
+            if ($_POST['id']) {
+                $model = \common\models\Subdivisions::find()->where(['id' => $_POST['id']])->one();
+                $model->did = @$_POST['organisation'];
+                $model->direct_id = @$_POST['subdepartment'];
+                $model->div_id = @$_POST['division'];
+                $model->name = @$_POST['subdivision'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Sub Division successfully updated");
+                }
+            } else {
+                $model = new \common\models\Subdivisions();
+                $model->did = @$_POST['organisation'];
+                $model->direct_id = @$_POST['subdepartment'];
+                $model->div_id = @$_POST['division'];
+                $model->name = @$_POST['subdivision'];
+                $model->user_id = $user->UserId;
+                $model->createdon = date('Y-m-d h:i:s');
+                $model->status = 1;
+                if ($model->save()) {
+                    Yii::$app->session->setFlash('success', "Sub Division successfully added");
+                }
+            }
+            return $this->redirect(Yii::$app->request->referrer ?: Yii::$app->homeUrl);
+        } else {
+            if ($id) {
+                $subdivision = \common\models\Subdivisions::find()->where(['id' => $id])->one();
+            } else {
+                $subdivision = [];
+            }
+            $departments = \common\models\Departments::find()->orderBy(['name' => SORT_ASC])->all();
+            $directs = \common\models\Directorates::find()->orderBy(['name' => SORT_ASC])->all();
+            $divisions = \common\models\Divisions::find()->orderBy(['name' => SORT_ASC])->all();
+            return $this->render('addsubdivision', [
+                        'departments' => $departments,
+                        'subdepartments' => $directs,
+                        'divisions' => $divisions,
+                        'subdivision' => $subdivision
             ]);
         }
     }

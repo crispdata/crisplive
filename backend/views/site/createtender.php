@@ -159,15 +159,31 @@ $imageURL = Yii::$app->params['IMAGE_URL'];
                                 <?php if (!@$tender->division) { ?>
                                     <div class="input-fields col s12 row divisions" style="display:none;">
                                         <label>Select Division</label>
-                                        <select class="validate required materialSelect" name="division" id="division">
+                                        <select class="validate required materialSelect" name="division" id="division" onchange="getsubdivision(this.value)">
                                             <option value="0" disabled selected>Select</option>
                                         </select>
                                     </div>
                                 <?php } else { ?>
                                     <div class="input-fields col s12 row divisions" >
                                         <label>Select Division</label>
-                                        <select class="validate required materialSelect" name="division" id="division">
+                                        <select class="validate required materialSelect" name="division" id="division" onchange="getsubdivision(this.value)">
                                             <?php SiteController::actionGetdivisionbydirect($tender->directorate, $tender->division); ?>
+                                        </select>
+                                    </div>
+                                <?php } ?>
+
+                                <?php if (!@$tender->subdivision) { ?>
+                                    <div class="input-fields col s12 row subdivisions" style="display:none;">
+                                        <label>Select Sub Division</label>
+                                        <select class="validate required materialSelect" name="subdivision" id="subdivision">
+                                            <option value="0" disabled selected>Select</option>
+                                        </select>
+                                    </div>
+                                <?php } else { ?>
+                                    <div class="input-fields col s12 row subdivisions" >
+                                        <label>Select Sub Division</label>
+                                        <select class="validate required materialSelect" name="subdivision" id="subdivision">
+                                            <?php SiteController::actionGetsubdivisionsbydiv($tender->directorate, $tender->division,$tender->subdivision); ?>
                                         </select>
                                     </div>
                                 <?php } ?>
